@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#050A06">
+<title>Jacked Gazelle 2.0</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#050A06; --panel:#152619; --panel2:#1E3324; --line:#33503E;
+  --ink:#EDF5EE; --dim:#AAC6B1; --faint:#78957F;
+  --blue:#3ECF8E; --blue-deep:#1E7A52; --gold:#E9C46A; --green:#3FD68F; --red:#FF6B5E;
+  --disp:'Barlow Condensed',-apple-system,sans-serif;
+  --body:-apple-system,BlinkMacSystemFont,'SF Pro Text',Segoe UI,Roboto,sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.45}
+body{padding-bottom:110px;overscroll-behavior-y:contain}
+button{font-family:inherit;border:none;background:none;color:inherit;cursor:pointer}
+input,textarea{font-family:inherit;color:var(--ink);background:var(--panel2);border:1px solid var(--line);border-radius:8px;outline:none}
+input:focus,textarea:focus{border-color:var(--blue)}
+::placeholder{color:var(--faint)}
+
+/* ---------- Header ---------- */
+header{position:sticky;top:0;z-index:40;background:linear-gradient(180deg,rgba(5,10,6,.98),rgba(5,10,6,.92));backdrop-filter:blur(10px);border-bottom:1px solid var(--line);padding:calc(env(safe-area-inset-top) + 10px) 14px 0}
+.brand{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.brand>div:first-child{min-width:0}
+.brand h1{font-family:var(--disp);font-weight:800;font-size:clamp(17px,5.4vw,24px);letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}
+.brand h1 em{font-style:normal;color:var(--gold)}
+.brand .sub{font-family:var(--disp);font-size:10px;letter-spacing:.2em;color:var(--faint);text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.toolbtn{font-family:var(--disp);font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);padding:6px 2px}
+.selrow{display:flex;gap:8px;margin:10px 0}
+.selpill{flex:1;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px 12px;text-align:left;display:flex;justify-content:space-between;align-items:center}
+.selpill .lab{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--faint);display:block}
+.selpill .val{font-family:var(--disp);font-size:19px;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+.selpill .car{color:var(--faint);font-size:11px}
+.dayrail{display:flex;gap:6px;overflow-x:auto;padding:2px 0 12px;scrollbar-width:none}
+.dayrail::-webkit-scrollbar{display:none}
+.daychip{min-width:66px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:7px 6px 6px;text-align:center;position:relative;flex-shrink:0}
+.daychip .d{font-family:var(--disp);font-weight:700;font-size:17px;letter-spacing:.05em}
+.daychip .f{font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:.05em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.daychip.on{border-color:var(--blue);background:linear-gradient(180deg,#1B3B26,#142B1A)}
+.daychip.on .d{color:var(--blue)}
+.daychip .dot{position:absolute;top:5px;right:6px;width:6px;height:6px;border-radius:50%;background:var(--green);display:none}
+.daychip.done .dot{display:block}
+
+/* ---------- Day ticket ---------- */
+.ticket{margin:16px 14px 6px;border-left:3px solid var(--gold);padding-left:12px}
+.ticket .meta{font-family:var(--disp);font-size:12px;letter-spacing:.24em;color:var(--dim);text-transform:uppercase}
+.ticket h2{font-family:var(--disp);font-weight:800;font-size:34px;line-height:1;letter-spacing:.03em;text-transform:uppercase;margin-top:2px}
+.ticket .donetag{display:inline-block;margin-top:6px;font-family:var(--disp);font-size:12px;letter-spacing:.14em;color:var(--green);text-transform:uppercase}
+
+/* ---------- Cards ---------- */
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;margin:12px 14px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.35)}
+.card>.chead{display:flex;justify-content:space-between;align-items:center;padding:11px 14px;border-bottom:1px solid var(--line)}
+.card>.chead .t{font-family:var(--disp);font-weight:700;font-size:16px;letter-spacing:.14em;text-transform:uppercase}
+.card>.chead .n{font-size:11px;color:var(--faint)}
+.cond .chead .t{color:var(--blue)}
+.exrow{border-bottom:1px solid var(--line)}
+.exrow:last-child{border-bottom:none}
+.exmain{width:100%;display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 14px;text-align:left}
+.exmain .nm{font-weight:600;font-size:15px}
+.exmain .rx{font-family:var(--disp);font-size:16px;font-weight:600;letter-spacing:.03em;color:var(--gold);white-space:nowrap}
+.exmain .chev{color:var(--faint);font-size:11px;margin-left:2px;transition:transform .15s}
+.exrow.open .chev{transform:rotate(90deg)}
+.exnote{font-size:12.5px;color:var(--dim);padding:0 14px 10px;margin-top:-6px}
+.logger{display:none;padding:0 14px 12px;background:var(--panel2)}
+.exrow.open .logger{display:block}
+.last{font-size:12px;color:var(--dim);padding:9px 0 6px}
+.last b{color:var(--ink);font-weight:600}
+.setrow{display:grid;grid-template-columns:26px 1fr 1fr 34px;gap:8px;align-items:center;margin-bottom:7px}
+.setrow .sn{font-family:var(--disp);font-weight:700;color:var(--faint);font-size:15px;text-align:center}
+.setrow input{padding:9px 10px;font-size:16px;text-align:center;width:100%}
+.setrow .del{color:var(--faint);font-size:17px;text-align:center}
+.addset{width:100%;padding:9px;border:1px dashed var(--line);border-radius:8px;color:var(--blue);font-family:var(--disp);font-size:14px;letter-spacing:.1em;text-transform:uppercase;margin-top:2px}
+.collab{display:grid;grid-template-columns:26px 1fr 1fr 34px;gap:8px;font-size:10px;letter-spacing:.12em;color:var(--faint);text-transform:uppercase;padding:2px 0 4px}
+.collab span:nth-child(2),.collab span:nth-child(3){text-align:center}
+
+/* conditioning */
+.condbody{padding:12px 14px}
+.condbody p{margin-bottom:6px;font-size:14.5px}
+.condbody p b{color:var(--blue);font-weight:600}
+.result{margin-top:10px}
+.result label{display:block;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);margin-bottom:5px}
+.result input{width:100%;padding:10px 12px;font-size:15px}
+
+/* groups & top notes */
+.grp{border-left:3px solid var(--gold);background:rgba(233,196,106,.07)}
+.grphead{font-family:var(--disp);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);padding:9px 14px 0}
+.lt{display:inline-block;font-family:var(--disp);font-weight:700;font-size:12px;color:var(--gold);border:1px solid rgba(233,196,106,.5);border-radius:4px;padding:0 5px;margin-right:8px;line-height:16px;vertical-align:1px}
+.topnotes{margin:10px 14px -2px;font-size:12.5px;color:var(--dim)}
+.topnotes span{display:block;padding:2px 0}
+.topnotes span::before{content:'\00BB  ';color:var(--gold)}
+
+/* footer of day */
+.dayfoot{margin:16px 14px}
+.dayfoot textarea{width:100%;min-height:64px;padding:10px 12px;font-size:14px;resize:vertical}
+.donebtn{width:100%;margin-top:10px;padding:14px;border-radius:12px;font-family:var(--disp);font-weight:700;font-size:18px;letter-spacing:.14em;text-transform:uppercase;background:var(--panel2);border:1px solid var(--line);color:var(--ink)}
+.donebtn.on{background:linear-gradient(180deg,#45DB98,#2FA871);border-color:#45DB98;color:#04150C;box-shadow:0 4px 18px rgba(62,207,142,.4);animation:pop .35s ease}
+@keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.05)}100%{transform:scale(1)}}
+.donebtn:active{transform:scale(.97)}
+.restday{margin:40px 14px;text-align:center}
+.restday h3{font-family:var(--disp);font-size:44px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--panel2);-webkit-text-stroke:1px var(--faint)}
+.restday p{color:var(--dim);margin-top:8px}
+.savemsg{position:fixed;left:50%;bottom:96px;transform:translateX(-50%) translateY(8px);background:var(--panel2);border:1px solid var(--line);color:var(--dim);font-size:12px;padding:6px 14px;border-radius:99px;opacity:0;transition:.25s;pointer-events:none;z-index:60}
+.savemsg.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ---------- Prep / video / progress ---------- */
+.prep{margin:12px 14px -2px;padding:10px 12px;background:var(--panel);border:1px solid var(--line);border-radius:10px;font-size:13px;color:var(--dim);display:flex;justify-content:space-between;align-items:center;gap:10px}
+.prep b{color:var(--ink);font-weight:600}
+.prep a,.vidlink{color:var(--blue);text-decoration:none;font-weight:600;white-space:nowrap}
+.vidlink{float:right}
+#exSel{width:100%;padding:10px;background:var(--panel);border:1px solid var(--line);border-radius:8px;color:var(--ink);font-size:15px;margin-bottom:10px;-webkit-appearance:none}
+.chart{width:100%;height:auto;display:block;margin-bottom:8px;background:var(--panel);border-radius:8px}
+
+/* ---------- Sheets ---------- */
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:80;display:none}
+.scrim.show{display:block}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:90;background:var(--panel);border-top:1px solid var(--line);border-radius:18px 18px 0 0;padding:14px 16px calc(env(safe-area-inset-bottom) + 20px);transform:translateY(105%);transition:transform .22s ease;max-height:82vh;overflow-y:auto}
+.sheet.show{transform:translateY(0)}
+.sheet h3{font-family:var(--disp);font-weight:700;font-size:19px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:12px}
+.optbtn{display:flex;width:100%;justify-content:space-between;align-items:center;padding:13px 12px;border-bottom:1px solid var(--line);text-align:left}
+.optbtn .nm{font-family:var(--disp);font-size:18px;font-weight:600;letter-spacing:.05em;text-transform:uppercase}
+.optbtn .sub{font-size:12px;color:var(--faint)}
+.optbtn.on .nm{color:var(--blue)}
+.wdots{display:flex;gap:4px}
+.wdots i{width:7px;height:7px;border-radius:50%;background:var(--line)}
+.wdots i.d{background:var(--green)}
+.presets{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.presets button{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:14px 0;font-family:var(--disp);font-size:19px;font-weight:700;letter-spacing:.06em}
+.timerbig{text-align:center;font-family:var(--disp);font-weight:800;font-size:64px;letter-spacing:.04em;margin:6px 0 10px;font-variant-numeric:tabular-nums}
+.trow{display:flex;gap:8px}
+.trow button{flex:1;padding:12px;border-radius:10px;background:var(--panel2);border:1px solid var(--line);font-family:var(--disp);font-size:15px;letter-spacing:.1em;text-transform:uppercase}
+.trow .stop{color:var(--red);border-color:#4A2622}
+
+/* tools */
+.tool{border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:12px;background:var(--panel2)}
+.tool h4{font-family:var(--disp);font-size:15px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:8px}
+.tool .frow{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.tool input{padding:9px 10px;font-size:15px;width:100%;background:var(--panel)}
+.tool .out{font-size:13.5px;color:var(--dim)}
+.tool .out b{color:var(--ink)}
+.rpetab{width:100%;font-size:13px;color:var(--dim)}
+.rpetab td{padding:4px 0;border-bottom:1px solid var(--line)}
+.rpetab td:first-child{color:var(--blue);font-family:var(--disp);font-size:14px;letter-spacing:.04em;white-space:nowrap;padding-right:10px}
+.subres{max-height:200px;overflow-y:auto}
+.subres div{padding:7px 0;border-bottom:1px solid var(--line);font-size:13px}
+.subres b{color:var(--ink)}
+.subres span{color:var(--dim)}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <div>
+      <div class="sub">Terminator Training Method</div>
+      <h1>Jacked Gazelle <em>2.0</em></h1>
+    </div>
+    <div style="display:flex;gap:16px"><button class="toolbtn" id="progOpen">Progress</button><button class="toolbtn" id="toolsOpen">Tools</button></div>
+  </div>
+  <div class="selrow">
+    <button class="selpill" id="phasePill"><span><span class="lab">Phase</span><span class="val" id="phaseVal">Phase 1</span></span><span class="car">&#9662;</span></button>
+    <button class="selpill" id="weekPill"><span><span class="lab">Week</span><span class="val" id="weekVal">Week 1</span></span><span class="car">&#9662;</span></button>
+  </div>
+  <div class="dayrail" id="dayrail"></div>
+</header>
+
+<main id="main"></main>
+
+<div class="savemsg" id="savemsg">Saved</div>
+
+<div class="scrim" id="scrim"></div>
+<div class="sheet" id="phaseSheet"><h3>Select Phase</h3><div id="phaseOpts"></div></div>
+<div class="sheet" id="weekSheet"><h3>Select Week</h3><div id="weekOpts"></div></div>
+<div class="sheet" id="progSheet">
+  <h3>Progress</h3>
+  <div class="tool">
+    <h4>Lift Progression</h4>
+    <select id="exSel"></select>
+    <div id="chartWrap"></div>
+  </div>
+  <div class="tool">
+    <h4>PR Board</h4>
+    <div class="subres" id="prBoard" style="max-height:none"></div>
+  </div>
+</div>
+<div class="sheet" id="toolsSheet">
+  <h3>Tools</h3>
+  <div class="tool">
+    <h4>Repeat Pace &middot; from 2-mile TT</h4>
+    <div class="frow"><input id="tt2" placeholder="2-mi time e.g. 13:30" inputmode="numeric"></div>
+    <div class="out" id="tt2out">Enter your 2-mile time to get your 200m repeat window (15&ndash;20 sec/mi faster than TT pace).</div>
+  </div>
+  <div class="tool">
+    <h4>Tempo Pace &middot; from 5-mile TT</h4>
+    <div class="frow"><input id="tt5" placeholder="5-mi time e.g. 36:00" inputmode="numeric"></div>
+    <div class="out" id="tt5out">Enter your 5-mile time to get your tempo window (8&ndash;15 sec/mi slower than TT pace).</div>
+  </div>
+  <div class="tool">
+    <h4>Plate Math</h4>
+    <div class="frow"><input id="pcW" placeholder="Target weight (lb)" inputmode="decimal"><input id="pcB" placeholder="Bar: 45" inputmode="decimal" style="max-width:92px"></div>
+    <div class="out" id="pcOut">Per-side plate breakdown for any target weight.</div>
+  </div>
+  <div class="tool">
+    <h4>Zone 2 Heart Rate</h4>
+    <div class="frow"><input id="age" placeholder="Your age" inputmode="numeric"></div>
+    <div class="out" id="ageout">MAF method: top of zone = 180 &minus; age; bottom &asymp; 15&ndash;20 bpm below.</div>
+  </div>
+  <div class="tool">
+    <h4>Exercise Substitutions</h4>
+    <div class="frow"><input id="subq" placeholder="Search an exercise&hellip;"></div>
+    <div class="subres" id="subres"></div>
+  </div>
+  <div class="tool">
+    <h4>Effort Reference</h4>
+    <table class="rpetab">
+      <tr><td>RIR 1&ndash;2</td><td>1&ndash;2 clean reps left in the tank</td></tr>
+      <tr><td>RIR 0</td><td>Last good rep &mdash; form never breaks</td></tr>
+      <tr><td>F</td><td>Failure &mdash; can't complete another rep</td></tr>
+      <tr><td>Zone 2</td><td>RPE 4&ndash;5, conversational, nasal breathing</td></tr>
+      <tr><td>Tempo</td><td>RPE 6.5&ndash;7.5 &middot; 4&ndash;5 words per breath</td></tr>
+      <tr><td>Threshold</td><td>RPE 7.5&ndash;8.5</td></tr>
+      <tr><td>Speed/VO2</td><td>RPE 8.5&ndash;10 (10 = time trials only)</td></tr>
+    </table>
+  </div>
+</div>
+
+<script>
+/* =============== PROGRAM DATA =============== */
+const E=(n,rx,nt)=>({n,rx,nt});
+const REST={rest:true};
+const P={phases:[
+{id:'DL',name:'Deload',short:'Deload',weeks:[[
+ {f:'Full Body Deload',blocks:[{t:'Main Lifts',ex:[E('Non-axial loaded squat','2x6-8 @4-5 RIR','Machine squat you\'re used to; 2 easy sets'),E('Hinge','2x6-8 @4-5 RIR','Any hinge besides conventional DL'),E('Horizontal press','2x6-8 @4-5 RIR'),E('Vertical pull','2x6-8 @4-5 RIR')]}],cond:{t:'Aerobic Intervals',l:['Airbike, rower or ski','5 min easy warmup','<b>21:00</b> of :15 hard (RPE 7-8) / 1:15 easy (RPE 2-3)','5 min easy cooldown']},notes:['Deload = easy. Use the press/pull variants from your current phase.']},
+ {f:'Aerobic Intervals',blocks:[],cond:{t:'Aerobic Intervals (Optional)',l:['5 min easy warmup','<b>21:00</b> of :15 hard (RPE 7-8) / 1:15 easy','5 min easy cooldown','Feeling good? 20-30 min easy run instead']},notes:['Session optional. Stick to RPE prescriptions.']},
+ REST,
+ {f:'Full Body Deload',blocks:[{t:'Main Lifts',ex:[E('Unilateral squat','2x6-8 @4-5 RIR'),E('Vertical push','2x6-8 @4-5 RIR'),E('Unilateral hinge','2x6-8 @4-5 RIR'),E('Horizontal pull','2x6-8 @4-5 RIR')]}],notes:['Same rules as Day 1. No novel movements.']},
+ {f:'Pickup Run',blocks:[],cond:{t:'Easy Run w/ Pickups',l:['30 minute easy run','At minute 5, 15, 20, 25: speed up to threshold pace, hold 45-60 sec']}},
+ REST,REST
+]]},
+{id:'P1',name:'Phase 1',short:'P1',weeks:[
+/* ---- P1 W1 ---- */
+[
+{f:'Lower · Repeats',blocks:[
+ {t:'Jumps',g:[2],ir:'Rest 90 sec between A & B',ex:[E('Pogo hops','2x10'),E('Seated box jump','2x2','Max effort, reasonable box height. Step off, don\'t jump off')]},
+ {t:'Pump Work',g:[2],ir:'Stagger · rest ~90 sec',ex:[E('Lying leg curl','2x12-15 (RIR 1,0)'),E('Backward drags','2x90 sec','Light/easy — pump & bloodflow')]},
+ {t:'Main Lifts',hr:'Rest 2-4 min',ex:[E('Back or SSB squat','3x5-7 (RIR 1-2)','Rest 2-4 min between main sets'),E('RDL','3x6-8 (RIR 1-2)','BB, hex bar, DBs or belt squat')]}],
+ cond:{t:'Repeats — 14x200m',l:['Pace: <b>15-20 sec/mi faster</b> than 2-mile TT pace','Rest: 1:1 work:rest','Goal: repeatable pace, last lap best lap','5-8 min easy run/walk cooldown','Ex: 12:00 2-mi = 200s @ ~42-43 sec (extend ±1)']},
+ notes:['Repeats can be right after lifting or later in the day — stick to pacing.']},
+{f:'Upper · Recovery',blocks:[
+ {t:'Pump Work',g:[3],ir:'Tri-set · rest as needed',ex:[E('Cable face pull','2x12-15'),E('Cable lat prayer','2x10-12'),E('Straight arm plate raise','2x10-12','Tri-set, rest as needed')]},
+ {t:'Main Lifts',hr:'2-4 min · stagger 60-90 sec',g:[2,1,2],ex:[E('BB or swiss bar bench','3x5-7 (RIR 1-2)','Swiss/cadillac bar if BB isn\'t shoulder friendly'),E('Jumping pushup','3x5 max effort','Between bench sets (not working sets)'),E('Chest supported row','2x8-10 (RIR 1)'),E('Dips or machine dips','2x5-7 (RIR 1-2)','Machine dips can go 0-1 RIR'),E('Chin ups','2x5-7 (RIR 1-2)','7+ BW w/ slow negative? Go weighted')]},
+ {t:'Core / Calisthenics',g:[2],ex:[E('45° side raises','2 x 2 RIR ea','Top leg forward, slow, feel oblique stretch'),E('Hand release / classic pushups','2x30 sec')]}],
+ cond:{t:'Recovery Cardio (Optional)',l:['15-20 min low-impact, high Z1/low Z2','Bike, row, incline walk, stairs, ski, elliptical']}},
+{f:'Tempo / Cruise',blocks:[],cond:{t:'Cruise Intervals',l:['8:00 easy run warmup','<b>4 x 5:00 tempo intervals</b>','&nbsp;&nbsp;4:00 at tempo pace + 1:00 easy jog','8:00 easy run cooldown','Tempo: RPE 7.5-8 · ~8-15 sec/mi slower than 5-mi TT','Talk test: 4-5 words at a time']},notes:['Recovery jog as slow as needed. Cooldown: bring HR back to zone 2.']},
+{f:'Upper · Metcon',blocks:[
+ {t:'Power / Stability',g:[2],ir:'Rest 90 sec between A & B',ex:[E('Med ball chest pass','3x5','12-20 lb ball, max effort'),E('Overhead KB carry','3x25 yd ea','Start light, slow & controlled')]},
+ {t:'Main Lifts',hr:'Rest 2-4 min',ex:[E('Smith CG incline press','2x6-8 (RIR 1-2)','Low incline (~10-30°), grip no closer than shoulders'),E('Cable extra ROM row','2x10-12 (RIR 1-2)','Takes skill — ramp up to get the feel'),E('High incline DB press','3x6-8 (RIR 1-2)','60-70° incline (not vertical)')]},
+ {t:'Arm Farm — set 1: 1 RIR, set 2: 0 RIR',g:[2,2],ir:'Superset A/B · rest 30-45 sec',ex:[E('Tricep pushdown','2x10-12'),E('Cable curl','2x10-12'),E('Incline bench lateral raise','2x10-12','Bench ~70°'),E('Spider curl','2x8-10')]}],
+ cond:{t:'Metcon — 12 min AMRAP',l:['15 cal row','5 KB snatches · 5 KB cleans · 5 KB push press','Rower damper 4-6 (~125 drag factor)','KB load: fresh set of 6 snatches = 5 RPE']},
+ notes:['Lats/pecs may be sore from Day 2 in week 1 — fine, decreases weekly.']},
+{f:'Lower · Volume',blocks:[
+ {t:'Jumps',ex:[E('Skips for height','2x5-7 ea leg','Max effort, HEIGHT not distance')]},
+ {t:'Pump Work',g:[3],ir:'Stagger · rest as needed',ex:[E('Seated leg curl','2x12-15 (RIR 1,0)'),E('Seated calf raise','2x6-8 (RIR 1,0)','3 sec bottom stretch, slow eccentric'),E('Goblet squat tempo','2x6-8','3-4 sec eccentric + 2 sec pause. Prep, not work sets')]},
+ {t:'Main Lifts',hr:'Rest 2-4 min',ex:[E('Machine squat','1x8-10, 1x10+ (RIR 1-2)','Hack, pendulum, leg press, belt, smith. 2nd set less load'),E('45° back raise','3x10-12 (RIR 1,1,0)','Sub hip thrusts if practical'),E('Deficit reverse lunges','2x8-10 ea (RIR 1-2)','Target glutes: big step back, vertical shin, lean torso')]},
+ {t:'Core',g:[2],ex:[E('Glute ham raise crunch','3 x 1 RIR','Emphasize stretch, rib cage to pelvis'),E('Farmer\'s carry','3x50 yd','70-80% BW total')]}]},
+{f:'Long Run',blocks:[],cond:{t:'Long Run — Zone 2',l:['<b>60 minutes</b>, aerobic effort','Conversational pace · nasal breathing · RPE 4-5','HR: MAF 180 or 65-70% MHR','Pick 2 measures and use them weekly']},notes:['Running not required — alternative zone 2 implement OK.']},
+REST],
+/* ---- P1 W2 ---- */
+[
+{f:'Lower · Repeats',blocks:[
+ {t:'Jumps',g:[2],ir:'Rest 90 sec between A & B',ex:[E('Pogo hops','2x10'),E('Seated box jump','2x2')]},
+ {t:'Pump Work',g:[2],ir:'Stagger · rest ~90 sec',ex:[E('Lying leg curl','2x12-15 (RIR 1,0)','Double progression: add load if you hit 15'),E('Backward drags','2x90 sec','Same load or +5-10#')]},
+ {t:'Main Lifts',hr:'Rest 2-4 min',ex:[E('Back or SSB squat','3x5-7 (RIR 1-2)','Same bar as W1 — double progression'),E('RDL','3x6-8 (RIR 1-2)')]}],
+ cond:{t:'Repeats — 16x200m',l:['Pace: match / 1-2 sec faster than week 1','Rest 1:1 · last lap best lap','If last week avg 43 sec → aim 41-43 avg']}},
+{f:'Upper · Recovery',blocks:[
+ {t:'Pump Work',g:[3],ir:'Tri-set · rest as needed',ex:[E('Cable face pull','2x12-15'),E('Cable lat prayer','2x10-12'),E('Straight arm plate raise','2x10-12')]},
+ {t:'Main Lifts',hr:'2-4 min · stagger 60-90 sec',g:[2,1,2],ex:[E('BB or swiss bar bench','3x5-7 (RIR 1-2)','Double progression'),E('Jumping pushup','3x5 max effort'),E('Chest supported row','2x8-10 (RIR 1)'),E('Dips or machine dips','2x5-7 (RIR 1-2)'),E('Chin ups','2x5-7 (RIR 1-2) + 1xBW max','Rest 60 sec after set 2, then BW max — perfect technique')]},
+ {t:'Core / Calisthenics',g:[2],ex:[E('45° side raises','2 x 1 RIR ea'),E('Pushups','1x45 sec, 1x30 sec')]}],
+ cond:{t:'Recovery Cardio (Optional)',l:['15-20 min low-impact, high Z1/low Z2']}},
+{f:'Tempo / Cruise',blocks:[],cond:{t:'Cruise Intervals',l:['8:00 easy warmup','<b>4 x 5:30</b> — 4:30 tempo + 1:00 jog','8:00 easy cooldown','Match last week\'s pace if well executed']},notes:['Goal: more repeatable than last week.']},
+{f:'Upper · Metcon',blocks:[
+ {t:'Power / Stability',g:[2],ir:'Rest 90 sec between A & B',ex:[E('Med ball chest pass','3x5'),E('Overhead KB carry','3x25 yd ea')]},
+ {t:'Main Lifts',hr:'Rest 2-4 min',ex:[E('Smith CG incline press','2x6-8 (RIR 1-2)','Double progression'),E('Cable extra ROM row','2x10-12 (RIR 1-2)'),E('High incline DB press','3x6-8 (RIR 1-2)')]},
+ {t:'Arm Farm — set 1: 0 RIR, set 2: Failure',g:[2,2],ir:'Superset A/B · rest 30-45 sec',ex:[E('Tricep pushdown','2x10-12'),E('Cable curl','2x10-12'),E('Incline bench lateral raise','2x10-12'),E('Spider curl','2x8-10')]}],
+ cond:{t:'Metcon — 12 min AMRAP',l:['15 cal row · 5 KB snatch · 5 clean · 5 push press','<b>Beat last week\'s rounds</b> using same loads']}},
+{f:'Lower · Volume',blocks:[
+ {t:'Jumps',ex:[E('Skips for height','2x5-7 ea leg')]},
+ {t:'Pump Work',g:[3],ir:'Stagger · rest as needed',ex:[E('Seated leg curl','2x12-15 (RIR 0)'),E('Seated calf raise','2x6-8 (RIR 0)'),E('Goblet squat tempo','2x6-8','3-4s ecc + 2s pause')]},
+ {t:'Main Lifts',hr:'Rest 2-4 min',ex:[E('Machine squat','1x8-10, 1x10+ (RIR 1-2)','Same machine — double progression'),E('45° back raise','3x10-12 (RIR 1,0,0)'),E('Deficit reverse lunges','2x8-10 ea (RIR 1-2)')]},
+ {t:'Core',g:[2],ex:[E('Glute ham raise crunch','3 x 1 RIR'),E('Farmer\'s carry','3x50 yd')]}],
+ notes:['Goal: add 1 rep of side raise to each set.']},
+{f:'Ruck',blocks:[],cond:{t:'Ruck — 60 min',l:['Fastest walking pace','Beginner (<5 rucks ever): 20 lb, 30-40 min','Rusty (<3 in 6 mo): 25 lb, 40-50 min','Weekend warrior (1+/mo): 30 lb','Rucking regular (2+/mo): 40-45 lb','Not rucking? Run/condition 70 min']}},
+REST],
+/* ---- P1 W3 ---- */
+[
+{f:'Lower · Hills',blocks:[
+ {t:'Jumps',g:[2],ir:'Rest 90 sec between A & B',ex:[E('Pogo hops','2x12'),E('Seated box jump','2x3')]},
+ {t:'Pump Work',g:[2],ir:'Stagger · rest ~90 sec',ex:[E('Lying leg curl','2x12-15 (RIR 0)'),E('Backward drags','2x2 min')]},
+ {t:'Main Lifts',hr:'Rest 2-4 min',ex:[E('Back or SSB squat','3x5-7 (RIR 1-2)'),E('RDL','3x6-8 (RIR 1-2)')]}],
+ cond:{t:'Hill Repeats — 8x45 sec',l:['Effort: <b>8-9 RPE & repeatable</b>','Incline 6-7% (or outdoor equivalent)','Rest 1:30 (or walk to base)','~2-mile pace or slightly faster','5-8 min easy cooldown']},notes:['Treadmill = most controlled environment (not required).']},
+{f:'Upper · Recovery',blocks:[
+ {t:'Pump Work',g:[3],ir:'Tri-set · rest as needed',ex:[E('Cable face pull','2x12-15'),E('Cable lat prayer','2x10-12'),E('Straight arm plate raise','2x10-12')]},
+ {t:'Main Lifts',hr:'2-4 min · stagger 60-90 sec',g:[2,1,2],ex:[E('BB or swiss bar bench','3x5-7 (RIR 1-2)'),E('Jumping pushup','3x5-7 max effort'),E('Chest supported row','2x8-10 (RIR 0)'),E('Dips or machine dips','2x5-7 (RIR 1-2)'),E('Chin ups','2x5-7 (RIR 1-2)')]},
+ {t:'Core / Calisthenics',g:[2],ex:[E('45° side raises','2 x 1 RIR ea'),E('Pushups','2x45 sec')]}],
+ cond:{t:'Recovery Cardio (Optional)',l:['15-20 min low-impact, high Z1/low Z2']}},
+{f:'Tempo Run',blocks:[],cond:{t:'Tempo Run',l:['8:00 easy warmup','<b>20:00 tempo run</b> — no rest periods','8:00 easy cooldown','Match last week\'s pace, RPE 7.5-8']},notes:['Can\'t hold last week\'s pace? You may be going too hard on cruise intervals.']},
+{f:'Upper · Metcon',blocks:[
+ {t:'Power / Stability',g:[2],ir:'Rest 90 sec between A & B',ex:[E('Med ball chest pass','3x5'),E('Overhead KB carry','3x25 yd ea')]},
+ {t:'Main Lifts',hr:'Rest 2-4 min',ex:[E('Smith CG incline press','2x6-8 (RIR 1-2)'),E('Cable extra ROM row','2x10-12 (RIR 1,0)'),E('High incline DB press','3x6-8 (RIR 1-2)')]},
+ {t:'Arm Farm — all 0 RIR + techniques',g:[2,2],ir:'Superset A/B · rest 30-45 sec',ex:[E('Tricep pushdown','1x10-12, 1x10-12 +3,3,3','Rest/pause last set: 15-20 sec breaks, 3 reps, x3'),E('Cable curl','2x10-12'),E('Incline bench lateral raise','1x10-12, 1x10-12 +3,3,3','Rest/pause last set'),E('Spider curl','1x10-12, 1x10-12 +2-3','2-3 perfect partials on set 2')]}],
+ cond:{t:'Metcon — 125 cal Airbike',l:['125 calories for time','Echo bike: every 3:00 → 6 DB man-makers','Assault bike: every 2:30 → 6 man-makers','Man-maker weight: 6 reps = ~6 RPE','Clock keeps running']}},
+{f:'Lower · Volume',blocks:[
+ {t:'Jumps',ex:[E('Skips for height','2x5-7 ea leg')]},
+ {t:'Pump Work',g:[3],ir:'Stagger · rest as needed',ex:[E('Seated leg curl','1x12-15 (0), 1x12-15 +2-3','Set 2: 2-3 partials'),E('Seated calf raise','2x6-8 (RIR 0)','After set 2: 10-15 sec bottom stretch hold'),E('Goblet squat tempo','2x6-8')]},
+ {t:'Main Lifts',hr:'Rest 2-4 min',ex:[E('Machine squat','1x8-10, 1x10+ (RIR 1)'),E('45° back raise','3x10-12 (RIR 1,0,F)'),E('Deficit reverse lunges','2x8-10 ea (RIR 1)')]},
+ {t:'Core',g:[2],ex:[E('Glute ham raise crunch','3 x 0 RIR'),E('Farmer\'s carry','3x50 yd')]}]},
+{f:'Long Run',blocks:[],cond:{t:'Long Run — Zone 2',l:['<b>70 minutes</b>, aerobic effort']}},
+REST],
+/* ---- P1 W4 ---- */
+[
+{f:'Lower · Repeats',blocks:[
+ {t:'Jumps',g:[2],ir:'Rest 90 sec between A & B',ex:[E('Pogo hops','2x12'),E('Seated box jump','2x3')]},
+ {t:'Pump Work',g:[2],ir:'Stagger · rest ~90 sec',ex:[E('Lying leg curl','2x12-15 (RIR 0,F)'),E('Backward drags','2x2 min')]},
+ {t:'Main Lifts',hr:'Rest 2-4 min',ex:[E('Back or SSB squat','3x5-7 (RIR 1-2)'),E('RDL','3x6-8 (RIR 1-2)')]}],
+ cond:{t:'Repeats — 18x200m',l:['Pace: match / 1-2 sec faster than week 2','Rest 1:1 · last lap best lap']}},
+{f:'Upper · Recovery',blocks:[
+ {t:'Pump Work',g:[3],ir:'Tri-set · rest as needed',ex:[E('Cable face pull','2x12-15'),E('Cable lat prayer','2x10-12'),E('Straight arm plate raise','2x10-12')]},
+ {t:'Main Lifts',hr:'2-4 min · stagger 60-90 sec',g:[2,1,2],ex:[E('BB or swiss bar bench','3x5-7 (RIR 1-2)'),E('Jumping pushup','3x6 max effort'),E('Chest supported row','2x8-10 (RIR 0,F)'),E('Dips or machine dips','2x5-7 (RIR 1-2)'),E('Chin ups','2x5-7 (RIR 1-2) + 1xBW max','Rest 60 sec after set 2')]},
+ {t:'Core / Calisthenics',g:[2],ex:[E('45° side raises','2 x 0 RIR ea'),E('Pushups','1x60 sec, 1x45 sec')]}],
+ cond:{t:'Recovery Cardio (Optional)',l:['15-20 min low-impact']}},
+{f:'Tempo / Cruise',blocks:[],cond:{t:'Cruise Intervals',l:['8:00 easy warmup','<b>4 x 6:30</b> — 5:30 tempo + 1:00 jog','8:00 easy cooldown']}},
+{f:'Upper · Metcon',blocks:[
+ {t:'Power / Stability',g:[2],ir:'Rest 90 sec between A & B',ex:[E('Med ball chest pass','3x5'),E('Overhead KB carry','3x25 yd ea')]},
+ {t:'Main Lifts',hr:'Rest 2-4 min',ex:[E('Smith CG incline press','3x6-8 (RIR 1-2)','BB incline? Do NOT go 0 RIR — smith only'),E('Cable extra ROM row','2x10-12 (RIR 1,0)'),E('High incline DB press','3x6-8 (RIR 1-2)')]},
+ {t:'Arm Farm — all 0 RIR',g:[2,2],ir:'Superset A/B · rest 30-45 sec',ex:[E('Tricep pushdown','2x10-12'),E('Cable curl','2x10-12'),E('Incline bench lateral raise','1x10-12, 1x10-12 +2-3'),E('Spider curl','2x8-10')]}],
+ cond:{t:'Metcon — 125 cal Airbike',l:['Same as last week — same conditions','Every 3:00 (echo) / 2:30 (assault): 6 man-makers']}},
+{f:'Lower · Volume',blocks:[
+ {t:'Jumps',ex:[E('Skips for height','2x7-9 ea leg')]},
+ {t:'Pump Work',g:[3],ir:'Stagger · rest as needed',ex:[E('Seated leg curl','2x12-15 (RIR 0,F)'),E('Seated calf raise','2x6-8 (RIR 0,F)'),E('Goblet squat tempo','2x6-8')]},
+ {t:'Main Lifts',hr:'Rest 2-4 min',ex:[E('Machine squat','1x8-10, 1x10+ (RIR 1,0)','0 RIR only on failsafe machine or w/ spotter'),E('45° back raise','3x10-12 (RIR 0,0,F)'),E('Deficit reverse lunges','2x8-10 ea (RIR 0)')]},
+ {t:'Core',g:[2],ex:[E('Glute ham raise crunch','3 x 0 RIR'),E('Farmer\'s carry','3x50 yd')]}]},
+{f:'Ruck',blocks:[],cond:{t:'Ruck — 70 min',l:['Fastest walking pace','Same weight or ≤ +5 lb from last ruck (50 lb max)','Not rucking? Run/condition 80 min']}},
+REST],
+/* ---- P1 W5 ---- */
+[
+{f:'Lower · Intervals',blocks:[
+ {t:'Jumps',g:[2],ir:'Rest 90 sec between A & B',ex:[E('Pogo hops','2x15'),E('Seated box jump','2x3')]},
+ {t:'Pump Work',g:[2],ir:'Stagger · rest ~90 sec',ex:[E('Lying leg curl','2x12-15 (RIR 0,F)'),E('Backward drags','2x2:30')]},
+ {t:'Main Lifts',hr:'Rest 2-4 min',ex:[E('Back or SSB squat','3x5-7 (RIR 1-2)'),E('RDL','3x6-8 (RIR 1)')]}],
+ cond:{t:'Aerobic Intervals (non-impact)',l:['Airbike, rower or ski','10 min easy warmup','<b>21:00</b> of :15 hard (RPE 7-8) / 1:15 easy','10 min easy cooldown']},notes:['Non-repeat week — no track work.']},
+{f:'Upper Body',blocks:[
+ {t:'Pump Work',g:[3],ir:'Tri-set · rest as needed',ex:[E('Cable face pull','2x12-15'),E('Cable lat prayer','2x10-12'),E('Straight arm plate raise','2x10-12')]},
+ {t:'Main Lifts',hr:'2-4 min · stagger 60-90 sec',g:[2,1,2],ex:[E('BB or swiss bar bench','3x5-7 (RIR 1-2)'),E('Jumping pushup','3x7 max effort'),E('Chest supported row','2x8-10 (RIR 0,F)'),E('Dips or machine dips','2x5-7 (RIR 1-2)'),E('Chin ups','2x5-7 (RIR 1-2)')]},
+ {t:'Core / Calisthenics',g:[2],ex:[E('45° side raises','2 x 0 RIR ea'),E('Pushups','2x60 sec')]}],
+ notes:['No recovery cardio this week.']},
+REST,
+{f:'Upper · Pickup Run',blocks:[
+ {t:'Power / Stability',g:[2],ir:'Rest 90 sec between A & B',ex:[E('Med ball chest pass','3x5'),E('Overhead KB carry','3x25 yd ea')]},
+ {t:'Main Lifts',hr:'Rest 2-4 min',ex:[E('Smith CG incline press','3x6-8 (RIR 1)','BB? Don\'t go 0 RIR'),E('Cable extra ROM row','2x10-12 (RIR 0)'),E('High incline DB press','3x6-8 (RIR 1-2)')]},
+ {t:'Arm Farm — all 0 RIR + techniques',g:[2,2],ir:'Superset A/B · rest 30-45 sec',ex:[E('Tricep pushdown','1x10-12, 1x10-12 +3,3,3'),E('Cable curl','2x10-12'),E('Incline bench lateral raise','1x10-12, 1x10-12 +2-3','2-3 partials post failure'),E('Spider curl','1x10-12, 1x10-12 +3,3,3')]}],
+ cond:{t:'Easy Run w/ Pickups',l:['30 minute easy run','Minutes 5, 10, 15, 20, 25: ~tempo pace for 45 sec','Keep easy portions VERY easy']}},
+{f:'Lower · Volume',blocks:[
+ {t:'Jumps',ex:[E('Skips for height','2x7-9 ea leg')]},
+ {t:'Pump Work',g:[3],ir:'Stagger · rest as needed',ex:[E('Seated leg curl','1x12-15 (0), 1x12-15 +2-3'),E('Seated calf raise','2x6-8 (0) + stretch hold','10-15 sec bottom stretch after set 2'),E('Goblet squat tempo','2x6-8')]},
+ {t:'Main Lifts',hr:'Rest 2-4 min',ex:[E('Machine squat','1x8-10, 1x10+ (RIR 1,0)'),E('45° back raise','3x10-12 (RIR 0,0,F)'),E('Deficit reverse lunges','2x8-10 ea (RIR 0)')]},
+ {t:'Core',g:[2],ex:[E('Glute ham raise crunch','3 x F'),E('Farmer\'s carry','3x50 yd')]}]},
+{f:'Walk / Run',blocks:[],cond:{t:'Walk/Run — 75 min',l:['First 30 min: steady easy run','Last 45 min: 3 x 15-min blocks — 10 run / 5 walk','ALL easy paced — recovery session pre-Phase 2','You should feel energized, not smoked']}},
+REST]
+]},
+{id:'P2',name:'Phase 2',short:'P2',weeks:[
+/* ---- P2 W1 ---- */
+[
+{f:'Lower · Repeats',blocks:[
+ {t:'Pump / Stability / Power',g:[1,2],ir:'Rest 45-60 sec between A & B',ex:[E('Backward drag','4 min continuous','Light bloodflow/pump'),E('Single leg RDL','2x8-10','LIGHT and easy — not working sets'),E('Lateral med ball slam','2x3 ea','12-20# ball')]},
+ {t:'Main Lifts',hr:'Rest 2-4 min',ex:[E('Front squat','3x4-6 @RPE 8-9','Front or SSB squats. Seated vertical jump 3x2 between ramp-ups'),E('Deadlift','1x3, 2x4-6 @RPE 8-9','Heavy triple, then backoffs −14-17% for 4-6. Conv/sumo/hex')]},
+ {t:'Accessories',g:[2],ir:'Stagger · 2-3 sec stretch holds',ex:[E('Tib raise','2x12-15 (F)','2-3 sec stretch holds'),E('Seated calf raise','2x8-10 (F)')]}],
+ cond:{t:'Repeats — Mixed Distances',l:['<b>Pt 1: 5x200m</b> — match/1-2 sec faster than P1 200s, 1:1 rest','— rest 2:00 —','<b>Pt 2: 4x400m</b> — 10-15 sec/mi faster than pre-program 2-mi TT, 1:1','— rest 3:00 —','<b>Pt 3: 2x600m</b> — 5-8 sec/mi faster than 2-mi TT, 1:1','5-8 min cooldown · repeatable pace, last lap best']}},
+{f:'Upper Body',blocks:[
+ {t:'Pump & Power',g:[3],ir:'~2 min between jumps & slams · band PAs during rest',ex:[E('Bumper jumping pushups','2x6-8','Can raise plate height over weeks'),E('Band pull apart','2x15-20'),E('Lateral med ball slam','2x3 ea')]},
+ {t:'Main Lifts',hr:'2-4 min · stagger 60-90 sec',ex:[E('Bench clusters (BB/swiss)','3 x 3,3,3,3','~8RM · 15 sec between minis · 3+ min between clusters'),E('Chest supported row','2x6-8, 1x8+ (RIR 1)','Different variant from last block'),E('10-30° incline DB press','2x6-8 (RIR 1-2)'),E('Rack chins','2x8-10 (RIR 1)','Rings/D-handles ideal; load plate/DB on lap')]},
+ {t:'Core',g:[2],ex:[E('Suitcase carry','3x50 yd ea hand','7/10 effort, upright posture'),E('Roman chair raises','3x10-12 (F)','Tempo makes 10-12 hard')]}]},
+{f:'Strongman / Tempo',blocks:[],cond:{t:'Pick ONE — alternate weekly',l:['<b>A: Strongman</b> — buy-in 50 cal row/bike/ski, then 20 min AMRAP:','3x ea odd-object ground-to-shoulder · 100 yd OO shoulder carry (50/50)','100 yd zercher/bear-hug carry · 50 yd fwd + 50 yd back sled drag','100 yd farmer\'s walk · buy-out 50 cal (≤10 sec slower than buy-in)','Sandbag/dball 40-80# · 2 KB/DB 45-60# · conditioning > strength, go lighter','<b>B: Tempo</b> — 8 min warmup, 22:00 tempo @ match/beat last phase']}},
+{f:'Lower · Volume',blocks:[
+ {t:'Power & Pump',g:[3],ir:'~60 sec between moves · 30+ sec between throws',ex:[E('Skips for distance','2x6 ea leg'),E('Seated leg curl (leaned fwd)','2x12-15 (0-1 RIR)'),E('Underhand ball toss','2x2 throws','Height OR distance · 10-16# ball · 30+ sec between throws')]},
+ {t:'Main Lifts',hr:'Rest 2-4 min',ex:[E('Machine squat','1x6-8, 1x8+ (RIR 1-2)','Different machine than last block. Set 3: −10-20%, 8+ near failure'),E('B-stance RDL','2x8-10 ea (RIR 1-2)'),E('Leg extensions','2x12-15 (RIR 0)','Straight sets (myoreps alternate weeks)')]},
+ {t:'Core',g:[2],ex:[E('Cross bench ab mat crunch','3 x 1-2 RIR'),E('Front rack carry','3x50 yd','RPE ~7')]}]},
+{f:'Upper · Metcon',blocks:[
+ {t:'Main Lifts',hr:'2-4 min · stagger 60-90 sec',g:[1,1,2],ex:[E('Machine chest press','2x6-8, 1x8+ (RIR 1)','Horizontal or slight incline'),E('Chest supported T-bar row','3x10-12 (RIR 1)'),E('Deficit pushups','2x8-12 (RIR 1)','3-4 sec eccentric, 1 sec pause chest off floor'),E('Neutral grip chins','2 x 1 RIR','Slow eccentric, dead hang, BW only')]},
+ {t:'Arm Farm — set 1: 0 RIR, set 2: F',g:[2,2,2],ir:'Superset pairs · rest 30-45 sec',ex:[E('Close grip pushup','2x10-15'),E('DB rear delt fly','2x10-15'),E('Overhead rope extension','2x10-15'),E('Rope cable curl','2x10-15'),E('Leaned back lateral raise','2x8-10'),E('Incline bench curl','2x8-10')]}],
+ cond:{t:'Metcon — pick ONE',l:['<b>A:</b> AMRAP 15 — 25 cal row/bike/ski, 6 KB cleans, 6 push press, 6 front squats','KB load: 10-12 push presses fresh','<b>B:</b> 150 cal row for time — every 2:00 (incl 0): 5 man-makers','DBs you can hit 8 @ 6-7 RPE fresh']}},
+{f:'Long Run',blocks:[],cond:{t:'Long Run — Zone 2',l:['<b>80 minutes</b>, aerobic effort']}},
+REST],
+/* ---- P2 W2 ---- */
+[
+{f:'Lower · Repeats',blocks:[
+ {t:'Pump / Stability / Power',g:[1,2],ir:'Rest 45-60 sec between A & B',ex:[E('Backward drag','4 min continuous'),E('Single leg RDL','2x8-10'),E('Lateral med ball slam','2x3 ea')]},
+ {t:'Main Lifts',hr:'Rest 2-4 min',ex:[E('Front squat','3x4-6 @RPE 8-9','Double progression'),E('Deadlift','1x3, 2x4-6 @RPE 8-9','+5-10 lb top set, then more backoff reps OR +5-10 lb & match. Don\'t force it'),]},
+ {t:'Accessories',g:[2],ir:'Stagger · 2-3 sec stretch holds',ex:[E('Tib raise','2x12-15 (F)'),E('Seated calf raise','2x8-10 (F)')]}],
+ cond:{t:'Repeats — Mixed Distances',l:['<b>6x200</b> — match/beat last week · rest 2:00 after','<b>4x400</b> — match/beat · rest 3:00 after','<b>2x600</b> — match/beat','All 1:1 rest · 5-8 min cooldown']}},
+{f:'Upper Body',blocks:[
+ {t:'Pump & Power',g:[3],ir:'~2 min between jumps & slams · band PAs during rest',ex:[E('Bumper jumping pushups','2x6-8'),E('Band pull apart','2x15-20'),E('Lateral med ball slam','2x3 ea')]},
+ {t:'Main Lifts',hr:'2-4 min · stagger 60-90 sec',ex:[E('Bench clusters','3 x 3,3,3,3','Sub-8 RPE last week? +5-10#'),E('Chest supported row','2x6-8, 1x8+ (RIR 1)'),E('10-30° incline DB press','2x6-8 (RIR 1-2)'),E('Rack chins','2x8-10 (RIR 1,0)','0 RIR set 2')]},
+ {t:'Core',g:[2],ex:[E('Suitcase carry','3x50 yd ea hand','Same load unless sub-7/10'),E('Roman chair raises','3x10-12 (F)','+1-2 reps')]}]},
+{f:'Strongman / Tempo',blocks:[],cond:{t:'Pick ONE',l:['<b>A: Strongman</b> — same circuit, <b>25 min</b> AMRAP + buy-in/out 50 cal','Beat last week\'s numbers','<b>B: Tempo</b> — 8 min wu, <b>24:00</b> @ match/beat last week','(Suggest 20:00 if you did strongman last week)']}},
+{f:'Lower · Volume',blocks:[
+ {t:'Power & Pump',g:[3],ir:'~60 sec between moves · 30+ sec between throws',ex:[E('Skips for distance','2x6 ea leg'),E('Seated leg curl (leaned fwd)','2x12-15 (0-1 RIR)','Double progression'),E('Underhand ball toss','2x2 throws','More distance and/or +2# every ~2 weeks')]},
+ {t:'Main Lifts',hr:'Rest 2-4 min',ex:[E('Machine squat','1x6-8, 1x8+ (RIR 1-2)','Same machine'),E('B-stance RDL','2x8-10 ea (RIR 1-2)'),E('Leg extensions','2 x myo-rep match (12-15)','Activation set 12-15 near failure, then mini-sets to match total')]},
+ {t:'Core',g:[2],ex:[E('Cross bench ab mat crunch','3 x 1-2 RIR'),E('Front rack carry','3x50 yd','Optional +2.5-5#')]}]},
+{f:'Upper · Metcon',blocks:[
+ {t:'Main Lifts',hr:'2-4 min · stagger 60-90 sec',g:[1,1,2],ex:[E('Machine chest press','2x6-8, 1x8+ (RIR 0-1)'),E('Chest supported T-bar row','3x10-12 (RIR 0)'),E('Deficit pushups','2x8-12 (RIR 0)'),E('Neutral grip chins','2 x 1 RIR')]},
+ {t:'Arm Farm — set 1: 0 RIR, set 2: F',g:[2,2,2],ir:'Superset pairs · rest 30-45 sec',ex:[E('Close grip pushup','2x10-15'),E('DB rear delt fly','2x10-15'),E('Overhead rope extension','2x10-15'),E('Rope cable curl','2x10-15'),E('Leaned back lateral raise','2x8-10'),E('Incline bench curl','2x8-10')]}],
+ cond:{t:'Metcon — pick ONE',l:['<b>A:</b> AMRAP 15 (same) — beat last week','<b>B:</b> 150 cal row + man-makers — beat last week']}},
+{f:'Ruck',blocks:[],cond:{t:'Ruck — 80 min',l:['Fastest walking pace','Same as ruck 2 or ≤ +5 lb (50 lb max)','Not rucking? Condition 90 min']}},
+REST],
+/* ---- P2 W3 ---- */
+[
+{f:'Lower · Repeats',blocks:[
+ {t:'Pump / Stability / Power',g:[1,2],ir:'Rest 45-60 sec between A & B',ex:[E('Backward drag','4 min continuous','Optional +load'),E('Single leg RDL','2x8-10'),E('Lateral med ball slam','2x3 ea')]},
+ {t:'Main Lifts',hr:'Rest 2-4 min',ex:[E('Front squat','3x4-6 @RPE 8-9','Double progression'),E('Deadlift','1x2, 2x3-5 @RPE 8-9','Top DOUBLE on feel · backoffs −13-16% for 2x3-5')]},
+ {t:'Accessories',g:[2],ir:'Stagger · 2-3 sec stretch holds',ex:[E('Tib raise','2x12-15 (F)'),E('Seated calf raise','2x8-10 (F)')]}],
+ cond:{t:'Repeats — Mixed Distances',l:['<b>6x200</b> · rest 2:00 after','<b>5x400</b> · rest 3:00 after','<b>2x600</b>','Match/beat last week · 1:1 rest']}},
+{f:'Upper Body',blocks:[
+ {t:'Pump & Power',g:[3],ir:'~2 min between jumps & slams · band PAs during rest',ex:[E('Bumper jumping pushups','2x6-8'),E('Band pull apart','2x15-20'),E('Lateral med ball slam','2x3 ea')]},
+ {t:'Main Lifts',hr:'2-4 min · stagger 60-90 sec',ex:[E('Bench clusters','3 x 4,4,3,3','Sub-8 RPE last week? +5# (more reps clusters 3&4). Barely made it? Drop load'),E('Chest supported row','2x6-8, 1x8+ (RIR 1)'),E('10-30° incline DB press','2x6-8 (RIR 1-2)'),E('Rack chins','2x8-10 (RIR 1,0)')]},
+ {t:'Core',g:[2],ex:[E('Suitcase carry','3x50 yd ea hand','+2.5-5#'),E('Roman chair raises','3x10-12 (F)')]}]},
+REST,
+{f:'Lower · Volume',blocks:[
+ {t:'Power & Pump',g:[3],ir:'~60 sec between moves · 30+ sec between throws',ex:[E('Skips for distance','2x8 ea leg'),E('Seated leg curl (leaned fwd)','2x12-15 (RIR 0)'),E('Underhand ball toss','2x2 throws')]},
+ {t:'Main Lifts',hr:'Rest 2-4 min',ex:[E('Machine squat','1x6-8, 1x8+ (RIR 1-2)'),E('B-stance RDL','2x8-10 ea (RIR 1-2)'),E('Leg extensions','2x12-15 (RIR 0,F)','No myoreps — set 2 drop load a bit if needed')]},
+ {t:'Core',g:[2],ex:[E('Cross bench ab mat crunch','3 x 0-1 RIR'),E('Front rack carry','3x50 yd')]}]},
+{f:'Upper · Metcon',blocks:[
+ {t:'Main Lifts',hr:'2-4 min · stagger 60-90 sec',g:[1,1,2],ex:[E('Machine chest press','2x6-8, 1x8+ (1,0,0)'),E('Chest supported T-bar row','3x10-12 (0,0,F)'),E('Deficit pushups','2x8-12 (0,F)'),E('Neutral grip chins','2 x (1,0 RIR)')]},
+ {t:'Arm Farm — 0 RIR / F + techniques',g:[2,2,2],ir:'Superset pairs · rest 30-45 sec',ex:[E('Overhead rope extension','2x10-15'),E('Rope cable curl','2x10-15'),E('Leaned back lateral raise','2x8-10'),E('Incline bench curl','2x8-10'),E('Close grip pushup','1x10-15, 1x10-15 +3,2,2','Rest/pause after set 2 (15-20 sec rests)'),E('DB rear delt fly','1x10-15, 1x10-15 +2-3','2-3 partials after failure')]}],
+ cond:{t:'Metcon — pick ONE',l:['<b>A:</b> EMOM x18 — min 0: 12 no-jump burpees · min 1: 15 cal row · min 2: 15 cal ski','<b>B:</b> 150 cal airbike for time — every 4:00 (incl 0): 250m row/ski. Establish baseline','<b>Runner:</b> 30 min run w/ 5x30 sec pickups to tempo pace']}},
+{f:'Long Run',blocks:[],cond:{t:'Long Run — Zone 2',l:['<b>95 minutes</b>, aerobic effort']}},
+REST],
+/* ---- P2 W4 ---- */
+[
+{f:'Lower · Alt Cardio',blocks:[
+ {t:'Pump / Stability / Power',g:[1,2],ir:'Rest 45-60 sec between A & B',ex:[E('Backward drag','5 min continuous'),E('Single leg RDL','2x8-10'),E('Lateral med ball slam','2x3 ea')]},
+ {t:'Main Lifts',hr:'Rest 2-4 min',ex:[E('Front squat','3x4-6 @RPE 8-9'),E('Deadlift','1x2, 2x3-5 @RPE 8-9','Top double · backoffs −13-16%')]},
+ {t:'Accessories',g:[2],ir:'Stagger · 2-3 sec stretch holds',ex:[E('Tib raise','2x12-15 (F)'),E('Seated calf raise','2x8-10 (F)')]}],
+ cond:{t:'Non-Repeat Week',l:['<b>35 min run</b> w/ 5x45 sec pickups to tempo pace','&mdash; OR &mdash;','Aerobic intervals: 10 wu · <b>24:00</b> of :15 hard/1:15 easy · 10 cd']}},
+{f:'Upper Body',blocks:[
+ {t:'Pump & Power',g:[3],ir:'~2 min between jumps & slams · band PAs during rest',ex:[E('Bumper jumping pushups','2x6-8'),E('Band pull apart','2x15-20'),E('Lateral med ball slam','2x3 ea')]},
+ {t:'Main Lifts',hr:'2-4 min · stagger 60-90 sec',ex:[E('Bench clusters','3 x 4,4,4,4','Progression rules as W3'),E('Chest supported row','2x6-8, 1x8+ (RIR 1)'),E('10-30° incline DB press','2x6-8 (RIR 1-2)'),E('Rack chins','1x8-10 (1), 1x8-10 (0) + drop','After 0 RIR: drop lap weight, BW max within 20 sec')]},
+ {t:'Core',g:[2],ex:[E('Suitcase carry','3x50 yd ea hand'),E('Roman chair raises','3x10-12 (F)')]}]},
+{f:'Strongman / Tempo',blocks:[],cond:{t:'Pick ONE',l:['<b>A: Strongman work</b>','Pt 1: sandbag ground-to-shoulder x 4:00 continuous (alt shoulders)','— rest 2:00 — Pt 2: sandbag zercher carry x 6:00 max distance','— rest 2:00 — Pt 3: farmer\'s carry :45 on / :45 off x 6','— rest 2:00 — max duration plank hold','Sandbag 50-100# · 2x 45-70# KBs (common sense rule)','<b>B: Tempo</b> — 8 min wu, <b>26:00</b> @ match/beat last tempo']}},
+{f:'Lower · Volume',blocks:[
+ {t:'Power & Pump',g:[3],ir:'~60 sec between moves · 30+ sec between throws',ex:[E('Skips for distance','2x8 ea leg'),E('Seated leg curl (leaned fwd)','2x12-15 (F)'),E('Underhand ball toss','2x2 throws')]},
+ {t:'Main Lifts',hr:'Rest 2-4 min',ex:[E('Machine squat','1x6-8, 1x8+ (RIR 1)'),E('B-stance RDL','2x8-10 ea (RIR 1-2)'),E('Leg extensions','2 x myo-rep match (12-15)','Same load as W2, more reps set 1 or fewer mini-sets')]},
+ {t:'Core',g:[2],ex:[E('Cross bench ab mat crunch','3 x 0-1 RIR'),E('Front rack carry','3x50 yd')]}]},
+{f:'Upper · Metcon',blocks:[
+ {t:'Main Lifts',hr:'2-4 min · stagger 60-90 sec',g:[1,1,2],ex:[E('Machine chest press','2x6-8, 1x8+ (1,0,F)'),E('Chest supported T-bar row','3x10-12 (0,0,F)'),E('Deficit pushups','2x8-12 (F)'),E('Neutral grip chins','2 x (1,F RIR)')]},
+ {t:'Arm Farm — 0 RIR / F + techniques',g:[2,2,2],ir:'Superset pairs · rest 30-45 sec',ex:[E('Close grip pushup','2x10-15'),E('DB rear delt fly','2x10-15'),E('Overhead rope extension','2x10-15'),E('Rope cable curl','2x10-15'),E('Leaned back lateral raise','2x8-10 +3,2,2','Rest/pause after set 2'),E('Incline bench curl','1x8-10, 1x8-10 + mech drop','After failure: stand up, alternating DB curls to failure')]}],
+ cond:{t:'Metcon — pick ONE',l:['<b>A:</b> EMOM x18 (burpees/row/ski)','<b>B:</b> 150 cal airbike + 250m every 4:00 — beat last week']}},
+{f:'Ruck',blocks:[],cond:{t:'Ruck — 90 min',l:['Fastest walking pace · same or ≤ +5 lb (50 max)','Not rucking? Condition 100-105 min']}},
+REST],
+/* ---- P2 W5 ---- */
+[
+{f:'Lower · Repeats',blocks:[
+ {t:'Pump / Stability / Power',g:[1,2],ir:'Rest 45-60 sec between A & B',ex:[E('Backward drag','5 min continuous'),E('Single leg RDL','2x8-10'),E('Lateral med ball slam','2x3 ea')]},
+ {t:'Main Lifts',hr:'Rest 2-4 min',ex:[E('Front squat','3x4-6 @RPE 8-9'),E('Deadlift','1x1, 2x2-4 @RPE 8-9','Top SINGLE on feel · backoffs −12-15% for 2x2-4')]},
+ {t:'Accessories',g:[2],ir:'Stagger · 2-3 sec stretch holds',ex:[E('Tib raise','2x12-15 (F)'),E('Seated calf raise','2x8-10 (F)')]}],
+ cond:{t:'Repeats — Mixed Distances',l:['<b>6x200</b> · rest 2:00 after','<b>4x400</b> · rest 3:00 after','<b>3x600</b>','Match/beat last week · 1:1 rest']}},
+{f:'Upper Body',blocks:[
+ {t:'Pump & Power',g:[3],ir:'~2 min between jumps & slams · band PAs during rest',ex:[E('Bumper jumping pushups','2x6-8'),E('Band pull apart','2x15-20'),E('Lateral med ball slam','2x3 ea')]},
+ {t:'Main Lifts',hr:'2-4 min · stagger 60-90 sec',ex:[E('Bench clusters','3 x 4,4,4,4+','Same load if completed. LAST mini of LAST set: 4+ to ~9 RPE (spotter!)'),E('Chest supported row','2x6-8, 1x8+ (RIR 1)'),E('10-30° incline DB press','2x6-8 (RIR 1-2)'),E('Rack chins','1x8-10 (1), 1x8-10 (0) + drop')]},
+ {t:'Core',g:[2],ex:[E('Suitcase carry','3x50 yd ea hand','+2.5-5#'),E('Roman chair raises','3x10-12 (F)')]}]},
+{f:'Strongman / Tempo',blocks:[],cond:{t:'Pick ONE',l:['<b>A: Strongman work</b> — same as W4 · same loads or small adds · beat results','<b>B: Tempo</b> — 8 min wu, <b>28:00</b> @ match/beat']}},
+{f:'Lower · Volume',blocks:[
+ {t:'Power & Pump',g:[3],ir:'~60 sec between moves · 30+ sec between throws',ex:[E('Skips for distance','2x8 ea leg'),E('Seated leg curl (leaned fwd)','2x12-15 (0-1 RIR)'),E('Underhand ball toss','2x2 throws')]},
+ {t:'Main Lifts',hr:'Rest 2-4 min',ex:[E('Machine squat','1x6-8, 1x8+ (RIR 1)'),E('B-stance RDL','2x8-10 ea (RIR 1-2)'),E('Leg extensions','2x12-15 (RIR 0,F)')]},
+ {t:'Core',g:[2],ex:[E('Cross bench ab mat crunch','3 x 0 RIR'),E('Front rack carry','3x50 yd')]}]},
+{f:'Upper · Volume',blocks:[
+ {t:'Main Lifts',hr:'2-4 min · stagger 60-90 sec',g:[1,1,2],ex:[E('Machine chest press','2x6-8, 1x8+ (1,0,F)'),E('Chest supported T-bar row','3x10-12 (0,F,F)'),E('Deficit pushups','2x8-12 (F, F+1-2)','1-2 partials on last set'),E('Neutral grip chins','2 x (0,F RIR)')]},
+ {t:'Arm Farm — 0 RIR / F + techniques',g:[2,2,2],ir:'Superset pairs · rest 30-45 sec',ex:[E('Overhead rope extension','2x10-15'),E('Rope cable curl','2x10-15'),E('Leaned back lateral raise','2x8-10'),E('Incline bench curl','2x8-10'),E('Close grip pushup','1x10-15, 1x10-15 +3,2,2'),E('DB rear delt fly','1x10-15, 1x10-15 +2-3')]}],
+ notes:['No metcon this week.']},
+{f:'Long Run',blocks:[],cond:{t:'Long Run — Zone 2',l:['<b>45-60 minutes</b> — dialing back into final phase']}},
+REST]
+]},
+{id:'P3',name:'Phase 3',short:'P3',weeks:[
+/* ---- P3 W1 ---- */
+[
+{f:'Push + Quad · Run',blocks:[
+ {t:'Power',g:[2],ir:'Rest 60-90 sec between A & B',ex:[E('Jumping pushups','3x5-7','Max effort, floor or box'),E('Pogos w/ high hops','3x5','Jump high every 2-3 hops, minimize knee bend')]},
+ {t:'Main Lifts',hr:'Rest 3-4 min between main sets',ex:[E('Incline BB/swiss/smith press','3x6-8 (RIR 1-2)'),E('Chain dips','6, 4, 2, BW (1-2 RIR)','Chains optional — dead weight or BW'),E('Cable or machine fly','2x6-8 (RIR 1)','Slow, controlled, emphasize stretch'),E('Walking lunge (quad bias)','2x10-12 (RIR 1)','Upright torso, shorter step, knee over toe')]},
+ {t:'Arms / Shoulder (stagger)',g:[3],ir:'Stagger · ~60 sec between moves',ex:[E('Cable lateral','2x10-12 (0 RIR)'),E('Cable crossover tri-ext','2x10-12 (0 RIR)'),E('Farmer\'s walk','3x50 yd (RPE 7-8)')]}],
+ cond:{t:'Run w/ Tempo Pickups — 35 min',l:['35 min easy run','Minute 8 & 15: tempo pace x 2:00','Minute 22: 5-mile pace x 4:00','= 8 easy · 2 tempo · 5 easy · 2 tempo · 5 easy · 4:00 @ 5-mi · 9 easy']}},
+{f:'Pull + Hams',blocks:[
+ {t:'Power',g:[2],ir:'Rest 90 sec between A & B',ex:[E('KB swing','3x5','Heavy/power focus'),E('Box jump','3x3','Max jump, NOT max box height')]},
+ {t:'Main Lifts',hr:'Rest 2-4 min',ex:[E('Bent row (DB or BB)','3x6-8 (RIR 1-2)'),E('Lat pulldown','2x8-10 (RIR 1)','Grip of choice'),E('CS T-bar or DB row','2x8-10 (RIR 0-1)'),E('Glute ham raise','2 x 1-2 RIR','Not proficient? Leg curl or RDL variant')]},
+ {t:'Arms / Core',g:[2],ir:'Super or stagger A/B',ex:[E('Preacher curl','3x8-10 (RIR 1)'),E('Bench reverse crunch','3x10-15 (F)','Slow & controlled'),E('Tibs/calf raises (optional)','2-3x8-15 ea')]}]},
+{f:'Repeats',blocks:[],cond:{t:'Repeats — Mile / 800s / 400s',l:['<b>Pt 1:</b> 1 mile @ RPE 9 · rest 4:00','<b>Pt 2:</b> 2x800 @ 6-8 sec/mi faster than mile · rest 3:00','<b>Pt 3:</b> 3x400 @ 3-5 sec/mi faster than avg 800 (walk 100m between)','5-8 min jog/walk cooldown','Run the mile too hard and you\'ll know it later. Nail the pacing']}},
+REST,
+{f:'Lower + Circuit',blocks:[
+ {t:'Prep Jumps',g:[2],ir:'Rest 90 sec between A & B',ex:[E('Trap bar jumps','3x3','Very light, usually empty bar'),E('Pogos','3x12')]},
+ {t:'Pump Work',g:[2],ir:'Stagger · rest 60-90 sec',ex:[E('Seated leg curl (leaned fwd)','2 x 12-14, 10-12'),E('Xtra ROM leg ext','2 x 12-14, 10-12')]},
+ {t:'Main Lifts',hr:'2-4 min · ~90 sec between BSS legs',ex:[E('SSB or machine squat','1x6-8, 1x8+','Heavy 6-8 @1-2 RIR, drop ~10%, 8+ to 1 RIR. New machine this phase'),E('Hip thrust','2x6-8','Machine saves tons of time'),E('Bulgarian split squat','2x8-10','Load however, rest between legs')]},
+ {t:'Core',g:[2],ex:[E('Hanging leg raise','2x10-15'),E('45° side raises','2 x 1 RIR')]}],
+ cond:{t:'Conditioning Circuit — 3 rounds',l:['Heavy sled push 20 yd (8-9/10 RPE)','KB front rack carry 50 yd (~35-50# KBs)','Sandbag/dball GTOS 6 ea (alternating) — 50-80#','Sandbag getups 10 total (5/side)','Rest 2:00 between rounds']}},
+{f:'Upper + Easy Run',blocks:[
+ {t:'Push',hr:'Rest 2-3 min between sets',g:[2,1],ir:'Stagger A/B',ex:[E('DB front delt press','2x6-8','60-70° bench'),E('Kelso shrug','2x10-12'),E('Deficit pushup death set','x1','Demo in TTM library')]},
+ {t:'Armageddon',g:[2,2],ir:'Superset or stagger A/B',ex:[E('Smith JM press','3x8-10','Rev band recommended; DBs or BB OK'),E('Chins','3 x 1 RIR','BW only, perfect form'),E('Cable curl','2x10-12'),E('Cable pressdown','2x10-12')]},
+ {t:'Shoulder Shocker — 2 rounds, same DBs',g:[4],ir:'Circuit · minimal rest · ~90 sec between rounds',ex:[E('Straight arm plate raise','x F','BB plate'),E('Lateral raise','x F'),E('Upright row','x F'),E('Rear delt fly','x F','Minimal rest between movements, ~90 sec between rounds')]}],
+ cond:{t:'Conditioning (optional — pick one)',l:['a) 25 min easy run','b) 25 min easy low-impact','c) 25 min aerobic intervals: 5 wu · 15 min of :45 easy/:15 hard · 5 cd']}},
+{f:'Long Run',blocks:[],cond:{t:'Long Run — Zone 2',l:['<b>70 minutes</b> (shorter due to Sat/Mon volume)']}}],
+/* ---- P3 W2 ---- */
+[
+{f:'Push + Quad · Run',blocks:[
+ {t:'Power',g:[2],ir:'Rest 60-90 sec between A & B',ex:[E('Jumping pushups','3x5-7'),E('Pogos w/ high hops','3x5')]},
+ {t:'Main Lifts',hr:'Rest 3-4 min between main sets',ex:[E('Incline BB/swiss press','3x6-8 (RIR 1-2)'),E('Chain dips','6, 4, 2, 6 (1-2 RIR)','Last set: 6 w/ load 5-10 lb less than set 1'),E('Cable or machine fly','2x6-8 (0 RIR)'),E('Walking lunge (quad bias)','2x10-12 (RIR 1)')]},
+ {t:'Arms / Shoulder (stagger)',g:[3],ir:'Stagger · ~60 sec between moves',ex:[E('Cable lateral','3x10-12 (F)'),E('Cable crossover tri-ext','3x10-12 (F)'),E('Farmer\'s walk','3x50 yd (RPE 7-8)')]}],
+ cond:{t:'Run w/ Tempo Pickups — 35 min',l:['Minute 8 & 15: tempo x 2:30','Minute 22: 5-mile pace x 4:30']}},
+{f:'Pull + Hams',blocks:[
+ {t:'Power',g:[2],ir:'Rest 90 sec between A & B',ex:[E('KB swing','3x5','Can increase weight'),E('Box jump','3x3')]},
+ {t:'Main Lifts',hr:'Rest 2-4 min',ex:[E('Cable rows (upper back)','3x8-10','Replaces bent row on RDL weeks'),E('RDL','2x6-8 (RIR 1-2)','Replaces GHR in even weeks — earlier due to demand'),E('Lat pulldown','2x8-10 (RIR 1)'),E('CS T-bar or DB row','2x8-10 (0-F RIR)')]},
+ {t:'Arms / Core',g:[2],ir:'Super or stagger A/B',ex:[E('Preacher curl','3x8-10 (RIR 1)'),E('Bench reverse crunch','3x10-15 (F)'),E('Tibs/calf raises (optional)','2-3x8-15 ea')]}]},
+{f:'Repeats',blocks:[],cond:{t:'Repeats — Pacing Discipline',l:['<b>Pt 1:</b> 1 mile — 4-8 sec SLOWER than last week\'s mile · rest 5:00','<b>Pt 2:</b> 1 mile — match/within 3 sec of last week · rest 4:00','<b>Pt 3:</b> 3x400 @ 6-8 sec/mi faster than pt 2 (walk 100m between)','Possibly paying for your sins last week']}},
+REST,
+{f:'Lower + Circuit',blocks:[
+ {t:'Prep Jumps',g:[2],ir:'Rest 90 sec between A & B',ex:[E('Trap bar jumps','3x3'),E('Pogos','3x12')]},
+ {t:'Pump Work',g:[2],ir:'Stagger · rest 60-90 sec',ex:[E('Seated leg curl (leaned fwd)','2 x 12-14, 10-12'),E('Xtra ROM leg ext','2 x 12-14, 10-12')]},
+ {t:'Main Lifts',hr:'2-4 min · ~90 sec between BSS legs',ex:[E('SSB or machine squat','1x6-8, 1x8+'),E('Hip thrust','2x6-8'),E('Bulgarian split squat','2x8-10')]},
+ {t:'Core',g:[2],ex:[E('Hanging leg raise','2x10-15'),E('45° side raises','2 x 1 RIR')]}],
+ cond:{t:'Conditioning Circuit — 3 rounds',l:['Sled +10-15# · front rack +2.5-5# · GTOS 7 ea','Sandbag getups 10 total · rest 2:00']}},
+{f:'Upper Body',blocks:[
+ {t:'Push',hr:'Rest 2-3 min between sets',g:[2,1],ir:'Stagger A/B',ex:[E('DB front delt press','2x6-8'),E('Kelso shrug','2x10-12'),E('Deficit pushup death set','x1')]},
+ {t:'Armageddon',g:[2,2],ir:'Superset or stagger A/B',ex:[E('Smith JM press','3x8-10'),E('Chins','2 x 1 RIR, 1 x F'),E('Cable curl','2x10-12'),E('Cable pressdown','2x10-12')]},
+ {t:'Shoulder Shocker — 2 rounds',g:[4],ir:'Circuit · minimal rest · ~90 sec between rounds',ex:[E('Straight arm plate raise','x F'),E('Lateral raise','x F'),E('Upright row','x F'),E('Rear delt fly','x F','Can add load or reps')]}],
+ cond:{t:'Conditioning (optional)',l:['a) 30 min easy run · b) 30 min low-impact','c) 30 min intervals: 5 wu · 20 min :45/:15 · 5 cd']}},
+{f:'Ruck',blocks:[],cond:{t:'Ruck — 75 min',l:['Fastest walking pace · same or ≤ +5 lb (50 max)','Not rucking? Condition 70-80 min']}}],
+/* ---- P3 W3 ---- */
+[
+{f:'Push + Quad · Run',blocks:[
+ {t:'Power',g:[2],ir:'Rest 60-90 sec between A & B',ex:[E('Jumping pushups','3x5-7'),E('Pogos w/ high hops','3x5')]},
+ {t:'Main Lifts',hr:'Rest 3-4 min between main sets',ex:[E('Incline BB/swiss press','2x6-8, 1x8+ (RIR 1-2)','Set 3 backoff: −10% to 8+ reps'),E('Chain dips','6, 4, 2, BW (1-2 RIR)'),E('Cable or machine fly','2x6-8'),E('Walking lunge (quad bias)','2x10-12')]},
+ {t:'Arms / Shoulder (stagger)',g:[3],ir:'Stagger · ~60 sec between moves',ex:[E('Cable lateral','3x10-12'),E('Cable crossover tri-ext','3x10-12'),E('Farmer\'s walk','3x50 yd')]}],
+ cond:{t:'Run w/ Tempo Pickups — 40 min',l:['Minute 7 & 17: tempo x 3:00','Minute 25: 5-mile pace x 5:00']}},
+{f:'Pull + Hams',blocks:[
+ {t:'Power',g:[2],ir:'Rest 90 sec between A & B',ex:[E('KB swing','3x5'),E('Box jump','3x3')]},
+ {t:'Main Lifts',hr:'Rest 2-4 min',ex:[E('Bent row (DB or BB)','3x6-8 (RIR 1-2)'),E('Lat pulldown','2x8-10 (RIR 1)'),E('CS T-bar or DB row','2x8-10 (RIR 0-1)'),E('Glute ham raise','2 x 1-2 RIR')]},
+ {t:'Arms / Core',g:[2],ir:'Super or stagger A/B',ex:[E('Preacher curl','3x8-10 (RIR 1)'),E('Bench reverse crunch','3x10-15 (F)'),E('Tibs/calf raises (optional)','2-3x8-15 ea')]}]},
+{f:'Hill Repeats',blocks:[],cond:{t:'Hill Repeats — 8x1:00',l:['Treadmill @ 5-6% incline (or outdoor hill)','~2-mile pace or slightly faster · RPE 8-9','Rest 1:30 (hop off / walk back)','Repeat or slightly increase pace each round']}},
+REST,
+{f:'Lower Hypertrophy',blocks:[
+ {t:'Prep Jumps',g:[2],ir:'Rest 90 sec between A & B',ex:[E('Trap bar jumps','3x3'),E('Pogos','3x12')]},
+ {t:'Pump Work',g:[2],ir:'Stagger · rest 60-90 sec',ex:[E('Seated leg curl (leaned fwd)','2 x 12-14, 10-12'),E('Xtra ROM leg ext','2 x 12-14, 10-12')]},
+ {t:'Main Lifts',hr:'2-4 min · ~90 sec between BSS legs',ex:[E('SSB or machine squat','1x6-8, 1x8+'),E('Hip thrust','2x6-8'),E('Bulgarian split squat','2x8-10')]},
+ {t:'Core',g:[2],ex:[E('Hanging leg raise','2x10-15'),E('45° side raises','2 x 1 RIR')]}],
+ cond:{t:'Conditioning Circuit — 3 rounds',l:['Sled push 20 yd · front rack 50 yd','GTOS 8 ea · getups 12 total (6/side) · rest 2:00']}},
+{f:'Upper Body',blocks:[
+ {t:'Push',hr:'Rest 2-3 min between sets',g:[2,1],ir:'Stagger A/B',ex:[E('DB front delt press','2x6-8'),E('Kelso shrug','2x10-12'),E('Deficit pushup death set','x1')]},
+ {t:'Armageddon',g:[2,2],ir:'Superset or stagger A/B',ex:[E('Smith JM press','3x8-10'),E('Chins','3 x 1 RIR'),E('Cable curl','2x10-12'),E('Cable pressdown','2x10-12')]},
+ {t:'Shoulder Shocker — 2 rounds',g:[4],ir:'Circuit · minimal rest · ~90 sec between rounds',ex:[E('Straight arm plate raise','x F'),E('Lateral raise','x F'),E('Upright row','x F'),E('Rear delt fly','x F')]}],
+ notes:['No conditioning today — big long run tomorrow.']},
+{f:'Long Run',blocks:[],cond:{t:'Long Run — Zone 2',l:['<b>100 minutes</b> (longer: no run day 6, non-tempo week incoming)']}}],
+/* ---- P3 W4 ---- */
+[
+{f:'Push + Quad',blocks:[
+ {t:'Power',g:[2],ir:'Rest 60-90 sec between A & B',ex:[E('Jumping pushups','3x5-7'),E('Pogos w/ high hops','3x5')]},
+ {t:'Main Lifts',hr:'Rest 3-4 min between main sets',ex:[E('Incline BB/swiss press','2x6-8, 1x8+ (RIR 1-2)'),E('Chain dips','6, 4, 2, 6 (1-2 RIR)'),E('Cable or machine fly','2x6-8 (0 RIR)'),E('Walking lunge (quad bias)','2x10-12 (RIR 1)')]},
+ {t:'Arms / Shoulder (stagger)',g:[3],ir:'Stagger · ~60 sec between moves',ex:[E('Cable lateral','3x10-12 (F)'),E('Cable crossover tri-ext','3x10-12 (F)'),E('Farmer\'s walk','3x50 yd (RPE 7-8)')]}],
+ cond:{t:'Non-Tempo Week',l:['30-40 min easy run (low Z2)','&mdash; OR &mdash;','Aerobic intervals: 10 wu · 21:00 of :15/:1:15 · 10 cd']}},
+{f:'Pull + Hams',blocks:[
+ {t:'Power',g:[2],ir:'Rest 90 sec between A & B',ex:[E('KB swing','3x5'),E('Box jump','3x3')]},
+ {t:'Main Lifts',hr:'Rest 2-4 min',ex:[E('Cable rows (upper back)','3x8-10'),E('RDL','2x6-8 (RIR 1-2)'),E('Lat pulldown','2x8-10 (RIR 1)'),E('CS T-bar or DB row','2x8-10 (0-F RIR)')]},
+ {t:'Arms / Core',g:[2],ir:'Super or stagger A/B',ex:[E('Preacher curl','3x8-10 (RIR 1)'),E('Bench reverse crunch','3x10-15 (F)'),E('Tibs/calf raises (optional)','2-3x8-15 ea')]}]},
+{f:'Repeats',blocks:[],cond:{t:'Repeats — Mile PR?',l:['<b>Pt 1:</b> 1 mile — beat all miles so far by 2-5 sec (no more) · rest 4:00','<b>Pt 2:</b> 1 mile — finish within ±3 sec of part 1','Reduced volume to recover for time trial week']}},
+REST,
+{f:'Lower + Circuit',blocks:[
+ {t:'Prep Jumps',g:[2],ir:'Rest 90 sec between A & B',ex:[E('Trap bar jumps','3x3'),E('Pogos','3x12')]},
+ {t:'Pump Work',g:[2],ir:'Stagger · rest 60-90 sec',ex:[E('Seated leg curl (leaned fwd)','2 x 12-14, 10-12'),E('Xtra ROM leg ext','2 x 12-14, 10-12')]},
+ {t:'Main Lifts',hr:'2-4 min · ~90 sec between BSS legs',ex:[E('SSB or machine squat','1x6-8, 1x8+'),E('Hip thrust','2x6-8'),E('Bulgarian split squat','2x8-10')]},
+ {t:'Core',g:[2],ex:[E('Hanging leg raise','2x10-15'),E('45° side raises','2 x 1 RIR')]}],
+ cond:{t:'Conditioning Circuit — 3 rounds',l:['Keep W2 loads · note longer distances / higher-rep GTOS']}},
+{f:'Upper Body',blocks:[
+ {t:'Push',hr:'Rest 2-3 min between sets',g:[2,1],ir:'Stagger A/B',ex:[E('DB front delt press','2x6-8'),E('Kelso shrug','2x10-12'),E('Deficit pushup death set','x1')]},
+ {t:'Armageddon',g:[2,2],ir:'Superset or stagger A/B',ex:[E('Smith JM press','3x8-10'),E('Chins','2 x 1 RIR, 1 x F'),E('Cable curl','2x10-12','Face-away mech drop after failure: step to machine, bang out 2-4 std curls'),E('Cable pressdown','2x10-12')]},
+ {t:'Shoulder Shocker — 2 rounds',g:[4],ir:'Circuit · minimal rest · ~90 sec between rounds',ex:[E('Straight arm plate raise','x F'),E('Lateral raise','x F'),E('Upright row','x F'),E('Rear delt fly','x F')]}],
+ cond:{t:'Conditioning (optional)',l:['a) 20 min easy run (35-40 if not testing next week)','b) 35 min low-impact · c) 35 min intervals (1:15 easy/:15 hard x 25)']}},
+REST]
+]},
+{id:'TT',name:'Time Trial Week',short:'TT',weeks:[[
+{f:'3RM Day 1',blocks:[{t:'Optional Maxes',ex:[E('Front squat','work to 3RM','"Training 3RM," not all-out. Used an SSB? Use the SSB'),E('Deadlift','work to 3RM','Hex bar users: don\'t do a BB DL 3RM'),E('Weighted/chain dip','work to 3RM','Machine dips all program? Skip it')]}],notes:['100% optional. Only test lifts you\'ve been training.']},
+{f:'2-Mile TT',blocks:[],cond:{t:'2-Mile Time Trial (Optional)',l:['Run warmup, then <b>2 miles for time</b>']}},
+REST,
+{f:'3RM Day 2',blocks:[{t:'Optional Maxes',ex:[E('Bench press','work to 3RM','Same bar you\'ve used all program'),E('Back squat','work to 3RM','SSB users use the SSB'),E('Weighted chin up','work to 3RM','Chins, neutral, or pull ups — your pick')]}],notes:['"Training 3RM," not all-out — no heroics.']},
+REST,
+{f:'5-Mile TT',blocks:[],cond:{t:'5-Mile Time Trial (Optional)',l:['Run warmup, then <b>5 miles for time</b>','Congrats — you\'ve completed JGV2!']}},
+REST]]}
+]};
+
+/* =============== SUBSTITUTIONS =============== */
+const SUBS=[["Back Squat","front squat, SSB squat, leg press, hack squat, pendulum, goblet squat"],["Backward Drags","deadmill walks"],["Bent Rows","chest supported rows, cable rows"],["B-Stance RDL","single leg RDL, DB RDL, landmine SL RDL"],["Bulgarian Split Squat","lunge (any), machine split squat, single leg leg press"],["Cable Fly","machine fly, DB fly"],["Cable Lat Prayer","DB pullover, single arm cable pullover"],["Cable Y Raise","DB lateral raise, cable lateral"],["Chest Supported DB Row","CS machine/T-bar row, head supported row"],["Chin Ups","pull ups, rack chins, neutral chins, pulldowns"],["CG Incline Smith Press","incline BB or DB press, machine CG incline"],["Close Grip Pushup","classic pushup, tricep pressdown"],["DB Skull Crusher","cable skull crusher, EZ bar skull crusher, JM press"],["Deadlift","hex bar DL, sumo DL, RDL, stiff leg DL"],["Deficit Pushup","ring pushup, standard pushup, full ROM DB press, machine press"],["Dips","decline press (machine/DB/BB), push up"],["Face Pull","banded face pull, upper back cable row, band pull apart, rear delt fly"],["Farmer's Carry","DBs, KBs, hex bar, torpedoes, water cans"],["Flat Bench","flat machine, DB, smith press"],["Front Squat","high bar squat, SSB squat, hack squat, pendulum, goblet"],["Glute Ham Raise","leg curl, nordic, 45° back extension"],["Goblet Squat","front squat, hack squat, sissy squat, leg extension"],["Hamstring Curl","banded curls, glute ham raises (advanced)"],["High Incline Delt Press","smith press, BB press, machine delt press"],["Incline Bench Curl","face away curl, standard DB curl"],["Incline Bench Lateral Raise","standing lateral raise (DB or cable)"],["Incline Bench Press","incline DB/smith/machine press"],["JM Press","skull crusher, overhead tricep extension"],["KB Swing","KB clean/snatch, DB swings, box jumps, cleans"],["Kelso Shrugs","upright shrugs, leaned forward shrugs"],["Lat Pulldown","pull up, chin up, machine pulldown, single arm pulldown"],["Leaned Back Lateral Raise","cable laterals, handles mid-thigh"],["Leg Extension","sissy squat, reverse nordic"],["Machine Chest Press","alt machine, DB press, deficit pushup"],["Machine Dips","BW/weighted dips, deficit pushups, slight decline DB/machine press"],["Machine Squat","SSB, back squat, front squat, zercher"],["Neutral Chins","neutral pulldowns, supinated chins, rack chins"],["Overhead KB Carry","overhead DB carry"],["Preacher Curl","spider curl, concentration curl"],["Pull Ups","chins, neutral chins, lat pulldown, rack chins"],["Rack Chins","pull ups, inverted rows, lat pulldowns"],["Rear Delt Fly","pec deck rear delt, cable rear delt, rear delt rows"],["Reverse Lunge (deficit)","FFE split squat, hatfield reverse lunge, walking lunge, step up, BSS"],["Ring Pushup","deficit pushup, TRX pushup, dips, pushups"],["RDL","stiff leg deadlift, hex bar DL, good morning"],["Rope Cable Curl","hammer curl, straight bar cable curl"],["Rope Overhead Extension","DB overhead ext, banded overhead ext"],["Roman Chair Leg Raise","hanging leg raise, elbow strap leg raise"],["Sandbag Getups","Turkish getups, KB clean hold getups"],["Sandbag GTOS","sandbag/OO getups, KB clean"],["Seated Calf Raise","standing calf raise, bent knee BW calf raise"],["Stiff Leg Deadlift","45° back raise, deadlifts, RDL, good morning"],["Spider Curl","preacher curl, concentration curl"],["SSB Squat","back squat, front squat, machine squat"],["Straight Arm Plate Raise","cable front raise, DB front raise"],["Suitcase Carry","DBs, KBs, torpedoes, water cans"],["Tib Raise","machine, KBs, tib bar, bodyweight"],["Tricep Pushdown","banded pushdown, close grip pushup"],["Walking Lunge","reverse lunge, split squat, step ups"],["Box Jumps","vertical jumps, light hex bar jumps, tuck jumps"],["Pogo Hops","double unders (jump rope)"],["Med Ball Chest Pass","lying MB chest pass, jumping pushups"],["Trap Bar Jumps","DB vertical jumps, BW vertical jumps"],["Skips for Height","skips for distance"],["45° Back Raise","BB back raise, hip thrusts"],["45° Side Raise","weighted side bends"]];
+
+/* =============== STATE & STORAGE =============== */
+let S={p:1,w:0,d:0};           // indices: phase, week, day
+let dayData=null;               // loaded log for current day
+let lastLifts={};               // exercise -> {s:[{w,r}], at:'P1W2'}
+let saveT=null, dirty=false;
+
+const kDay=()=>`log:${S.p}-${S.w}-${S.d}`;
+const WS=(typeof window!=='undefined'&&window.storage&&window.storage.get)?window.storage:null;
+async function sGet(k){
+  if(WS){try{const r=await WS.get(k);return r?JSON.parse(r.value):null}catch(e){return null}}
+  try{const v=localStorage.getItem('jg2:'+k);return v?JSON.parse(v):null}catch(e){return null}
+}
+async function sSet(k,v){
+  if(WS){try{await WS.set(k,JSON.stringify(v));return}catch(e){console.error('storage',e)}}
+  try{localStorage.setItem('jg2:'+k,JSON.stringify(v))}catch(e){console.error('storage',e)}
+}
+
+async function loadState(){
+  const st=await sGet('state'); if(st) S=st;
+  lastLifts=(await sGet('lastlifts'))||{};
+}
+async function loadDay(){ dayData=(await sGet(kDay()))||{sets:{},done:false,note:'',cond:''}; }
+function scheduleSave(){
+  dirty=true; clearTimeout(saveT);
+  saveT=setTimeout(saveDay,700);
+}
+async function saveDay(){
+  if(!dirty) return; dirty=false;
+  await sSet(kDay(),dayData);
+  // update lastLifts for exercises with logged sets
+  const tag=phTag();
+  let ch=false;
+  for(const [ex,sets] of Object.entries(dayData.sets)){
+    const good=sets.filter(s=>s.w||s.r);
+    if(good.length){ lastLifts[ex]={s:good,at:tag}; ch=true; }
+  }
+  if(ch) await sSet('lastlifts',lastLifts);
+  // history for charts/PRs: best numeric set per exercise per day
+  const H=(await sGet('hist'))||{}; let hch=false;
+  for(const [ex,sets] of Object.entries(dayData.sets)){
+    let best=null,bv=0;
+    sets.forEach(s=>{const w=parseFloat(s.w),r=parseFloat(s.r);
+      if(w>0&&r>0){const e=w*(1+r/30); if(e>bv){bv=e;best={w:s.w,r:s.r,e1:e}}}});
+    if(best){(H[ex]=H[ex]||{})[kDay()]={...best,at:tag,o:S.p*10000+S.w*100+S.d};hch=true}
+  }
+  if(hch) await sSet('hist',H);
+  toast('Saved');
+}
+function toast(m){const el=document.getElementById('savemsg');el.textContent=m;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),1100)}
+function phTag(){const ph=P.phases[S.p];return (ph.short==='P1'||ph.short==='P2'||ph.short==='P3')?`${ph.short} W${S.w+1} D${S.d+1}`:`${ph.short} D${S.d+1}`}
+
+/* done-days index for dots */
+let doneIdx={};
+async function loadDone(){ doneIdx=(await sGet('doneidx'))||{}; }
+async function setDone(v){
+  dayData.done=v; scheduleSave();
+  toast(v?'Day complete \u2713':'Marked incomplete');
+  doneIdx[kDay()]=v; await sSet('doneidx',doneIdx);
+  renderDayRail(); renderDoneUI();
+}
+
+/* =============== RENDER =============== */
+const $=id=>document.getElementById(id);
+function ph(){return P.phases[S.p]}
+function wk(){return ph().weeks[S.w]}
+function dy(){return wk()[S.d]}
+
+function renderHeader(){
+  $('phaseVal').textContent=ph().name;
+  $('weekVal').textContent=ph().weeks.length>1?`Week ${S.w+1}`:'—';
+  $('weekPill').style.opacity=ph().weeks.length>1?1:.4;
+}
+function renderDayRail(){
+  const rail=$('dayrail'); rail.innerHTML='';
+  wk().forEach((d,i)=>{
+    const b=document.createElement('button');
+    b.className='daychip'+(i===S.d?' on':'')+(doneIdx[`log:${S.p}-${S.w}-${i}`]?' done':'');
+    b.innerHTML=`<span class="dot"></span><div class="d">D${i+1}</div><span class="f">${d.rest?'Rest':d.f}</span>`;
+    b.onclick=()=>{go({d:i})};
+    rail.appendChild(b);
+  });
+}
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;')}
+function renderDay(){
+  const m=$('main'); const d=dy();
+  if(d.rest){
+    m.innerHTML=`<div class="ticket"><div class="meta">${phTag()}</div><h2>Rest Day</h2></div>
+    <div class="restday"><h3>Recover</h3><p>Training is only effective to the extent it's recovered from.<br>Sleep, eat, walk. That's the work today.</p></div>`;
+    return;
+  }
+  let h=`<div class="ticket"><div class="meta">${phTag()}</div><h2>${d.f}</h2>${dayData.done?'<span class="donetag">&#10003; Completed</span>':''}</div>`;
+  const wuk=(WUMAP[S.p]||{})[S.d];
+  if(wuk){const wu=WUV[wuk];
+    h+=`<div class="prep"><span>Prep: <b>${wu.n}</b> &mdash; add/subtract/adjust as needed</span><a href="${wu.u}" target="_blank" rel="noopener">Watch &#9654;</a></div>`;}
+  if(d.notes&&d.notes.length){h+=`<div class="topnotes">${d.notes.map(n=>`<span>${n}</span>`).join('')}</div>`;}
+  // blocks
+  d.blocks.forEach((b,bi)=>{
+    h+=`<div class="card"><div class="chead"><span class="t">${b.t}</span>${b.hr?`<span class="n">${b.hr}</span>`:''}</div>`;
+    const spans=[];let idx=0;
+    (b.g||[]).forEach(sz=>{spans.push([idx,sz]);idx+=sz});
+    while(idx<b.ex.length){spans.push([idx,1]);idx++}
+    const row=(ei,lt)=>{const e=b.ex[ei];return `<div class="exrow" id="ex-${bi}-${ei}">
+        <button class="exmain" onclick="togEx(${bi},${ei})"><span class="nm">${lt?`<span class="lt">${lt}</span>`:''}${esc(e.n)}</span><span><span class="rx">${e.rx}</span><span class="chev">&#9654;</span></span></button>
+        ${e.nt?`<div class="exnote">${esc(e.nt)}</div>`:''}
+        <div class="logger" id="lg-${bi}-${ei}"></div>
+      </div>`};
+    spans.forEach(([st,sz])=>{
+      if(sz>1){
+        h+=`<div class="grp"><div class="grphead">${sz===2?'Superset':sz===3?'Tri-set':'Circuit'} &middot; ${b.ir||'alternate &middot; rest 60-90 sec between moves'}</div>`;
+        for(let k=0;k<sz;k++)h+=row(st+k,'ABCD'[k]);
+        h+=`</div>`;
+      } else h+=row(st,null);
+    });
+    h+=`</div>`;
+  });
+  // conditioning
+  if(d.cond){
+    h+=`<div class="card cond"><div class="chead"><span class="t">${d.cond.t}</span></div><div class="condbody">`;
+    d.cond.l.forEach(l=>h+=`<p>${l}</p>`);
+    h+=`<div class="result"><label>Result / notes (pace, rounds, time&hellip;)</label><input id="condres" value="${(dayData.cond||'').replace(/"/g,'&quot;')}" placeholder="e.g. 200s avg 42.5 · felt smooth"></div></div></div>`;
+  }
+  h+=`<div class="dayfoot">
+    <textarea id="daynote" placeholder="Session notes — how it felt, PRs, tweaks for next week&hellip;">${esc(dayData.note||'')}</textarea>
+    <button class="donebtn ${dayData.done?'on':''}" id="donebtn">${dayData.done?'&#10003; Day Complete':'Mark Day Complete'}</button>
+  </div>`;
+  m.innerHTML=h;
+  const cr=$('condres'); if(cr) cr.oninput=()=>{dayData.cond=cr.value;scheduleSave()};
+  $('daynote').oninput=()=>{dayData.note=$('daynote').value;scheduleSave()};
+  $('donebtn').onclick=()=>setDone(!dayData.done);
+}
+function renderDoneUI(){
+  const b=$('donebtn'); if(!b) return;
+  b.className='donebtn '+(dayData.done?'on':'');
+  b.innerHTML=dayData.done?'&#10003; Day Complete':'Mark Day Complete';
+  const t=document.querySelector('.ticket');
+  const ex=t.querySelector('.donetag');
+  if(dayData.done&&!ex){const s=document.createElement('span');s.className='donetag';s.innerHTML='&#10003; Completed';t.appendChild(s)}
+  if(!dayData.done&&ex)ex.remove();
+}
+
+window.togEx=function(bi,ei){
+  const row=$(`ex-${bi}-${ei}`); const was=row.classList.contains('open');
+  row.classList.toggle('open');
+  if(!was) renderLogger(bi,ei);
+};
+function renderLogger(bi,ei){
+  const e=dy().blocks[bi].ex[ei]; const key=e.n;
+  if(!dayData.sets[key]) dayData.sets[key]=[{w:'',r:''}];
+  const lg=$(`lg-${bi}-${ei}`);
+  const last=lastLifts[key];
+  const vu=vidFor(key);
+  const vl=vu?`<a class="vidlink" href="${vu}" target="_blank" rel="noopener">Demo &#9654;</a>`:'';
+  let h='';
+  if(last&&last.at!==phTag()){
+    h+=`<div class="last">${vl}Last (${last.at}): <b>${last.s.map(s=>`${s.w||'–'}×${s.r||'–'}`).join(' · ')}</b></div>`;
+  } else {
+    h+=`<div class="last">${vl}Log your working sets</div>`;
+  }
+  h+=`<div class="collab"><span></span><span>Weight</span><span>Reps</span><span></span></div>`;
+  dayData.sets[key].forEach((s,si)=>{
+    h+=`<div class="setrow"><span class="sn">${si+1}</span>
+    <input inputmode="decimal" placeholder="lb" value="${s.w}" oninput="upSet('${cssk(key)}',${si},'w',this.value)">
+    <input inputmode="numeric" placeholder="reps" value="${s.r}" oninput="upSet('${cssk(key)}',${si},'r',this.value)">
+    <button class="del" onclick="delSet('${cssk(key)}',${si},${bi},${ei})">&times;</button></div>`;
+  });
+  h+=`<button class="addset" onclick="addSet('${cssk(key)}',${bi},${ei})">+ Add set</button>`;
+  lg.innerHTML=h;
+}
+function cssk(k){return k.replace(/'/g,"\\'")}
+window.upSet=function(k,si,f,v){dayData.sets[k][si][f]=v;scheduleSave()};
+window.addSet=function(k,bi,ei){dayData.sets[k].push({w:dayData.sets[k].at(-1)?.w||'',r:''});renderLogger(bi,ei);scheduleSave()};
+window.delSet=function(k,si,bi,ei){dayData.sets[k].splice(si,1);if(!dayData.sets[k].length)dayData.sets[k].push({w:'',r:''});renderLogger(bi,ei);scheduleSave()};
+
+async function go(chg){
+  await saveDay();
+  Object.assign(S,chg);
+  if(chg.p!==undefined){S.w=0;S.d=0}
+  if(chg.w!==undefined&&chg.d===undefined){S.d=0}
+  await sSet('state',S);
+  await loadDay();
+  renderHeader();renderDayRail();renderDay();
+  window.scrollTo({top:0});
+}
+
+/* =============== SHEETS =============== */
+function openSheet(id){$('scrim').classList.add('show');$(id).classList.add('show')}
+function closeSheets(){$('scrim').classList.remove('show');document.querySelectorAll('.sheet').forEach(s=>s.classList.remove('show'))}
+$('scrim').onclick=closeSheets;
+
+$('phasePill').onclick=()=>{
+  const o=$('phaseOpts');o.innerHTML='';
+  P.phases.forEach((p,i)=>{
+    const b=document.createElement('button');b.className='optbtn'+(i===S.p?' on':'');
+    b.innerHTML=`<span class="nm">${p.name}</span><span class="sub">${p.weeks.length>1?p.weeks.length+' weeks':'1 week'}</span>`;
+    b.onclick=()=>{closeSheets();go({p:i})};o.appendChild(b);
+  });
+  openSheet('phaseSheet');
+};
+$('weekPill').onclick=()=>{
+  if(ph().weeks.length<2)return;
+  const o=$('weekOpts');o.innerHTML='';
+  ph().weeks.forEach((w,i)=>{
+    const dots=w.map((d,di)=>`<i class="${doneIdx[`log:${S.p}-${i}-${di}`]?'d':''}"></i>`).join('');
+    const b=document.createElement('button');b.className='optbtn'+(i===S.w?' on':'');
+    b.innerHTML=`<span class="nm">Week ${i+1}</span><span class="wdots">${dots}</span>`;
+    b.onclick=()=>{closeSheets();go({w:i})};o.appendChild(b);
+  });
+  openSheet('weekSheet');
+};
+
+/* =============== VIDEOS & WARMUPS =============== */
+const fmt=s=>`${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;
+const vu_=x=>x.startsWith('shorts/')?'https://www.youtube.com/'+x:'https://www.youtube.com/watch?v='+x;
+const WUV={
+ lower:{n:'Lower warmup',u:vu_('2pcglD-IkuM&t=281s')},
+ upper:{n:'Upper warmup',u:vu_('JLGfuPbT99g&t=17s')},
+ full:{n:'Full warmup',u:vu_('11p_hP-rrao&t=14s')}
+};
+const WUMAP={0:{0:'full',3:'full'},1:{0:'lower',1:'upper',3:'upper',4:'lower'},2:{0:'lower',1:'upper',3:'lower',4:'upper'},3:{0:'full',1:'full',4:'lower',5:'upper'},4:{0:'lower',3:'full'}};
+const VID=[
+['deficit pushup death set','fBYE810xeig'],['glute ham raise crunch','shorts/KdsVf7z8RbY'],
+['pogos w/ high hops','shorts/igOzrmfOFus'],['seated vertical jump','wtl-ygEksVI'],
+['seated box jump','b3KwzJU2GOI'],['box jump','b3KwzJU2GOI'],
+['bumper jumping pushup','MvxzaDLpGsY'],['jumping pushup','MvxzaDLpGsY'],
+['b-stance rdl','JXrVWb3pDqM'],['single leg rdl','ItampFN_jC4&t=89s'],
+['back or ssb squat','B2QxMEkNaQU&t=20s'],['ssb or machine squat','1iYaCW88W2o'],
+['machine squat','omxprjT5txc'],['front squat','Av3pr9NMVKk'],['goblet squat','VlN7BGAY7a0&t=1s'],
+['bulgarian split squat','OcCX3Az_GkY&t=42s'],['walking lunge','y_K5uWIg-Ms&t=3s'],['reverse lunge','s_8k8he-GOI'],
+['lying leg curl','GVyoZYdofl8'],['seated leg curl','tvMbHxWqXm0'],['backward drag','Nrgi4GD5geE'],
+['deadlift','BrrqNqCyRe0'],['stiff leg','IAifH6MGmx4'],['rdl','SVEefZSArKI'],
+['face pull','Lt9fRO3Tx0M&t=1s'],['lat prayer','FeVGrlxQiiE'],['straight arm plate raise','8b2GdSFjO0I'],
+['swiss bar bench','adkmhe-F2FM'],['bench clusters','Av3oa-8spCw&t=33s'],
+['chest supported t-bar','1rAvk5cw3z0'],['t-bar','1rAvk5cw3z0'],['chest supported row','6rGk_Ea_6Ew'],
+['machine dips','shorts/oqX7Gry969Q'],['chain dips','xqfxVNtEk0E'],['dips','xqfxVNtEk0E'],
+['rack chins','fDyQAB488oA'],['neutral grip chins','L-8lb1Kqiuk'],['chin up','MYYCuFKZ654&t=95s'],['chins','MYYCuFKZ654&t=95s'],
+['45\u00b0 side raise','9xSAbigRAk8'],['45\u00b0 back raise','GOXLUbnHnwA'],
+['med ball chest pass','LfY9zyb206I'],['overhead kb carry','54POVWkWjEs'],
+['cg incline press','jNHljQOB33c'],['extra rom row','shorts/Z9wpIN-pBkg'],['high incline db press','xaJ9ulRYzeA'],
+['tricep pushdown','shorts/zZVkAY26k7c'],['rope cable curl','InSw6QHZca0'],
+['incline bench lateral raise','vuE70dJUqEQ'],['incline bench curl','kZDr3IavmrU'],
+['spider curl','tHl3wDu9IQU'],['preacher curl','NbdQgP8_lig'],
+['skips for height','Pi0YukN5wGs'],['skips for distance','abldaDzipv8'],
+['seated calf raise','A-9oP8ik5Yo'],['tib raise','cvX5P9uGdCw'],
+['farmer','I4tN1DhqyIU&t=3s'],['suitcase carry','P6V77UPN7c8'],['front rack carry','XQ5_eAbnfIA'],
+['cross bench ab mat crunch','vGzz8bDKmts'],['leg ext','XBzqfvZanD4'],
+['machine chest press','u_lZvv8vNQg'],['deficit pushup','TwF5db8Sy_o'],['close grip pushup','Bt7U2HRLTI0'],
+['rear delt fly','ntNVBEdIvLk'],['overhead rope extension','EKxN1jhUeQM'],
+['leaned back lateral raise','shorts/RjzSZunQCtc'],['kb swing','9gxfe_GXP8Y'],
+['bent row','-xuNzI2aZWU&list=PLdkafGCdlmaxznTNnS2sngn8b0bFrDNkK&index=7'],
+['lat pulldown','WRn-I9XriIE'],['machine fly','TobcY6KxCNg'],['cable fly','TobcY6KxCNg'],
+['trap bar jumps','-n2p5mQxYTw'],['pogo','iU-TKr4YesM'],
+['kelso shrug','xjAFm8-y6-4'],['jm press','FSCfIXQSuNA'],
+['sandbag getups','BA38hqDcPX0'],['gtos','MzfDYzVI5hw'],['glute ham raise','m0AIU1dCVkU'],
+['pull up','odRoc5bnBzY']
+];
+function vidFor(n){const s=n.toLowerCase();for(const [k,u] of VID){if(s.includes(k))return vu_(u)}return null}
+
+/* =============== PROGRESS =============== */
+$('progOpen').onclick=openProg;
+async function openProg(){
+  await saveDay();
+  const H=(await sGet('hist'))||{};
+  const sel=$('exSel'); const names=Object.keys(H).sort();
+  sel.innerHTML=names.length?names.map(n=>`<option>${n.replace(/</g,'&lt;')}</option>`).join(''):'<option>No lifts logged yet</option>';
+  sel.onchange=()=>drawChart(H,sel.value);
+  drawChart(H,names[0]);
+  renderPR(H);
+  openSheet('progSheet');
+}
+function drawChart(H,name){
+  const w=$('chartWrap');
+  if(!name||!H[name]){w.innerHTML='<div class="out">Log sets on any exercise and its trend shows up here.</div>';return}
+  const es=Object.values(H[name]).sort((a,b)=>a.o-b.o);
+  const nums=es.filter(e=>e.e1>0);
+  let h='';
+  if(nums.length>=2){
+    const W=320,Ht=130,pl=10,pr=10,pt=16,pb=18;
+    const min=Math.min(...nums.map(e=>e.e1)),max=Math.max(...nums.map(e=>e.e1));
+    const span=(max-min)||1;
+    const X=i=>pl+(W-pl-pr)*(i/(nums.length-1));
+    const Y=v=>pt+(Ht-pt-pb)*(1-(v-min)/span);
+    const pts=nums.map((e,i)=>`${X(i).toFixed(1)},${Y(e.e1).toFixed(1)}`).join(' ');
+    h+=`<svg class="chart" viewBox="0 0 ${W} ${Ht}">
+      <polyline points="${pts}" fill="none" stroke="#3ECF8E" stroke-width="2.5" stroke-linejoin="round"/>
+      ${nums.map((e,i)=>`<circle cx="${X(i).toFixed(1)}" cy="${Y(e.e1).toFixed(1)}" r="3.5" fill="#E9C46A"/>`).join('')}
+      <text x="${pl}" y="11" fill="#AAC6B1" font-size="10">est 1RM \u00b7 best ${Math.round(max)}</text>
+      <text x="${pl}" y="${Ht-5}" fill="#78957F" font-size="10">start ${Math.round(nums[0].e1)}</text>
+    </svg>`;
+  } else h+='<div class="out">Two or more logged sessions with weight draw the trend line.</div>';
+  h+='<div class="out" style="margin-top:4px">'+es.slice(-10).reverse().map(e=>`${e.at}: <b>${e.w}\u00d7${e.r}</b>${e.e1?` \u00b7 est ${Math.round(e.e1)}`:''}`).join('<br>')+'</div>';
+  w.innerHTML=h;
+}
+async function renderPR(H){
+  const bests=[];
+  for(const [n,d] of Object.entries(H)){
+    const es=Object.values(d).filter(e=>e.e1>0);
+    if(!es.length)continue;
+    bests.push({n,...es.reduce((a,c)=>c.e1>a.e1?c:a)});
+  }
+  bests.sort((a,b)=>b.e1-a.e1);
+  let h=bests.slice(0,12).map(b=>`<div><b>${b.n}</b><br><span>${b.w}\u00d7${b.r} \u00b7 est 1RM ${Math.round(b.e1)} \u00b7 ${b.at}</span></div>`).join('')||'<div><span>Log weighted sets to build your board.</span></div>';
+  const g=async k=>(await sGet(k))||{};
+  const tt2=(await g('log:4-0-1')).cond,tt5=(await g('log:4-0-5')).cond;
+  const d1=await g('log:4-0-0'),d4=await g('log:4-0-3');
+  const tl=[];
+  if(tt2)tl.push(`2-Mile TT: <b>${tt2}</b>`);
+  if(tt5)tl.push(`5-Mile TT: <b>${tt5}</b>`);
+  for(const dd of [d1,d4]){ if(dd.sets) for(const [n,ss] of Object.entries(dd.sets)){
+    const gs=ss.filter(s=>parseFloat(s.w)>0);
+    if(gs.length){const top=gs.reduce((a,c)=>parseFloat(c.w)>parseFloat(a.w)?c:a);tl.push(`${n} 3RM: <b>${top.w}</b>`)}}}
+  if(tl.length)h+=`<div style="margin-top:10px;border-top:1px solid #33503E;padding-top:8px"><b style="color:#E9C46A">Time Trial Week</b><br><span>${tl.join('<br>')}</span></div>`;
+  $('prBoard').innerHTML=h;
+}
+
+/* =============== PLATE MATH =============== */
+function calcPlates(){
+  const W=parseFloat($('pcW').value),B=parseFloat($('pcB').value)||45,o=$('pcOut');
+  if(!W){o.innerHTML='Per-side plate breakdown for any target weight.';return}
+  let per=(W-B)/2;
+  if(per<0){o.innerHTML=`Target is below the ${B} lb bar.`;return}
+  let rem=per,out=[];
+  [45,35,25,10,5,2.5].forEach(p=>{const c=Math.floor((rem+1e-9)/p);if(c){out.push(c>1?`${p}\u00d7${c}`:`${p}`);rem-=c*p}});
+  rem=Math.round(rem*100)/100;
+  o.innerHTML=`Per side: <b>${out.join(' \u00b7 ')||'bar only'}</b> (${B} lb bar)`+(rem?`<br>${rem} lb/side won\u2019t load \u2014 closest: <b>${W-rem*2} lb</b>`:'');
+}
+$('pcW').oninput=calcPlates;$('pcB').oninput=calcPlates;
+
+/* =============== TOOLS =============== */
+$('toolsOpen').onclick=()=>openSheet('toolsSheet');
+function parseTime(v){const m=v.trim().match(/^(\d{1,3})[:.](\d{2})$/);if(m)return +m[1]*60+ +m[2];const n=parseFloat(v);return isNaN(n)?null:n*60}
+$('tt2').oninput=()=>{const s=parseTime($('tt2').value);const o=$('tt2out');
+  if(!s){o.innerHTML='Format: mm:ss';return}
+  const permi=s/2, fast=permi-20, slow=permi-15;
+  const t200=x=>x/8;
+  o.innerHTML=`TT pace: <b>${fmt(Math.round(permi))}/mi</b><br>200m repeats: <b>${Math.round(t200(fast))}&ndash;${Math.round(t200(slow))} sec</b> each (${fmt(Math.round(fast))}&ndash;${fmt(Math.round(slow))}/mi)`};
+$('tt5').oninput=()=>{const s=parseTime($('tt5').value);const o=$('tt5out');
+  if(!s){o.innerHTML='Format: mm:ss';return}
+  const permi=s/5;
+  o.innerHTML=`TT pace: <b>${fmt(Math.round(permi))}/mi</b><br>Tempo window: <b>${fmt(Math.round(permi+8))}&ndash;${fmt(Math.round(permi+15))}/mi</b> (RPE 7.5-8)`};
+$('age').oninput=()=>{const a=parseInt($('age').value);const o=$('ageout');
+  if(!a){o.innerHTML='MAF method: 180 &minus; age.';return}
+  o.innerHTML=`Zone 2: <b>${180-a-20}&ndash;${180-a} bpm</b>`};
+function renderSubs(q){const r=$('subres');const s=(q||'').toLowerCase();
+  const hits=SUBS.filter(x=>!s||x[0].toLowerCase().includes(s)||x[1].toLowerCase().includes(s)).slice(0,s?40:12);
+  r.innerHTML=hits.map(x=>`<div><b>${x[0]}</b><br><span>${x[1]}</span></div>`).join('')||'<div><span>No match — try fewer letters.</span></div>'}
+$('subq').oninput=()=>renderSubs($('subq').value);
+renderSubs('');
+
+/* =============== INIT =============== */
+(async function(){
+  await loadState(); await loadDone();
+  if(S.p>=P.phases.length)S.p=1;
+  if(S.w>=ph().weeks.length)S.w=0;
+  if(S.d>=7)S.d=0;
+  await loadDay();
+  renderHeader();renderDayRail();renderDay();
+})();
+window.addEventListener('pagehide',()=>{if(dirty)saveDay()});
+</script>
+</body>
+</html>
