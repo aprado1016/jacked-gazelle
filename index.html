@@ -6,6 +6,10 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#050A06">
+<meta name="apple-mobile-web-app-title" content="Jacked Gazelle">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" type="image/png" href="icon-192.png">
 <title>Jacked Gazelle 2.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&display=swap" rel="stylesheet">
@@ -206,6 +210,15 @@ header{position:sticky;top:0;z-index:40;background:linear-gradient(180deg,rgba(5
     <h4>Plate Math</h4>
     <div class="frow"><input id="pcW" placeholder="Target weight (lb)" inputmode="decimal"><input id="pcB" placeholder="Bar: 45" inputmode="decimal" style="max-width:92px"></div>
     <div class="out" id="pcOut">Per-side plate breakdown for any target weight.</div>
+  </div>
+  <div class="tool">
+    <h4>Backup &amp; Restore</h4>
+    <div style="display:flex;gap:8px">
+      <button class="addset" style="margin:0" id="expBtn">Export logs</button>
+      <button class="addset" style="margin:0" id="impBtn">Import backup</button>
+    </div>
+    <input type="file" id="impFile" accept="application/json,.json" style="display:none">
+    <div class="out" id="bkOut" style="margin-top:8px">Export downloads all your logs as a file (save it to iCloud/Files). Import restores them on any device.</div>
   </div>
   <div class="tool">
     <h4>Zone 2 Heart Rate</h4>
@@ -948,6 +961,48 @@ function renderSubs(q){const r=$('subres');const s=(q||'').toLowerCase();
   r.innerHTML=hits.map(x=>`<div><b>${x[0]}</b><br><span>${x[1]}</span></div>`).join('')||'<div><span>No match — try fewer letters.</span></div>'}
 $('subq').oninput=()=>renderSubs($('subq').value);
 renderSubs('');
+
+/* =============== BACKUP / RESTORE =============== */
+async function sSetRaw(k,str){
+  if(WS){try{await WS.set(k,str);return}catch(e){console.error(e)}}
+  try{localStorage.setItem('jg2:'+k,str)}catch(e){console.error(e)}
+}
+$('expBtn').onclick=async()=>{
+  await saveDay();
+  const data={};
+  if(WS){
+    try{const r=await WS.list();
+      for(const k of (r.keys||[])){try{const v=await WS.get(k);if(v)data[k]=v.value}catch(e){}}
+    }catch(e){}
+  }else{
+    for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);
+      if(k&&k.startsWith('jg2:'))data[k.slice(4)]=localStorage.getItem(k)}
+  }
+  const n=Object.keys(data).length;
+  if(!n){$('bkOut').innerHTML='Nothing to export yet — log a set first.';return}
+  const blob=new Blob([JSON.stringify({app:'jg2',v:1,ts:Date.now(),data})],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='jg2-backup-'+new Date().toISOString().slice(0,10)+'.json';
+  document.body.appendChild(a);a.click();a.remove();
+  $('bkOut').innerHTML=`Exported <b>${n}</b> records. Keep that file somewhere safe.`;
+};
+$('impBtn').onclick=()=>$('impFile').click();
+$('impFile').onchange=async()=>{
+  const f=$('impFile').files[0]; if(!f)return;
+  try{
+    const obj=JSON.parse(await f.text());
+    if(obj.app!=='jg2'||!obj.data)throw 0;
+    let n=0;
+    for(const [k,v] of Object.entries(obj.data)){await sSetRaw(k,v);n++}
+    $('bkOut').innerHTML=`Restored <b>${n}</b> records. Reloading…`;
+    setTimeout(()=>location.reload(),900);
+  }catch(e){$('bkOut').innerHTML='That file isn\u2019t a Jacked Gazelle backup.'}
+  $('impFile').value='';
+};
+if('serviceWorker' in navigator&&location.protocol==='https:'){
+  navigator.serviceWorker.register('sw.js').catch(()=>{});
+}
 
 /* =============== INIT =============== */
 (async function(){
