@@ -98,6 +98,16 @@ header{position:sticky;top:0;z-index:40;background:linear-gradient(180deg,rgba(5
 
 /* conditioning */
 .condbody{padding:12px 14px}
+.calcstrip{margin-top:10px;border-top:1px solid var(--line);padding-top:9px}
+.calcrow{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.calcrow .tg{font-size:13px;color:var(--dim);line-height:1.35}
+.calcrow .tg b{color:var(--gold);font-weight:700;font-family:var(--disp);font-size:16px;letter-spacing:.03em}
+.calcrow button{font-family:var(--disp);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--blue);flex-shrink:0;padding:4px 0}
+.calcedit{display:none;margin-top:8px}
+.calcstrip.open .calcedit{display:block}
+.calcedit label{display:block;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin-bottom:5px}
+.calcedit input{width:100%;padding:9px 11px;font-size:16px}
+.calcask{width:100%;text-align:left;font-size:13px;color:var(--blue);padding:2px 0}
 .condbody p{margin-bottom:6px;font-size:14.5px}
 .condbody p b{color:var(--blue);font-weight:600}
 .result{margin-top:10px}
@@ -747,6 +757,7 @@ function renderDay(){
   if(d.cond){
     h+=`<div class="card cond"><div class="chead"><span class="t">${d.cond.t}</span></div><div class="condbody">`;
     d.cond.l.forEach(l=>h+=`<p>${l}</p>`);
+    h+=calcStrip(d.cond);
     h+=`<div class="result"><label>Result / notes (pace, rounds, time&hellip;)</label><input id="condres" value="${(dayData.cond||'').replace(/"/g,'&quot;')}" placeholder="e.g. 200s avg 42.5 · felt smooth"></div></div></div>`;
   }
   h+=`<div class="dayfoot">
@@ -755,6 +766,7 @@ function renderDay(){
   </div>`;
   m.innerHTML=h;
   const cr=$('condres'); if(cr) cr.oninput=()=>{dayData.cond=cr.value;scheduleSave()};
+  if(d.cond) wireCalc(d.cond);
   $('daynote').oninput=()=>{dayData.note=$('daynote').value;scheduleSave()};
   $('donebtn').onclick=()=>setDone(!dayData.done);
 }
@@ -959,16 +971,16 @@ $('pcW').oninput=calcPlates;$('pcB').oninput=calcPlates;
 $('toolsOpen').onclick=()=>openSheet('toolsSheet');
 $('backupOpen').onclick=()=>openSheet('backupSheet');
 function parseTime(v){const m=v.trim().match(/^(\d{1,3})[:.](\d{2})$/);if(m)return +m[1]*60+ +m[2];const n=parseFloat(v);return isNaN(n)?null:n*60}
-$('tt2').oninput=()=>{const s=parseTime($('tt2').value);const o=$('tt2out');
+$('tt2').oninput=()=>{CALC.tt2=$('tt2').value;sSet('calc',CALC);const s=parseTime($('tt2').value);const o=$('tt2out');
   if(!s){o.innerHTML='Format: mm:ss';return}
   const permi=s/2, fast=permi-20, slow=permi-15;
   const t200=x=>x/8;
   o.innerHTML=`TT pace: <b>${fmt(Math.round(permi))}/mi</b><br>200m repeats: <b>${Math.round(t200(fast))}&ndash;${Math.round(t200(slow))} sec</b> each (${fmt(Math.round(fast))}&ndash;${fmt(Math.round(slow))}/mi)`};
-$('tt5').oninput=()=>{const s=parseTime($('tt5').value);const o=$('tt5out');
+$('tt5').oninput=()=>{CALC.tt5=$('tt5').value;sSet('calc',CALC);const s=parseTime($('tt5').value);const o=$('tt5out');
   if(!s){o.innerHTML='Format: mm:ss';return}
   const permi=s/5;
   o.innerHTML=`TT pace: <b>${fmt(Math.round(permi))}/mi</b><br>Tempo window: <b>${fmt(Math.round(permi+8))}&ndash;${fmt(Math.round(permi+15))}/mi</b> (RPE 7.5-8)`};
-$('age').oninput=()=>{const a=parseInt($('age').value);const o=$('ageout');
+$('age').oninput=()=>{CALC.age=$('age').value;sSet('calc',CALC);const a=parseInt($('age').value);const o=$('ageout');
   if(!a){o.innerHTML='MAF method: 180 &minus; age.';return}
   o.innerHTML=`Zone 2: <b>${180-a-20}&ndash;${180-a} bpm</b>`};
 function renderSubs(q){const r=$('subres');const s=(q||'').toLowerCase();
@@ -976,6 +988,80 @@ function renderSubs(q){const r=$('subres');const s=(q||'').toLowerCase();
   r.innerHTML=hits.map(x=>`<div><b>${x[0]}</b><br><span>${x[1]}</span></div>`).join('')||'<div><span>No match — try fewer letters.</span></div>'}
 $('subq').oninput=()=>renderSubs($('subq').value);
 renderSubs('');
+
+/* =============== CONTEXTUAL PACE CALCULATORS =============== */
+let CALC={};
+const secPerMi=(s,mi)=>s/mi;
+const mmss=s=>`${Math.floor(s/60)}:${String(Math.round(s%60)).padStart(2,'0')}`;
+const secs=s=>`${s.toFixed(0)} sec`;
+
+function calcKind(cond){
+  const t=(cond.t||'').toLowerCase(), all=(t+' '+(cond.l||[]).join(' ')).toLowerCase();
+  if(t.includes('non-repeat')||t.includes('non tempo')||t.includes('non-tempo')) return null;
+  if(t.includes('hill')) return 'hill';
+  if(t.includes('tempo')||t.includes('cruise')) return 'tempo';
+  if(t.includes('repeat')||/(200|400|600)\s?m\b/.test(all)) return 'rep';
+  if(t.includes('long run')||t.includes('zone 2')||t.includes('aerobic run')) return 'z2';
+  return null;
+}
+const CFG={
+  rep:  {key:'tt2', lab:'Your 2-mile time trial', ph:'e.g. 13:30'},
+  hill: {key:'tt2', lab:'Your 2-mile time trial', ph:'e.g. 13:30'},
+  tempo:{key:'tt5', lab:'Your 5-mile time trial', ph:'e.g. 36:00'},
+  z2:   {key:'age', lab:'Your age', ph:'e.g. 32'}
+};
+function calcResult(kind,cond){
+  const cfg=CFG[kind], raw=(CALC[cfg.key]||'').trim();
+  if(!raw) return null;
+  if(kind==='z2'){
+    const a=parseInt(raw); if(!a) return null;
+    return `Zone 2: <b>${180-a-20}\u2013${180-a} bpm</b>`;
+  }
+  const s=parseTime(raw); if(!s) return null;
+  if(kind==='tempo'){
+    const p=secPerMi(s,5);
+    return `Tempo pace: <b>${mmss(p+8)}\u2013${mmss(p+15)}</b> /mi`;
+  }
+  const p=secPerMi(s,2);                       // 2-mile TT pace
+  if(kind==='hill') return `Target effort \u2248 2-mi pace: <b>${mmss(p)}</b> /mi`;
+  const all=((cond.t||'')+' '+(cond.l||[]).join(' '));
+  const rng=(a,b)=>b<60?`${Math.floor(a)}\u2013${Math.ceil(b)} sec`:`${mmss(a)}\u2013${mmss(b)}`;
+  const out=[];
+  if(/200\s?m\b/.test(all)) out.push(`200m <b>${rng((p-20)/8,(p-15)/8)}</b>`);
+  if(/400\s?m\b/.test(all)) out.push(`400m <b>${rng((p-15)/4,(p-10)/4)}</b>`);
+  if(/600\s?m\b/.test(all)) out.push(`600m <b>${rng((p-8)*0.373,(p-5)*0.373)}</b>`);
+  return out.length?out.join(' &nbsp;\u00b7&nbsp; '):`2-mile TT pace: <b>${mmss(p)}</b> /mi`;
+}
+function calcStrip(cond){
+  const kind=calcKind(cond); if(!kind) return '';
+  const cfg=CFG[kind], res=calcResult(kind,cond);
+  const val=(CALC[cfg.key]||'').replace(/"/g,'&quot;');
+  return `<div class="calcstrip" id="calcstrip" data-kind="${kind}">
+    ${res?`<div class="calcrow"><span class="tg">${res}</span><button id="calcToggle">Edit</button></div>`
+        :`<button class="calcask" id="calcToggle">&#8250; ${cfg.lab} &mdash; tap to set your target paces</button>`}
+    <div class="calcedit"><label>${cfg.lab}</label>
+      <input id="calcInput" inputmode="${kind==='z2'?'numeric':'text'}" value="${val}" placeholder="${cfg.ph}"></div>
+  </div>`;
+}
+function wireCalc(cond){
+  const strip=$('calcstrip'); if(!strip) return;
+  const kind=strip.dataset.kind, cfg=CFG[kind];
+  $('calcToggle').onclick=()=>{strip.classList.toggle('open'); if(strip.classList.contains('open')) $('calcInput').focus()};
+  if(!calcResult(kind,cond)) strip.classList.add('open');
+  $('calcInput').oninput=async e=>{
+    CALC[cfg.key]=e.target.value; await sSet('calc',CALC);
+    const r=calcResult(kind,cond), row=strip.querySelector('.calcrow .tg'), ask=strip.querySelector('.calcask');
+    if(r&&row) row.innerHTML=r;
+    else if(r&&ask){ask.outerHTML=`<div class="calcrow"><span class="tg">${r}</span><button id="calcToggle2">Edit</button></div>`;
+      $('calcToggle2').onclick=()=>strip.classList.toggle('open');}
+    syncTools();
+  };
+}
+function syncTools(){
+  if($('tt2')&&CALC.tt2!==undefined){$('tt2').value=CALC.tt2; $('tt2').oninput()}
+  if($('tt5')&&CALC.tt5!==undefined){$('tt5').value=CALC.tt5; $('tt5').oninput()}
+  if($('age')&&CALC.age!==undefined){$('age').value=CALC.age; $('age').oninput()}
+}
 
 /* =============== THEMES =============== */
 const CSSV=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
@@ -1053,11 +1139,13 @@ if('serviceWorker' in navigator&&location.protocol==='https:'){
 (async function(){
   await loadState(); await loadDone();
   applyTheme((await sGet('theme'))||'evergreen',false); buildThemeGrid();
+  CALC=(await sGet('calc'))||{};
   if(S.p>=P.phases.length)S.p=1;
   if(S.w>=ph().weeks.length)S.w=0;
   if(S.d>=7)S.d=0;
   await loadDay();
   renderHeader();renderDayRail();renderDay();
+  syncTools();
 })();
 window.addEventListener('pagehide',()=>{if(dirty)saveDay()});
 </script>
