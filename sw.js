@@ -1,4 +1,4 @@
-const C='jg2-v2';
+const C='jg2-v21';
 const SHELL=['./','./index.html','./manifest.webmanifest','./icon-192.png','./icon-512.png'];
 
 self.addEventListener('install',e=>{
