@@ -18,6 +18,8 @@
   --bg:#050A06; --panel:#152619; --panel2:#1E3324; --line:#33503E;
   --ink:#EDF5EE; --dim:#AAC6B1; --faint:#78957F;
   --blue:#3ECF8E; --blue-deep:#1E7A52; --gold:#E9C46A; --green:#3FD68F; --red:#FF6B5E;
+  --sel-a:#1B3B26; --sel-b:#142B1A; --gold-tint:rgba(233,196,106,.07); --gold-line:rgba(233,196,106,.5);
+  --done-a:#45DB98; --done-b:#2FA871; --done-ink:#04150C; --done-glow:rgba(62,207,142,.4);
   --disp:'Barlow Condensed',-apple-system,sans-serif;
   --body:-apple-system,BlinkMacSystemFont,'SF Pro Text',Segoe UI,Roboto,sans-serif;
 }
@@ -36,7 +38,17 @@ header{position:sticky;top:0;z-index:40;background:linear-gradient(180deg,rgba(5
 .brand h1{font-family:var(--disp);font-weight:800;font-size:clamp(17px,5.4vw,24px);letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}
 .brand h1 em{font-style:normal;color:var(--gold)}
 .brand .sub{font-family:var(--disp);font-size:10px;letter-spacing:.2em;color:var(--faint);text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.toolbtn{font-family:var(--disp);font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);padding:6px 2px}
+.toolbtn{font-family:var(--disp);font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--blue);padding:6px 2px;white-space:nowrap}
+.hbtns{display:flex;gap:13px;flex-shrink:0}
+.toolbtn.hi{color:var(--gold)}
+.bigbtn{width:100%;padding:15px;border-radius:12px;font-family:var(--disp);font-weight:700;font-size:17px;letter-spacing:.1em;text-transform:uppercase;background:var(--panel2);border:1px solid var(--line);color:var(--ink);margin-bottom:9px}
+.bigbtn.pri{background:linear-gradient(180deg,var(--done-a),var(--done-b));border-color:var(--done-a);color:var(--done-ink)}
+.themegrid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}
+.swatch{display:flex;align-items:center;gap:9px;padding:11px 12px;border-radius:11px;border:1px solid var(--line);background:var(--panel2);text-align:left}
+.swatch.on{border-color:var(--blue)}
+.swatch .dots{display:flex;gap:4px;flex-shrink:0}
+.swatch .dots i{width:13px;height:13px;border-radius:50%;display:block}
+.swatch .nm{font-family:var(--disp);font-size:15px;font-weight:600;letter-spacing:.05em;text-transform:uppercase}
 .selrow{display:flex;gap:8px;margin:10px 0}
 .selpill{flex:1;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px 12px;text-align:left;display:flex;justify-content:space-between;align-items:center}
 .selpill .lab{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--faint);display:block}
@@ -47,7 +59,7 @@ header{position:sticky;top:0;z-index:40;background:linear-gradient(180deg,rgba(5
 .daychip{min-width:66px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:7px 6px 6px;text-align:center;position:relative;flex-shrink:0}
 .daychip .d{font-family:var(--disp);font-weight:700;font-size:17px;letter-spacing:.05em}
 .daychip .f{font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:.05em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
-.daychip.on{border-color:var(--blue);background:linear-gradient(180deg,#1B3B26,#142B1A)}
+.daychip.on{border-color:var(--blue);background:linear-gradient(180deg,var(--sel-a),var(--sel-b))}
 .daychip.on .d{color:var(--blue)}
 .daychip .dot{position:absolute;top:5px;right:6px;width:6px;height:6px;border-radius:50%;background:var(--green);display:none}
 .daychip.done .dot{display:block}
@@ -93,9 +105,9 @@ header{position:sticky;top:0;z-index:40;background:linear-gradient(180deg,rgba(5
 .result input{width:100%;padding:10px 12px;font-size:15px}
 
 /* groups & top notes */
-.grp{border-left:3px solid var(--gold);background:rgba(233,196,106,.07)}
+.grp{border-left:3px solid var(--gold);background:var(--gold-tint)}
 .grphead{font-family:var(--disp);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);padding:9px 14px 0}
-.lt{display:inline-block;font-family:var(--disp);font-weight:700;font-size:12px;color:var(--gold);border:1px solid rgba(233,196,106,.5);border-radius:4px;padding:0 5px;margin-right:8px;line-height:16px;vertical-align:1px}
+.lt{display:inline-block;font-family:var(--disp);font-weight:700;font-size:12px;color:var(--gold);border:1px solid var(--gold-line);border-radius:4px;padding:0 5px;margin-right:8px;line-height:16px;vertical-align:1px}
 .topnotes{margin:10px 14px -2px;font-size:12.5px;color:var(--dim)}
 .topnotes span{display:block;padding:2px 0}
 .topnotes span::before{content:'\00BB  ';color:var(--gold)}
@@ -104,7 +116,7 @@ header{position:sticky;top:0;z-index:40;background:linear-gradient(180deg,rgba(5
 .dayfoot{margin:16px 14px}
 .dayfoot textarea{width:100%;min-height:64px;padding:10px 12px;font-size:14px;resize:vertical}
 .donebtn{width:100%;margin-top:10px;padding:14px;border-radius:12px;font-family:var(--disp);font-weight:700;font-size:18px;letter-spacing:.14em;text-transform:uppercase;background:var(--panel2);border:1px solid var(--line);color:var(--ink)}
-.donebtn.on{background:linear-gradient(180deg,#45DB98,#2FA871);border-color:#45DB98;color:#04150C;box-shadow:0 4px 18px rgba(62,207,142,.4);animation:pop .35s ease}
+.donebtn.on{background:linear-gradient(180deg,var(--done-a),var(--done-b));border-color:var(--done-a);color:var(--done-ink);box-shadow:0 4px 18px var(--done-glow);animation:pop .35s ease}
 @keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.05)}100%{transform:scale(1)}}
 .donebtn:active{transform:scale(.97)}
 .restday{margin:40px 14px;text-align:center}
@@ -166,7 +178,7 @@ header{position:sticky;top:0;z-index:40;background:linear-gradient(180deg,rgba(5
       <div class="sub">Terminator Training Method</div>
       <h1>Jacked Gazelle <em>2.0</em></h1>
     </div>
-    <div style="display:flex;gap:16px"><button class="toolbtn" id="progOpen">Progress</button><button class="toolbtn" id="toolsOpen">Tools</button></div>
+    <div class="hbtns"><button class="toolbtn" id="progOpen">Progress</button><button class="toolbtn hi" id="backupOpen">Backup</button><button class="toolbtn" id="toolsOpen">Tools</button></div>
   </div>
   <div class="selrow">
     <button class="selpill" id="phasePill"><span><span class="lab">Phase</span><span class="val" id="phaseVal">Phase 1</span></span><span class="car">&#9662;</span></button>
@@ -194,8 +206,19 @@ header{position:sticky;top:0;z-index:40;background:linear-gradient(180deg,rgba(5
     <div class="subres" id="prBoard" style="max-height:none"></div>
   </div>
 </div>
+<div class="sheet" id="backupSheet">
+  <h3>Backup &amp; Restore</h3>
+  <button class="bigbtn pri" id="expBtn">&#8681;&nbsp; Export my logs</button>
+  <button class="bigbtn" id="impBtn">&#8679;&nbsp; Import a backup</button>
+  <input type="file" id="impFile" accept="application/json,.json" style="display:none">
+  <div class="out" id="bkOut" style="margin-top:4px">Export saves every set, note and result to a file &mdash; keep it in Files or iCloud. Import restores it here or on a new phone. Your logs live only on this device, so back up every few weeks.</div>
+</div>
 <div class="sheet" id="toolsSheet">
   <h3>Tools</h3>
+  <div class="tool">
+    <h4>Theme</h4>
+    <div class="themegrid" id="themeGrid"></div>
+  </div>
   <div class="tool">
     <h4>Repeat Pace &middot; from 2-mile TT</h4>
     <div class="frow"><input id="tt2" placeholder="2-mi time e.g. 13:30" inputmode="numeric"></div>
@@ -210,15 +233,6 @@ header{position:sticky;top:0;z-index:40;background:linear-gradient(180deg,rgba(5
     <h4>Plate Math</h4>
     <div class="frow"><input id="pcW" placeholder="Target weight (lb)" inputmode="decimal"><input id="pcB" placeholder="Bar: 45" inputmode="decimal" style="max-width:92px"></div>
     <div class="out" id="pcOut">Per-side plate breakdown for any target weight.</div>
-  </div>
-  <div class="tool">
-    <h4>Backup &amp; Restore</h4>
-    <div style="display:flex;gap:8px">
-      <button class="addset" style="margin:0" id="expBtn">Export logs</button>
-      <button class="addset" style="margin:0" id="impBtn">Import backup</button>
-    </div>
-    <input type="file" id="impFile" accept="application/json,.json" style="display:none">
-    <div class="out" id="bkOut" style="margin-top:8px">Export downloads all your logs as a file (save it to iCloud/Files). Import restores them on any device.</div>
   </div>
   <div class="tool">
     <h4>Zone 2 Heart Rate</h4>
@@ -897,10 +911,10 @@ function drawChart(H,name){
     const Y=v=>pt+(Ht-pt-pb)*(1-(v-min)/span);
     const pts=nums.map((e,i)=>`${X(i).toFixed(1)},${Y(e.e1).toFixed(1)}`).join(' ');
     h+=`<svg class="chart" viewBox="0 0 ${W} ${Ht}">
-      <polyline points="${pts}" fill="none" stroke="#3ECF8E" stroke-width="2.5" stroke-linejoin="round"/>
-      ${nums.map((e,i)=>`<circle cx="${X(i).toFixed(1)}" cy="${Y(e.e1).toFixed(1)}" r="3.5" fill="#E9C46A"/>`).join('')}
-      <text x="${pl}" y="11" fill="#AAC6B1" font-size="10">est 1RM \u00b7 best ${Math.round(max)}</text>
-      <text x="${pl}" y="${Ht-5}" fill="#78957F" font-size="10">start ${Math.round(nums[0].e1)}</text>
+      <polyline points="${pts}" fill="none" stroke="${CSSV('--blue')}" stroke-width="2.5" stroke-linejoin="round"/>
+      ${nums.map((e,i)=>`<circle cx="${X(i).toFixed(1)}" cy="${Y(e.e1).toFixed(1)}" r="3.5" fill="${CSSV('--gold')}"/>`).join('')}
+      <text x="${pl}" y="11" fill="${CSSV('--dim')}" font-size="10">est 1RM \u00b7 best ${Math.round(max)}</text>
+      <text x="${pl}" y="${Ht-5}" fill="${CSSV('--faint')}" font-size="10">start ${Math.round(nums[0].e1)}</text>
     </svg>`;
   } else h+='<div class="out">Two or more logged sessions with weight draw the trend line.</div>';
   h+='<div class="out" style="margin-top:4px">'+es.slice(-10).reverse().map(e=>`${e.at}: <b>${e.w}\u00d7${e.r}</b>${e.e1?` \u00b7 est ${Math.round(e.e1)}`:''}`).join('<br>')+'</div>';
@@ -924,7 +938,7 @@ async function renderPR(H){
   for(const dd of [d1,d4]){ if(dd.sets) for(const [n,ss] of Object.entries(dd.sets)){
     const gs=ss.filter(s=>parseFloat(s.w)>0);
     if(gs.length){const top=gs.reduce((a,c)=>parseFloat(c.w)>parseFloat(a.w)?c:a);tl.push(`${n} 3RM: <b>${top.w}</b>`)}}}
-  if(tl.length)h+=`<div style="margin-top:10px;border-top:1px solid #33503E;padding-top:8px"><b style="color:#E9C46A">Time Trial Week</b><br><span>${tl.join('<br>')}</span></div>`;
+  if(tl.length)h+=`<div style="margin-top:10px;border-top:1px solid ${CSSV('--line')};padding-top:8px"><b style="color:${CSSV('--gold')}">Time Trial Week</b><br><span>${tl.join('<br>')}</span></div>`;
   $('prBoard').innerHTML=h;
 }
 
@@ -943,6 +957,7 @@ $('pcW').oninput=calcPlates;$('pcB').oninput=calcPlates;
 
 /* =============== TOOLS =============== */
 $('toolsOpen').onclick=()=>openSheet('toolsSheet');
+$('backupOpen').onclick=()=>openSheet('backupSheet');
 function parseTime(v){const m=v.trim().match(/^(\d{1,3})[:.](\d{2})$/);if(m)return +m[1]*60+ +m[2];const n=parseFloat(v);return isNaN(n)?null:n*60}
 $('tt2').oninput=()=>{const s=parseTime($('tt2').value);const o=$('tt2out');
   if(!s){o.innerHTML='Format: mm:ss';return}
@@ -961,6 +976,36 @@ function renderSubs(q){const r=$('subres');const s=(q||'').toLowerCase();
   r.innerHTML=hits.map(x=>`<div><b>${x[0]}</b><br><span>${x[1]}</span></div>`).join('')||'<div><span>No match — try fewer letters.</span></div>'}
 $('subq').oninput=()=>renderSubs($('subq').value);
 renderSubs('');
+
+/* =============== THEMES =============== */
+const CSSV=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const THEMES={
+ evergreen:{n:'Evergreen',v:{'--bg':'#050A06','--panel':'#152619','--panel2':'#1E3324','--line':'#33503E','--ink':'#EDF5EE','--dim':'#AAC6B1','--faint':'#78957F','--blue':'#3ECF8E','--blue-deep':'#1E7A52','--gold':'#E9C46A','--green':'#3FD68F','--red':'#FF6B5E','--sel-a':'#1B3B26','--sel-b':'#142B1A','--gold-tint':'rgba(233,196,106,.07)','--gold-line':'rgba(233,196,106,.5)','--done-a':'#45DB98','--done-b':'#2FA871','--done-ink':'#04150C','--done-glow':'rgba(62,207,142,.4)'}},
+ steel:{n:'Steel Blue',v:{'--bg':'#060910','--panel':'#141C29','--panel2':'#1C2738','--line':'#31435C','--ink':'#EDF2FA','--dim':'#A6BAD2','--faint':'#748AA6','--blue':'#3FA9F5','--blue-deep':'#1B6FB8','--gold':'#F0C36B','--green':'#3FD68F','--red':'#FF6B5E','--sel-a':'#1B3350','--sel-b':'#132338','--gold-tint':'rgba(240,195,107,.07)','--gold-line':'rgba(240,195,107,.5)','--done-a':'#42B4F7','--done-b':'#1E7FC4','--done-ink':'#041322','--done-glow':'rgba(63,169,245,.4)'}},
+ engineer:{n:'Engineer Red',v:{'--bg':'#0B0505','--panel':'#221312','--panel2':'#2E1B19','--line':'#4E2C29','--ink':'#F8EEEC','--dim':'#D3ADA8','--faint':'#A07E79','--blue':'#E4392F','--blue-deep':'#9E211A','--gold':'#E8D5B0','--green':'#3FD68F','--red':'#FF6B5E','--sel-a':'#3E1A17','--sel-b':'#2A100E','--gold-tint':'rgba(232,213,176,.07)','--gold-line':'rgba(232,213,176,.5)','--done-a':'#EF5247','--done-b':'#B62A22','--done-ink':'#1A0503','--done-glow':'rgba(228,57,47,.4)'}},
+ coyote:{n:'Coyote Tan',v:{'--bg':'#0A0805','--panel':'#1E1913','--panel2':'#2A231A','--line':'#483D2C','--ink':'#F6F0E6','--dim':'#C9B79B','--faint':'#96856C','--blue':'#D7A55C','--blue-deep':'#96702F','--gold':'#8FA05E','--green':'#3FD68F','--red':'#FF6B5E','--sel-a':'#3A2E1D','--sel-b':'#241C11','--gold-tint':'rgba(143,160,94,.08)','--gold-line':'rgba(143,160,94,.5)','--done-a':'#E0AE64','--done-b':'#A87B32','--done-ink':'#180F03','--done-glow':'rgba(215,165,92,.4)'}},
+ gunmetal:{n:'Gunmetal',v:{'--bg':'#08090A','--panel':'#181B1E','--panel2':'#22262A','--line':'#3C4348','--ink':'#F0F3F5','--dim':'#B3BCC3','--faint':'#7F8990','--blue':'#C3CDD6','--blue-deep':'#7C8B98','--gold':'#D89A4E','--green':'#3FD68F','--red':'#FF6B5E','--sel-a':'#2A3036','--sel-b':'#1C2126','--gold-tint':'rgba(216,154,78,.08)','--gold-line':'rgba(216,154,78,.5)','--done-a':'#D6DEE5','--done-b':'#93A1AD','--done-ink':'#0B0E11','--done-glow':'rgba(195,205,214,.35)'}},
+ nvg:{n:'Night Vision',v:{'--bg':'#000000','--panel':'#0A1410','--panel2':'#0F1F18','--line':'#1E3A2C','--ink':'#DFFFEE','--dim':'#7FCFA6','--faint':'#4E8F6C','--blue':'#00FF9C','--blue-deep':'#00A866','--gold':'#B6FF4A','--green':'#00FF9C','--red':'#FF6B5E','--sel-a':'#0C2A1C','--sel-b':'#04150D','--gold-tint':'rgba(182,255,74,.07)','--gold-line':'rgba(182,255,74,.45)','--done-a':'#00FF9C','--done-b':'#00B370','--done-ink':'#00160D','--done-glow':'rgba(0,255,156,.45)'}}
+};
+let curTheme='evergreen';
+function applyTheme(id,save){
+  const t=THEMES[id]; if(!t)return;
+  curTheme=id;
+  for(const [k,v] of Object.entries(t.v)) document.documentElement.style.setProperty(k,v);
+  const mt=document.querySelector('meta[name=theme-color]'); if(mt) mt.setAttribute('content',t.v['--bg']);
+  document.querySelectorAll('#themeGrid .swatch').forEach(b=>b.classList.toggle('on',b.dataset.id===id));
+  if(save) sSet('theme',id);
+}
+function buildThemeGrid(){
+  const g=$('themeGrid'); if(!g)return; g.innerHTML='';
+  for(const [id,t] of Object.entries(THEMES)){
+    const b=document.createElement('button');
+    b.className='swatch'+(id===curTheme?' on':''); b.dataset.id=id;
+    b.innerHTML=`<span class="dots"><i style="background:${t.v['--blue']}"></i><i style="background:${t.v['--gold']}"></i><i style="background:${t.v['--panel']};border:1px solid ${t.v['--line']}"></i></span><span class="nm">${t.n}</span>`;
+    b.onclick=()=>{applyTheme(id,true); if(!dy().rest) renderDay();};
+    g.appendChild(b);
+  }
+}
 
 /* =============== BACKUP / RESTORE =============== */
 async function sSetRaw(k,str){
@@ -1007,6 +1052,7 @@ if('serviceWorker' in navigator&&location.protocol==='https:'){
 /* =============== INIT =============== */
 (async function(){
   await loadState(); await loadDone();
+  applyTheme((await sGet('theme'))||'evergreen',false); buildThemeGrid();
   if(S.p>=P.phases.length)S.p=1;
   if(S.w>=ph().weeks.length)S.w=0;
   if(S.d>=7)S.d=0;
