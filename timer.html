@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#050A06">
+<title>Interval Timer — prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#050A06; --panel:#152619; --panel2:#1E3324; --line:#33503E;
+  --ink:#EDF5EE; --dim:#AAC6B1; --faint:#78957F;
+  --easy:#3ECF8E; --tempo:#E9C46A; --hard:#F0663F; --rest:#5A93B8; --cool:#7A8C99;
+  --cur:var(--easy);
+  --disp:'Barlow Condensed',-apple-system,sans-serif;
+  --body:-apple-system,BlinkMacSystemFont,'SF Pro Text',Segoe UI,Roboto,sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;height:100%}
+body{display:flex;flex-direction:column;padding:calc(env(safe-area-inset-top) + 12px) 16px calc(env(safe-area-inset-bottom) + 16px);overscroll-behavior:none}
+button{font-family:inherit;border:none;background:none;color:inherit;cursor:pointer}
+input,select{font-family:inherit;color:var(--ink);background:var(--panel2);border:1px solid var(--line);border-radius:9px;outline:none;padding:10px 11px;font-size:16px}
+
+/* ---- session picker ---- */
+.top{display:flex;gap:9px;align-items:center;margin-bottom:14px}
+#preset{flex:1;-webkit-appearance:none;background:var(--panel);font-size:15px}
+.iconbtn{width:44px;height:44px;border-radius:10px;background:var(--panel);border:1px solid var(--line);font-family:var(--disp);font-size:19px;font-weight:700;flex-shrink:0}
+
+/* ---- dial ---- */
+.dial{position:relative;flex:1;display:flex;align-items:center;justify-content:center;min-height:0}
+svg{width:min(84vw,380px);height:auto;display:block}
+.seg-track{stroke:var(--line);opacity:.55}
+.seg-done{opacity:.9}
+.ring-bg{stroke:var(--panel2)}
+.ring-fg{stroke:var(--cur);transition:stroke .3s}
+.center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none}
+.phase{font-family:var(--disp);font-size:19px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--cur);transition:color .3s}
+.clock{font-family:var(--disp);font-weight:800;font-size:clamp(66px,23vw,116px);line-height:.92;letter-spacing:.01em;font-variant-numeric:tabular-nums;margin:4px 0 2px}
+.clock.warn{animation:tick 1s steps(2,end) infinite}
+@keyframes tick{50%{opacity:.45}}
+.counter{font-family:var(--disp);font-size:16px;letter-spacing:.12em;color:var(--faint);text-transform:uppercase}
+.upnext{text-align:center;font-size:13px;color:var(--dim);margin-top:6px;min-height:18px}
+.upnext b{color:var(--ink);font-weight:600}
+
+/* ---- controls ---- */
+.ctrls{display:flex;gap:10px;margin-top:14px}
+.ctrls button{flex:1;padding:16px 0;border-radius:13px;font-family:var(--disp);font-weight:700;font-size:19px;letter-spacing:.12em;text-transform:uppercase;background:var(--panel);border:1px solid var(--line)}
+.ctrls .go{flex:2;background:linear-gradient(180deg,var(--cur),color-mix(in srgb,var(--cur) 62%,#000));border-color:var(--cur);color:#04150C}
+.ctrls button:active{transform:scale(.975)}
+.ctrls .lap{background:linear-gradient(180deg,var(--tempo),#B08A34);border-color:var(--tempo);color:#1A1205}
+
+/* ---- config sheet ---- */
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:40;display:none}
+.scrim.on{display:block}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:50;background:var(--panel);border-top:1px solid var(--line);border-radius:18px 18px 0 0;padding:16px 16px calc(env(safe-area-inset-bottom) + 20px);transform:translateY(105%);transition:transform .22s ease}
+.sheet.on{transform:translateY(0)}
+.sheet h2{font-family:var(--disp);font-size:20px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:12px}
+.frow{display:flex;gap:10px;margin-bottom:10px}
+.frow label{flex:1;font-size:12px;color:var(--faint)}
+.frow input{width:100%;margin-top:5px}
+.sheet .done{width:100%;padding:14px;border-radius:12px;background:var(--panel2);border:1px solid var(--line);font-family:var(--disp);font-size:17px;letter-spacing:.12em;text-transform:uppercase;margin-top:4px}
+.hint{font-size:12.5px;color:var(--faint);line-height:1.5}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <select id="preset"></select>
+  <button class="iconbtn" id="cfgBtn" title="Adjust">&#9881;</button>
+</div>
+
+<div class="dial">
+  <svg viewBox="0 0 320 320" aria-hidden="true">
+    <g id="segRing"></g>
+    <circle class="ring-bg" cx="160" cy="160" r="118" fill="none" stroke-width="15"/>
+    <circle class="ring-fg" id="ringFg" cx="160" cy="160" r="118" fill="none" stroke-width="15"
+            stroke-linecap="round" pathLength="1000" stroke-dasharray="1000" stroke-dashoffset="1000" transform="rotate(-90 160 160)"/>
+  </svg>
+  <div class="center">
+    <div class="phase" id="phase">Ready</div>
+    <div class="clock" id="clock">0:00</div>
+    <div class="counter" id="counter"></div>
+  </div>
+</div>
+<div class="upnext" id="upnext"></div>
+
+<div class="ctrls">
+  <button id="resetBtn">Reset</button>
+  <button class="go" id="goBtn">Start</button>
+  <button id="skipBtn">Skip</button>
+</div>
+
+<div class="scrim" id="scrim"></div>
+<div class="sheet" id="sheet">
+  <h2 id="cfgTitle">Adjust</h2>
+  <div id="cfgFields"></div>
+  <p class="hint" id="cfgHint"></p>
+  <button class="done" id="cfgDone">Apply</button>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const fmt=s=>{s=Math.max(0,Math.ceil(s));const m=Math.floor(s/60);return `${m}:${String(s%60).padStart(2,'0')}`};
+const EFFORT={easy:'--easy',tempo:'--tempo',hard:'--hard',rest:'--rest',cool:'--cool'};
+
+/* ---------------- session builders ---------------- */
+const seg=(name,dur,kind)=>({name,dur,kind});
+const PRESETS={
+  repeats:{
+    label:'Repeats — 200m (lap mode)',
+    cfg:[['reps','Reps',14],['target','Target per rep (sec)',43]],
+    hint:'Each rep runs for your target time, then recovery starts automatically at 1:1. Finished a rep early? Tap Skip \u2014 recovery then matches the time you actually ran.',
+    build:c=>{const a=[seg('Get ready',10,'rest')];
+      for(let i=1;i<=c.reps;i++){a.push({name:`Rep ${i}`,dur:+c.target,kind:'hard',pairRest:true});
+        a.push(seg('Recover',+c.target,'rest'));}
+      a.push(seg('Cool down',300,'cool'));return a}
+  },
+  hills:{
+    label:'Hill repeats — 8 × 0:45',
+    cfg:[['reps','Reps',8],['work','Work (sec)',45],['rest','Rest (sec)',90]],
+    hint:'Run hard up, walk or jog back down during the rest.',
+    build:c=>{const a=[seg('Warm-up',480,'easy')];
+      for(let i=1;i<=c.reps;i++){a.push(seg(`Hill ${i}`,+c.work,'hard'));
+        if(i<c.reps)a.push(seg('Walk down',+c.rest,'rest'));}
+      a.push(seg('Cool down',300,'cool'));return a}
+  },
+  cruise:{
+    label:'Cruise intervals — 4 × 4:00',
+    cfg:[['reps','Intervals',4],['work','Tempo (min)',4],['jog','Recovery jog (min)',1]],
+    hint:'Hold tempo pace for the work portion, then jog as slow as you need.',
+    build:c=>{const a=[seg('Warm-up',480,'easy')];
+      for(let i=1;i<=c.reps;i++){a.push(seg(`Tempo ${i}`,c.work*60,'tempo'));a.push(seg('Jog',c.jog*60,'rest'));}
+      a.push(seg('Cool down',480,'cool'));return a}
+  },
+  tempo:{
+    label:'Tempo run — 20:00',
+    cfg:[['work','Tempo (min)',20],['wu','Warm-up (min)',8],['cd','Cool down (min)',8]],
+    hint:'One continuous tempo block. You should be able to hold this pace 15 minutes longer.',
+    build:c=>[seg('Warm-up',c.wu*60,'easy'),seg('Tempo',c.work*60,'tempo'),seg('Cool down',c.cd*60,'cool')]
+  },
+  aerobic:{
+    label:'Aerobic intervals — :15 / 1:15',
+    cfg:[['block','Interval block (min)',21],['on','Hard (sec)',15],['off','Easy (sec)',75]],
+    hint:'Bike, row or ski. Hard bursts at RPE 7–8, easy at RPE 2–3.',
+    build:c=>{const a=[seg('Warm-up',600,'easy')];const n=Math.round(c.block*60/(+c.on + +c.off));
+      for(let i=1;i<=n;i++){a.push(seg('Hard',+c.on,'hard'));a.push(seg('Easy',+c.off,'rest'));}
+      a.push(seg('Cool down',600,'cool'));return a}
+  },
+  pickups:{
+    label:'Easy run with pickups — 30:00',
+    cfg:[['total','Total (min)',30],['len','Pickup (sec)',45],['every','First pickup at (min)',5]],
+    hint:'Pickups at minutes 5, 10, 15, 20 and 25. Keep the easy portions genuinely easy.',
+    build:c=>{const a=[];let t=0;const T=c.total*60;
+      for(let m=+c.every;m<=T/60-5;m+=5){const until=m*60;
+        if(until>t){a.push(seg('Easy',until-t,'easy'));t=until}
+        a.push(seg('Pickup',+c.len,'tempo'));t+=(+c.len)}
+      if(T>t)a.push(seg('Easy',T-t,'easy'));return a}
+  },
+  emom:{
+    label:'EMOM — 18 minutes',
+    cfg:[['rounds','Minutes',18]],
+    hint:'One movement per minute. The bar shows how much of the minute is left.',
+    build:c=>{const a=[];const names=['Burpees','Row','Ski'];
+      for(let i=0;i<c.rounds;i++)a.push(seg(`${names[i%3]}`,60,i%3===0?'hard':'tempo'));return a}
+  },
+  custom:{
+    label:'Custom intervals',
+    cfg:[['rounds','Rounds',8],['work','Work (sec)',60],['rest','Rest (sec)',60],['wu','Warm-up (min)',5]],
+    hint:'Build your own work/rest set.',
+    build:c=>{const a=c.wu>0?[seg('Warm-up',c.wu*60,'easy')]:[];
+      for(let i=1;i<=c.rounds;i++){a.push(seg(`Work ${i}`,+c.work,'hard'));
+        if(i<c.rounds)a.push(seg('Rest',+c.rest,'rest'));}
+      a.push(seg('Cool down',180,'cool'));return a}
+  }
+};
+
+/* ---------------- state ---------------- */
+let key='repeats', cfg={}, segs=[], idx=0;
+let running=false, segStart=0, carried=0, raf=null, wake=null, beeped={};
+
+function loadCfg(){cfg={};PRESETS[key].cfg.forEach(([k,,v])=>cfg[k]=v)}
+function rebuild(){segs=PRESETS[key].build(cfg);idx=0;carried=0;running=false;beeped={};drawSegRing();paint()}
+
+/* ---------------- session ring (outer) ---------------- */
+const R=143, C2=2*Math.PI*R;
+function drawSegRing(){
+  const total=segs.reduce((s,x)=>s+(x.dur||0),0)||1;
+  let acc=0, html='';
+  segs.forEach((s,i)=>{
+    const d=(s.dur||0), frac=d/total;
+    const len=Math.max(C2*frac-2.5,1.5);
+    html+=`<circle class="seg-track" data-i="${i}" cx="160" cy="160" r="${R}" fill="none" stroke-width="5"
+      stroke-dasharray="${len} ${C2-len}" stroke-dashoffset="${-C2*(acc/total)}"
+      transform="rotate(-90 160 160)"/>`;
+    acc+=d;
+  });
+  $('segRing').innerHTML=html;
+}
+function markSegRing(){
+  segs.forEach((s,i)=>{
+    const el=$('segRing').querySelector(`[data-i="${i}"]`); if(!el)return;
+    if(i<idx){el.style.stroke=`var(${EFFORT[s.kind]})`;el.style.opacity=.55}
+    else if(i===idx){el.style.stroke=`var(${EFFORT[s.kind]})`;el.style.opacity=1}
+    else{el.style.stroke='';el.style.opacity=''}
+  });
+}
+
+/* ---------------- paint ---------------- */
+const C=1000;
+$('ringFg').style.strokeDasharray=C;
+function paint(){
+  const s=segs[idx];
+  if(!s){finish();return}
+  document.documentElement.style.setProperty('--cur',`var(${EFFORT[s.kind]})`);
+  const el=elapsed(), dur=s.dur;
+  const left=Math.max(0,dur-el);
+  $('phase').textContent=s.name;
+  $('clock').textContent=fmt(left);
+  $('clock').classList.toggle('warn',left<=3&&running);
+  const reps=segs.filter(x=>x.kind==='hard').length;
+  const doneReps=segs.slice(0,idx+1).filter(x=>x.kind==='hard').length;
+  $('counter').textContent=reps?`${Math.min(doneReps,reps)} of ${reps}`:'';
+  const nxt=segs[idx+1];
+  $('upnext').innerHTML=nxt?`Next &nbsp;<b>${nxt.name}</b>${nxt.dur?` &middot; ${fmt(nxt.dur)}`:''}`:'Last one';
+  $('ringFg').style.strokeDashoffset=C*(1-Math.min(el/dur,1));
+  $('goBtn').textContent=running?'Pause':(el>0?'Resume':'Start');
+  $('goBtn').className='go';
+  markSegRing();
+}
+function elapsed(){
+  if(!running)return carried;
+  return carried+(performance.now()-segStart)/1000;
+}
+
+/* ---------------- loop ---------------- */
+function loop(){
+  raf=null;                    // this frame has fired; the chain is free to reschedule
+  if(!running)return;
+  const s=segs[idx];
+  const el=elapsed();
+  const left=s.dur-el;
+  for(const n of [3,2,1]) if(left<=n&&left>n-1&&!beeped[idx+'_'+n]){beeped[idx+'_'+n]=1;beep(660,.08)}
+  if(el>=s.dur){advance(el-s.dur,s.dur);return}
+  paint();
+  raf=requestAnimationFrame(loop);
+}
+function advance(overshoot,usedSec){
+  const prev=segs[idx];
+  if(prev&&prev.pairRest){                  // recovery matches the rep just run (1:1)
+    const nxt=segs[idx+1];
+    if(nxt&&nxt.kind==='rest')nxt.dur=Math.max(5,Math.round(usedSec==null?prev.dur:usedSec));
+    drawSegRing();
+  }
+  idx++;
+  carried=Math.max(0,overshoot||0);
+  segStart=performance.now();
+  if(idx>=segs.length){finish();return}
+  const s=segs[idx];
+  beep(s.kind==='hard'||s.kind==='tempo'?900:440,.22);
+  if(navigator.vibrate)navigator.vibrate(s.kind==='hard'?[120,60,120]:90);
+  paint();
+  if(running&&!raf)raf=requestAnimationFrame(loop);
+}
+function finish(){
+  running=false;if(raf){cancelAnimationFrame(raf);raf=null}
+  releaseWake();
+  $('phase').textContent='Done';$('clock').textContent='0:00';
+  $('counter').textContent='Session complete';$('upnext').textContent='';
+  $('ringFg').style.strokeDashoffset=0;$('goBtn').textContent='Start';
+  beep(880,.18);setTimeout(()=>beep(1180,.3),200);
+  if(navigator.vibrate)navigator.vibrate([200,100,200,100,300]);
+}
+
+/* ---------------- controls ---------------- */
+$('goBtn').onclick=()=>{
+  if(running){running=false;carried=elapsed();if(raf){cancelAnimationFrame(raf);raf=null}releaseWake();paint();return}
+  running=true;segStart=performance.now();requestWake();
+  if(!raf)raf=requestAnimationFrame(loop);
+  paint();
+};
+$('skipBtn').onclick=()=>advance(0,elapsed());
+$('resetBtn').onclick=()=>{running=false;if(raf){cancelAnimationFrame(raf);raf=null}
+  releaseWake();idx=0;carried=0;beeped={};rebuild()};
+
+/* ---------------- audio + wake lock ---------------- */
+let ac=null;
+function beep(f,d){
+  try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();
+    const o=ac.createOscillator(),g=ac.createGain();
+    o.frequency.value=f;o.type='sine';o.connect(g);g.connect(ac.destination);
+    g.gain.setValueAtTime(.0001,ac.currentTime);
+    g.gain.exponentialRampToValueAtTime(.5,ac.currentTime+.01);
+    g.gain.exponentialRampToValueAtTime(.0001,ac.currentTime+d);
+    o.start();o.stop(ac.currentTime+d+.02);
+  }catch(e){}
+}
+async function requestWake(){try{if('wakeLock' in navigator)wake=await navigator.wakeLock.request('screen')}catch(e){}}
+function releaseWake(){try{wake&&wake.release();wake=null}catch(e){}}
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&running)requestWake()});
+
+/* ---------------- preset + config UI ---------------- */
+const sel=$('preset');
+Object.entries(PRESETS).forEach(([k,p])=>{const o=document.createElement('option');o.value=k;o.textContent=p.label;sel.appendChild(o)});
+sel.onchange=()=>{key=sel.value;loadCfg();rebuild()};
+$('cfgBtn').onclick=()=>{
+  const p=PRESETS[key];
+  $('cfgTitle').textContent=p.label;
+  $('cfgHint').textContent=p.hint;
+  $('cfgFields').innerHTML=p.cfg.map(([k,lab])=>
+    `<div class="frow"><label>${lab}<input id="f_${k}" inputmode="numeric" value="${cfg[k]}"></label></div>`).join('');
+  $('scrim').classList.add('on');$('sheet').classList.add('on');
+};
+function closeSheet(){$('scrim').classList.remove('on');$('sheet').classList.remove('on')}
+$('scrim').onclick=closeSheet;
+$('cfgDone').onclick=()=>{
+  PRESETS[key].cfg.forEach(([k])=>{const v=parseFloat($('f_'+k).value);if(!isNaN(v))cfg[k]=v});
+  closeSheet();rebuild();
+};
+
+loadCfg();rebuild();
+</script>
+</body>
+</html>

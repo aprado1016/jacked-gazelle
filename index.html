@@ -144,6 +144,48 @@ header{position:sticky;top:0;z-index:40;background:linear-gradient(180deg,rgba(5
 .chart{width:100%;height:auto;display:block;margin-bottom:8px;background:var(--panel);border-radius:8px}
 
 /* ---------- Sheets ---------- */
+.timerwrap{position:fixed;inset:0;z-index:95;background:var(--bg);display:none;flex-direction:column;
+  padding:calc(env(safe-area-inset-top) + 12px) 16px calc(env(safe-area-inset-bottom) + 16px)}
+.timerwrap.on{display:flex}
+.tbar{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:6px}
+.tbar span{font-family:var(--disp);font-size:16px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tbar button{font-family:var(--disp);font-size:14px;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);flex-shrink:0}
+.tbarb{display:flex;gap:16px;flex-shrink:0}
+.tbarb #tCfg{color:var(--gold)}
+.tcfgwrap{position:absolute;inset:0;background:rgba(0,0,0,.66);display:none;align-items:flex-end;z-index:5}
+.tcfgwrap.on{display:flex}
+.tcfg{width:100%;background:var(--panel);border-top:1px solid var(--line);border-radius:18px 18px 0 0;
+  padding:15px 16px calc(env(safe-area-inset-bottom) + 18px);max-height:86%;overflow-y:auto}
+.tcfghead{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px}
+.tcfghead span:first-child{font-family:var(--disp);font-size:19px;letter-spacing:.12em;text-transform:uppercase}
+.tcfghead span:last-child{font-size:12px;color:var(--faint)}
+.tfield{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--line)}
+.tfield span{font-size:14px;color:var(--dim)}
+.tfield i{font-style:normal;color:var(--faint);font-size:12px}
+.tfield input{width:92px;text-align:center;padding:9px;font-size:17px;background:var(--panel2);border:1px solid var(--line);border-radius:9px;color:var(--ink);outline:none}
+.tfield input:focus{border-color:var(--blue)}
+.tcfgbtns{display:flex;gap:10px;margin-top:14px}
+.tcfgbtns button{flex:1;padding:14px;border-radius:12px;font-family:var(--disp);font-size:16px;letter-spacing:.12em;
+  text-transform:uppercase;background:var(--panel2);border:1px solid var(--line);color:var(--ink)}
+.tcfgbtns .ok{background:linear-gradient(180deg,var(--done-a),var(--done-b));border-color:var(--done-a);color:var(--done-ink)}
+.tdial{position:relative;flex:1;display:flex;align-items:center;justify-content:center;min-height:0}
+.tdial svg{width:min(84vw,380px);height:auto}
+.tcenter{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none}
+.tphase{font-family:var(--disp);font-size:19px;font-weight:600;letter-spacing:.16em;text-transform:uppercase}
+.tclock{font-family:var(--disp);font-weight:800;font-size:clamp(64px,22vw,112px);line-height:.92;font-variant-numeric:tabular-nums;margin:4px 0 2px}
+.tclock.warn{animation:tick 1s steps(2,end) infinite}
+@keyframes tick{50%{opacity:.45}}
+.tcount{font-family:var(--disp);font-size:16px;letter-spacing:.12em;color:var(--faint);text-transform:uppercase}
+.tnext{text-align:center;font-size:13px;color:var(--dim);margin-top:4px;min-height:18px}
+.tnext b{color:var(--ink);font-weight:600}
+.tctrls{display:flex;gap:10px;margin-top:14px}
+.tctrls button{flex:1;padding:16px 0;border-radius:13px;font-family:var(--disp);font-weight:700;font-size:19px;
+  letter-spacing:.12em;text-transform:uppercase;background:var(--panel);border:1px solid var(--line)}
+.tctrls .go{flex:2;background:linear-gradient(180deg,var(--done-a),var(--done-b));border-color:var(--done-a);color:var(--done-ink)}
+.tctrls button:active{transform:scale(.975)}
+.startbtn{width:100%;margin-top:10px;padding:13px;border-radius:11px;background:var(--panel2);border:1px solid var(--blue);
+  color:var(--blue);font-family:var(--disp);font-weight:700;font-size:16px;letter-spacing:.12em;text-transform:uppercase}
 .scrim{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:80;display:none}
 .scrim.show{display:block}
 .sheet{position:fixed;left:0;right:0;bottom:0;z-index:90;background:var(--panel);border-top:1px solid var(--line);border-radius:18px 18px 0 0;padding:14px 16px calc(env(safe-area-inset-bottom) + 20px);transform:translateY(105%);transition:transform .22s ease;max-height:82vh;overflow-y:auto}
@@ -201,6 +243,32 @@ header{position:sticky;top:0;z-index:40;background:linear-gradient(180deg,rgba(5
 
 <div class="savemsg" id="savemsg">Saved</div>
 
+<div class="timerwrap" id="timerWrap">
+  <div class="tbar"><span id="tTitle"></span><div class="tbarb"><button id="tCfg">Adjust</button><button id="tClose">Close</button></div></div>
+  <div class="tdial">
+    <svg viewBox="0 0 320 320" aria-hidden="true">
+      <g id="tSegRing"></g>
+      <circle cx="160" cy="160" r="118" fill="none" stroke-width="15" stroke="var(--panel2)"/>
+      <circle id="tRing" cx="160" cy="160" r="118" fill="none" stroke-width="15" stroke-linecap="round" pathLength="1000" stroke-dasharray="1000" stroke-dashoffset="1000" transform="rotate(-90 160 160)"/>
+    </svg>
+    <div class="tcenter">
+      <div class="tphase" id="tPhase">Ready</div>
+      <div class="tclock" id="tClock">0:00</div>
+      <div class="tcount" id="tCount"></div>
+    </div>
+  </div>
+  <div class="tnext" id="tNext"></div>
+  <div class="tctrls">
+    <button id="tReset">Reset</button><button class="go" id="tGo">Start</button><button id="tSkip">Skip</button>
+  </div>
+  <div class="tcfgwrap" id="tCfgWrap">
+    <div class="tcfg">
+      <div class="tcfghead"><span>Adjust this session</span><span id="tCfgTotal"></span></div>
+      <div id="tCfgFields"></div>
+      <div class="tcfgbtns"><button id="tCfgCancel">Cancel</button><button class="ok" id="tCfgApply">Apply</button></div>
+    </div>
+  </div>
+</div>
 <div class="scrim" id="scrim"></div>
 <div class="sheet" id="phaseSheet"><h3>Select Phase</h3><div id="phaseOpts"></div></div>
 <div class="sheet" id="weekSheet"><h3>Select Week</h3><div id="weekOpts"></div></div>
@@ -758,6 +826,7 @@ function renderDay(){
     h+=`<div class="card cond"><div class="chead"><span class="t">${d.cond.t}</span></div><div class="condbody">`;
     d.cond.l.forEach(l=>h+=`<p>${l}</p>`);
     h+=calcStrip(d.cond);
+    if(buildSession(d.cond)) h+=`<button class="startbtn" id="startTimer">&#9654;&nbsp; Start interval timer</button>`;
     h+=`<div class="result"><label>Result / notes (pace, rounds, time&hellip;)</label><input id="condres" value="${(dayData.cond||'').replace(/"/g,'&quot;')}" placeholder="e.g. 200s avg 42.5 · felt smooth"></div></div></div>`;
   }
   h+=`<div class="dayfoot">
@@ -767,6 +836,7 @@ function renderDay(){
   m.innerHTML=h;
   const cr=$('condres'); if(cr) cr.oninput=()=>{dayData.cond=cr.value;scheduleSave()};
   if(d.cond) wireCalc(d.cond);
+  if($('startTimer')) $('startTimer').onclick=()=>openTimer(d.cond);
   $('daynote').oninput=()=>{dayData.note=$('daynote').value;scheduleSave()};
   $('donebtn').onclick=()=>setDone(!dayData.done);
 }
@@ -970,6 +1040,18 @@ $('pcW').oninput=calcPlates;$('pcB').oninput=calcPlates;
 /* =============== TOOLS =============== */
 $('toolsOpen').onclick=()=>openSheet('toolsSheet');
 $('backupOpen').onclick=()=>openSheet('backupSheet');
+$('tClose').onclick=closeTimer;
+$('tCfg').onclick=openTCfg;
+$('tCfgCancel').onclick=closeTCfg;
+$('tCfgApply').onclick=applyTCfg;
+$('tSkip').onclick=()=>tAdvance(0);
+$('tReset').onclick=()=>{TS.running=false;if(TS.raf){cancelAnimationFrame(TS.raf);TS.raf=null}
+  TS.idx=0;TS.carried=0;TS.beeped={};tWake(false);drawTSegs();paintT()};
+$('tGo').onclick=()=>{
+  if(TS.running){TS.running=false;TS.carried=tElapsed();
+    if(TS.raf){cancelAnimationFrame(TS.raf);TS.raf=null}tWake(false);paintT();return}
+  TS.running=true;TS.segStart=performance.now();tWake(true);
+  if(!TS.raf)TS.raf=requestAnimationFrame(tLoop);paintT()};
 function parseTime(v){const m=v.trim().match(/^(\d{1,3})[:.](\d{2})$/);if(m)return +m[1]*60+ +m[2];const n=parseFloat(v);return isNaN(n)?null:n*60}
 $('tt2').oninput=()=>{CALC.tt2=$('tt2').value;sSet('calc',CALC);const s=parseTime($('tt2').value);const o=$('tt2out');
   if(!s){o.innerHTML='Format: mm:ss';return}
@@ -1063,6 +1145,256 @@ function syncTools(){
   if($('age')&&CALC.age!==undefined){$('age').value=CALC.age; $('age').oninput()}
 }
 
+/* =============== INTERVAL TIMER =============== */
+const sg=(name,dur,kind)=>({name,dur:Math.round(dur),kind});
+function repTarget(dist){                       // seconds per rep from the 2-mile TT
+  const s=parseTime(CALC.tt2||''); if(!s) return null;
+  const p=s/2;
+  if(dist===200) return ((p-20)/8 + (p-15)/8)/2;
+  if(dist===400) return ((p-15)/4 + (p-10)/4)/2;
+  if(dist===600) return ((p-8)*0.373 + (p-5)*0.373)/2;
+  if(dist===800) return (p-8)/2;
+  return null;
+}
+const stripTags=s=>String(s).replace(/<[^>]+>/g,'').replace(/&[a-z]+;/gi,' ');
+const F=(k,label,unit)=>({k,label,unit});
+
+// A session spec: editable params + a builder that turns them into segments.
+function sessionSpec(cond){
+  const T=stripTags(cond.t||''), lines=(cond.l||[]).map(stripTags);
+  const L=lines.join(' | '), all=T+' | '+L, t=T.toLowerCase();
+  const num=(re,d)=>{const m=all.match(re);return m?parseFloat(m[1]):d};
+  const clock=v=>{const m=String(v).match(/(\d+):(\d{2})/);return m?+m[1]*60+ +m[2]:null};
+  const M=60;
+
+  if(t.includes('hill repeat')){
+    const secM=all.match(/(\d+)\s*second/i), clkM=all.match(/\d+x(\d+:\d{2})/);
+    const rM=all.match(/Rest:?\s*(\d+:\d{2})/i);
+    return {kind:'hills',
+      params:{reps:num(/(\d+)\s*x\s*(?:\d+\s*second|\d+:\d{2})/i,8),
+              work:secM?+secM[1]:(clkM?clock(clkM[1]):45), rest:rM?clock(rM[1]):90, wu:8, cd:5},
+      fields:[F('reps','Repeats'),F('work','Work','sec'),F('rest','Rest','sec'),F('wu','Warm-up','min'),F('cd','Cool down','min')],
+      build:p=>{const a=[sg('Warm-up',p.wu*M,'easy')];
+        for(let i=1;i<=p.reps;i++){a.push(sg(`Hill ${i}`,p.work,'hard'));if(i<p.reps)a.push(sg('Walk down',p.rest,'rest'))}
+        a.push(sg('Cool down',p.cd*M,'cool'));return a}};
+  }
+  if(t.includes('repeat')&&!/(\d+)\s*x\s*(200|400|600)\s?m/i.test(all)) return null;
+  if(t.includes('repeat')){
+    const parts=[...all.matchAll(/(\d+)\s*x\s*(200|400|600)\s?m/gi)].map(m=>({n:+m[1],d:+m[2]}));
+    const params={cd:6}, fields=[];
+    let ok=true;
+    parts.forEach(p=>{
+      const tgt=repTarget(p.d); if(!tgt){ok=false;return}
+      params['n'+p.d]=p.n; params['t'+p.d]=Math.round(tgt);
+      fields.push(F('n'+p.d,`${p.d}m repeats`),F('t'+p.d,`${p.d}m target`,'sec'));
+    });
+    if(!ok) return null;
+    fields.push(F('cd','Cool down','min'));
+    return {kind:'repeats', dists:parts.map(p=>p.d), params, fields,
+      build:p=>{const a=[sg('Get ready',10,'rest')];
+        parts.forEach((part,pi)=>{const n=p['n'+part.d], tg=p['t'+part.d];
+          for(let i=1;i<=n;i++){a.push(sg(`${part.d}m — rep ${i}`,tg,'hard'));a.push(sg('Recover',tg,'rest'))}
+          if(pi<parts.length-1){a.pop();a.push(sg('Rest between sets',part.d===200?120:180,'rest'))}});
+        a.push(sg('Cool down',p.cd*M,'cool'));return a}};
+  }
+  if(t.includes('cruise')){
+    const wm=all.match(/(\d+:\d{2})\s*at\s*\*?tempo/i), jm=all.match(/(\d+:\d{2})\s*easy recovery/i);
+    return {kind:'cruise',
+      params:{reps:num(/(\d+)\s*x\s*\d+:\d{2}\s*tempo/i,4), work:wm?clock(wm[1]):240, jog:jm?clock(jm[1]):60, wu:8, cd:8},
+      fields:[F('reps','Intervals'),F('work','Tempo block','sec'),F('jog','Recovery jog','sec'),F('wu','Warm-up','min'),F('cd','Cool down','min')],
+      build:p=>{const a=[sg('Warm-up',p.wu*M,'easy')];
+        for(let i=1;i<=p.reps;i++){a.push(sg(`Tempo ${i}`,p.work,'tempo'));a.push(sg('Recovery jog',p.jog,'rest'))}
+        a.push(sg('Cool down',p.cd*M,'cool'));return a}};
+  }
+  if(t.includes('tempo run')&&!t.includes('pickup')){
+    const m=all.match(/(\d+):(\d{2})\s*tempo run/i);
+    return {kind:'tempo', params:{work:m?(+m[1]+ +m[2]/60):20, wu:8, cd:8},
+      fields:[F('work','Tempo','min'),F('wu','Warm-up','min'),F('cd','Cool down','min')],
+      build:p=>[sg('Warm-up',p.wu*M,'easy'),sg('Tempo',p.work*M,'tempo'),sg('Cool down',p.cd*M,'cool')]};
+  }
+  if(t.includes('aerobic interval')||/of\s*:15 hard/i.test(all)){
+    const bm=all.match(/(\d+):(\d{2})\s*of\s*:(\d+)\s*hard/i), om=all.match(/,\s*(\d+:\d{2})\s*easy/i);
+    return {kind:'aerobic',
+      params:{wu:num(/(\d+)\s*minutes? easy warmup/i,10), block:bm?(+bm[1]+ +bm[2]/60):21,
+              on:bm?+bm[3]:15, off:om?clock(om[1]):75},
+      fields:[F('block','Interval block','min'),F('on','Hard','sec'),F('off','Easy','sec'),F('wu','Warm-up / cool down','min')],
+      build:p=>{const a=[sg('Warm-up',p.wu*M,'easy')], n=Math.max(1,Math.round(p.block*M/(p.on+p.off)));
+        for(let i=1;i<=n;i++){a.push(sg('Hard',p.on,'hard'));a.push(sg('Easy',p.off,'rest'))}
+        a.push(sg('Cool down',p.wu*M,'cool'));return a}};
+  }
+  if(/pickup/i.test(all)||/increase to tempo|minute \d+ ?& ?\d+/i.test(all)){
+    const tm=T.match(/(\d+)\s*min/i)||all.match(/(\d+)\s*min(?:ute)?s?\s+(?:easy\s+)?run/i);
+    const total=tm?+tm[1]:30, pts=[];
+    lines.forEach(ln=>{
+      const s=ln.trim();
+      if(!/^(at\s+)?minutes?\b/i.test(s))return;
+      if(!/tempo|pace|threshold|pickup|speed/i.test(s))return;
+      let dur=45, m=s.match(/(?:hold(?:\s+for)?|for|x|@)\s*(\d+):(\d{2})/i);
+      if(m) dur=+m[1]*60 + +m[2];
+      else { m=s.match(/(\d+)\s*(?:-\s*\d+)?\s*sec/i); if(m)dur=+m[1] }
+      const s2=s.replace(/\d+\s*-?\s*mile/gi,' ');
+      const cut=s2.search(/increase|speed|hold|tempo|pace|threshold/i);
+      const head=cut>0?s2.slice(0,cut):s2;
+      [...head.matchAll(/\b(\d{1,3})\b/g)].map(x=>+x[1]).forEach(mk=>{if(mk>0&&mk<=total)pts.push({at:mk,dur})});
+    });
+    const marks=[...new Map(pts.map(p=>[p.at,p])).values()].sort((a,b)=>a.at-b.at);
+    const uniform=marks.length&&marks.every(m=>m.dur===marks[0].dur);
+    const params={total}; const fields=[F('total','Total run','min')];
+    if(uniform){params.hold=marks[0].dur; fields.push(F('hold','Each pickup','sec'))}
+    return {kind:'pickups', params, fields,
+      build:p=>{ if(!marks.length)return [sg('Easy run',p.total*M,'easy')];
+        const a=[];let t0=0;
+        marks.forEach(mk=>{const at=mk.at*M; if(at>t0){a.push(sg('Easy',at-t0,'easy'));t0=at}
+          const d=p.hold!=null?p.hold:mk.dur; a.push(sg('Pickup',d,'tempo'));t0+=d});
+        if(p.total*M>t0)a.push(sg('Easy',p.total*M-t0,'easy'));return a}};
+  }
+  if(/EMOM\s*x?\s*(\d+)/i.test(all)){
+    return {kind:'emom', params:{rounds:+all.match(/EMOM\s*x?\s*(\d+)/i)[1], len:60},
+      fields:[F('rounds','Rounds'),F('len','Each round','sec')],
+      build:p=>{const a=[];for(let i=1;i<=p.rounds;i++)a.push(sg(`Minute ${i}`,p.len,i%3===1?'hard':'tempo'));return a}};
+  }
+  if(/AMRAP|running clock/i.test(all)){
+    const m=all.match(/(\d+)\s*min(?:ute)?s?\s*(?:AMRAP|running clock)/i)||all.match(/AMRAP\s*x?\s*(\d+)/i);
+    if(m)return {kind:'amrap', params:{mins:+m[1]}, fields:[F('mins','Time cap','min')],
+      build:p=>[sg('AMRAP',p.mins*M,'hard')]};
+  }
+  const single=all.match(/(\d+)\s*min(?:ute)?s?\b/i);
+  if(single) return {kind:'single', params:{mins:+single[1]}, fields:[F('mins','Duration','min')],
+    build:p=>[sg(T.split('\u2014')[0].trim()||'Session',p.mins*M,'easy')]};
+  return null;
+}
+function buildSession(cond){const s=sessionSpec(cond);return s?s.build(s.params):null}
+
+// rep target -> implied 2-mile TT, so edits here update the pace calculator
+function ttFromTarget(dist,sec){
+  let p=null;
+  if(dist===200) p=(16*sec+35)/2;
+  if(dist===400) p=(8*sec+25)/2;
+  if(dist===600) p=(sec/0.1865+13)/2;
+  if(!p||p<180||p>1500) return null;
+  const tt=Math.round(p*2);
+  return `${Math.floor(tt/60)}:${String(tt%60).padStart(2,'0')}`;
+}
+
+/* ---- timer engine ---- */
+const TCOL={easy:'var(--blue)',tempo:'var(--gold)',hard:'#F0663F',rest:'#5A93B8',cool:'var(--faint)'};
+let TS={segs:[],idx:0,running:false,segStart:0,carried:0,raf:null,beeped:{},wake:null,ac:null,spec:null,title:''};
+let TPARAMS={};                        // per-session overrides, saved across launches
+const tfmt=s=>{s=Math.max(0,Math.ceil(s));return `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`};
+const TC=1000, TC2=2*Math.PI*143;
+
+function openTimer(cond){
+  const spec=sessionSpec(cond); if(!spec)return;
+  const title=stripTags(cond.t||'');
+  Object.assign(spec.params, TPARAMS[title]||{});          // restore previous edits
+  const segs=spec.build(spec.params); if(!segs||!segs.length)return;
+  TS={segs,idx:0,running:false,segStart:0,carried:0,raf:null,beeped:{},wake:null,ac:TS.ac,spec,title};
+  $('tTitle').textContent=cond.t;
+  $('timerWrap').classList.add('on');
+  drawTSegs();paintT();
+}
+function retime(){                                         // rebuild after an edit
+  TS.running=false; if(TS.raf){cancelAnimationFrame(TS.raf);TS.raf=null}
+  TS.idx=0;TS.carried=0;TS.beeped={};
+  TS.segs=TS.spec.build(TS.spec.params);
+  drawTSegs();paintT();
+}
+function openTCfg(){
+  const sp=TS.spec; if(!sp)return;
+  $('tCfgFields').innerHTML=sp.fields.map(f=>
+    `<label class="tfield"><span>${f.label}${f.unit?` <i>(${f.unit})</i>`:''}</span>
+      <input id="tf_${f.k}" inputmode="decimal" value="${sp.params[f.k]}"></label>`).join('');
+  const tot=TS.segs.reduce((a,x)=>a+x.dur,0);
+  $('tCfgTotal').textContent=`${Math.round(tot/60)} min total`;
+  $('tCfgWrap').classList.add('on');
+}
+function closeTCfg(){$('tCfgWrap').classList.remove('on')}
+async function applyTCfg(){
+  const sp=TS.spec, before={...sp.params};
+  sp.fields.forEach(f=>{const v=parseFloat($('tf_'+f.k).value); if(!isNaN(v)&&v>0)sp.params[f.k]=v});
+  TPARAMS[TS.title]={...sp.params}; await sSet('tparams',TPARAMS);
+  if(sp.kind==='repeats'){                                 // push a changed rep target back to the 2-mile TT
+    for(const d of sp.dists){
+      if(sp.params['t'+d]!==before['t'+d]){
+        const tt=ttFromTarget(d,sp.params['t'+d]);
+        if(tt){CALC.tt2=tt; await sSet('calc',CALC); syncTools()}
+        break;
+      }
+    }
+  }
+  closeTCfg(); retime();
+}
+function closeTimer(){
+  TS.running=false; if(TS.raf){cancelAnimationFrame(TS.raf);TS.raf=null}
+  tWake(false); $('timerWrap').classList.remove('on');
+}
+function drawTSegs(){
+  const total=TS.segs.reduce((s,x)=>s+x.dur,0)||1; let acc=0,html='';
+  TS.segs.forEach((s,i)=>{
+    const len=Math.max(TC2*(s.dur/total)-2.5,1.5);
+    html+=`<circle data-i="${i}" cx="160" cy="160" r="143" fill="none" stroke-width="5" stroke="var(--line)"
+      stroke-dasharray="${len} ${TC2-len}" stroke-dashoffset="${-TC2*(acc/total)}" transform="rotate(-90 160 160)"/>`;
+    acc+=s.dur});
+  $('tSegRing').innerHTML=html;
+}
+function tElapsed(){return TS.running?TS.carried+(performance.now()-TS.segStart)/1000:TS.carried}
+function paintT(){
+  const s=TS.segs[TS.idx]; if(!s)return tFinish();
+  const col=TCOL[s.kind];
+  $('tRing').style.stroke=col; $('tPhase').style.color=col; $('tPhase').textContent=s.name;
+  const el=tElapsed(), left=Math.max(0,s.dur-el);
+  $('tClock').textContent=tfmt(left);
+  $('tClock').classList.toggle('warn',left<=3&&TS.running);
+  $('tRing').style.strokeDasharray=TC;                       // re-assert each paint
+  $('tRing').style.strokeDashoffset=TC*(1-Math.min(el/s.dur,1));
+  const hard=TS.segs.filter(x=>x.kind==='hard'||x.kind==='tempo');
+  const done=TS.segs.slice(0,TS.idx+1).filter(x=>x.kind==='hard'||x.kind==='tempo');
+  $('tCount').textContent=hard.length?`${Math.min(done.length,hard.length)} of ${hard.length}`:'';
+  const n=TS.segs[TS.idx+1];
+  $('tNext').innerHTML=n?`Next &nbsp;<b>${n.name}</b> &middot; ${tfmt(n.dur)}`:'Last one';
+  $('tGo').textContent=TS.running?'Pause':(el>0?'Resume':'Start');
+  TS.segs.forEach((x,i)=>{const e=$('tSegRing').querySelector(`[data-i="${i}"]`);if(!e)return;
+    e.style.stroke=i<=TS.idx?TCOL[x.kind]:'var(--line)'; e.style.opacity=i<TS.idx?.5:1});
+}
+function tLoop(){
+  TS.raf=null; if(!TS.running)return;
+  const s=TS.segs[TS.idx], el=tElapsed(), left=s.dur-el;
+  for(const n of [3,2,1]) if(left<=n&&left>n-1&&!TS.beeped[TS.idx+'_'+n]){TS.beeped[TS.idx+'_'+n]=1;tBeep(660,.08)}
+  if(el>=s.dur){tAdvance(el-s.dur);return}
+  paintT(); TS.raf=requestAnimationFrame(tLoop);
+}
+function tAdvance(over){
+  TS.idx++; TS.carried=Math.max(0,over||0); TS.segStart=performance.now();
+  if(TS.idx>=TS.segs.length)return tFinish();
+  const s=TS.segs[TS.idx];
+  tBeep(s.kind==='hard'||s.kind==='tempo'?900:440,.22);
+  if(navigator.vibrate)navigator.vibrate(s.kind==='hard'?[120,60,120]:90);
+  paintT(); if(TS.running&&!TS.raf)TS.raf=requestAnimationFrame(tLoop);
+}
+function tFinish(){
+  TS.running=false; if(TS.raf){cancelAnimationFrame(TS.raf);TS.raf=null}
+  tWake(false);
+  $('tPhase').textContent='Done'; $('tClock').textContent='0:00';
+  $('tCount').textContent='Session complete'; $('tNext').textContent='';
+  $('tRing').style.strokeDashoffset=0; $('tGo').textContent='Start';
+  tBeep(880,.18); setTimeout(()=>tBeep(1180,.3),200);
+  if(navigator.vibrate)navigator.vibrate([200,100,200,100,300]);
+}
+function tBeep(f,d){
+  try{TS.ac=TS.ac||new (window.AudioContext||window.webkitAudioContext)();
+    const o=TS.ac.createOscillator(),g=TS.ac.createGain();
+    o.frequency.value=f;o.connect(g);g.connect(TS.ac.destination);
+    g.gain.setValueAtTime(.0001,TS.ac.currentTime);
+    g.gain.exponentialRampToValueAtTime(.5,TS.ac.currentTime+.01);
+    g.gain.exponentialRampToValueAtTime(.0001,TS.ac.currentTime+d);
+    o.start();o.stop(TS.ac.currentTime+d+.02)}catch(e){}
+}
+async function tWake(on){
+  try{ if(on&&'wakeLock' in navigator){TS.wake=await navigator.wakeLock.request('screen')}
+       else if(TS.wake){TS.wake.release();TS.wake=null} }catch(e){}
+}
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&TS.running)tWake(true)});
+
 /* =============== THEMES =============== */
 const CSSV=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
 const THEMES={
@@ -1140,6 +1472,7 @@ if('serviceWorker' in navigator&&location.protocol==='https:'){
   await loadState(); await loadDone();
   applyTheme((await sGet('theme'))||'evergreen',false); buildThemeGrid();
   CALC=(await sGet('calc'))||{};
+  TPARAMS=(await sGet('tparams'))||{};
   if(S.p>=P.phases.length)S.p=1;
   if(S.w>=ph().weeks.length)S.w=0;
   if(S.d>=7)S.d=0;
