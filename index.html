@@ -234,11 +234,11 @@ body.workout-active{padding-bottom:0;background:var(--tbg)}
 .tabbar button.on{color:var(--blue)}
 .tabind{position:absolute;top:4px;bottom:4px;left:0;width:calc(20% - 4px);border-radius:16px;background:var(--sel-a);z-index:0;pointer-events:none;
   transition:transform .32s cubic-bezier(.65,0,.35,1)}
-.planhead{margin:14px 14px 2px}
+.planhead{margin:calc(env(safe-area-inset-top) + 14px) 14px 2px}
 .planhead h2{font-family:var(--disp);font-weight:800;font-size:30px;letter-spacing:.03em;text-transform:uppercase}
 .planhead p{color:var(--dim);font-size:13px;margin-top:2px}
 .plancard{margin:14px}
-.toolstitle{margin:14px 14px 0;font-family:var(--disp);font-weight:800;font-size:22px;letter-spacing:.05em;text-transform:uppercase}
+.toolstitle{margin:calc(env(safe-area-inset-top) + 14px) 14px 0;font-family:var(--disp);font-weight:800;font-size:22px;letter-spacing:.05em;text-transform:uppercase}
 
 /* ---------- Day ticket ---------- */
 .ticket{margin:16px 14px 6px;border-left:3px solid var(--gold);padding-left:12px}
