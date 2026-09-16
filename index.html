@@ -53,39 +53,47 @@ input:focus,textarea:focus{border-color:var(--blue)}
 .selpill .car{color:var(--faint);font-size:11px}
 
 /* ---------- Home dashboard ---------- */
-.hero{margin:0 0 -34px;height:min(38vh,240px);overflow:hidden;position:relative}
-.hero svg{width:100%;height:calc(100% + 34px);display:block}
-.herocard{margin:0 14px 4px;padding:16px;border-radius:20px;position:relative;background:var(--panel);border:1px solid var(--glass-brd);box-shadow:var(--shadow);-webkit-backdrop-filter:blur(var(--blur)) saturate(150%);backdrop-filter:blur(var(--blur)) saturate(150%)}
-.herotop .sub{font-family:var(--disp);font-size:10px;letter-spacing:.2em;color:var(--faint);text-transform:uppercase}
-.herocard h1{font-family:var(--disp);font-weight:800;font-size:clamp(20px,6vw,27px);letter-spacing:.03em;text-transform:uppercase;margin:1px 0 12px}
+.hero{margin:0 0 14px;height:min(34vh,220px);border-radius:0 0 26px 26px;overflow:hidden;position:relative;
+  background-image:linear-gradient(150deg,#4A6350,#26332A);background-size:cover;background-position:center}
+.hero.has-img{background-image:var(--hero-img,none),linear-gradient(150deg,#4A6350,#26332A)}
+.herocard{margin:0 14px 4px;padding:16px}
+.herotop .sub{font-size:11px;letter-spacing:.14em;color:var(--faint);text-transform:uppercase;font-weight:600}
+.herocard h1{font-weight:700;font-size:22px;letter-spacing:0;margin:2px 0 14px;color:var(--ink)}
 .herocard h1 em{font-style:normal;color:var(--gold)}
-.heroprogwrap{display:flex;flex-direction:column;gap:6px}
-.heroprogbar{height:8px;border-radius:99px;background:var(--panel2);border:1px solid var(--line);overflow:hidden}
-.heroprogbar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--blue-deep),var(--blue));transition:width .3s}
-.heroproglbl{font-size:12px;color:var(--dim)}
-.dashtitle{margin:20px 14px 0;font-family:var(--disp);font-weight:800;font-size:20px;letter-spacing:.05em;text-transform:uppercase}
-.schedrow{display:flex;align-items:center;gap:12px;padding:13px 14px}
-.schedimg{width:56px;height:56px;border-radius:14px;flex-shrink:0;overflow:hidden}
-.schedimg svg{width:100%;height:100%;display:block}
+.heroprogwrap{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.heroprogbar{flex:1;height:6px;border-radius:99px;background:var(--panel2);border:1px solid var(--line);overflow:hidden}
+.heroprogbar i{display:block;height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,var(--blue-deep),var(--blue));transition:width .8s cubic-bezier(.4,0,.2,1)}
+.heroproglbl{font-size:13px;color:var(--dim);white-space:nowrap;flex-shrink:0}
+.dashtitle{margin:22px 14px 8px;font-weight:700;font-size:18px;color:var(--ink)}
+.schedrow{display:flex;align-items:center;gap:12px;padding:13px 14px;position:relative;overflow:hidden;transition:border-color .4s,background .4s}
+.schedimg{width:56px;height:56px;border-radius:14px;flex-shrink:0;background-image:linear-gradient(150deg,#4A6350,#26332A);background-size:cover;background-position:center}
+.schedimg.has-img{background-image:var(--sched-img,none),linear-gradient(150deg,#4A6350,#26332A)}
+.schedtap{display:flex;align-items:center;gap:12px;flex:1;min-width:0;text-align:left}
 .schedmid{flex:1;min-width:0}
-.schedtag{display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
-.schedtag i{width:7px;height:7px;border-radius:50%;background:var(--blue);display:inline-block}
-.schedname{font-weight:700;font-size:16px;margin-top:2px}
-.schedcheck{flex-shrink:0;width:30px;height:30px;border-radius:50%;border:2px solid var(--line);display:flex;align-items:center;justify-content:center;color:transparent;font-size:15px}
-.schedcheck.on{border-color:var(--done-a);background:linear-gradient(180deg,var(--done-a),var(--done-b));color:var(--done-ink)}
-.schedrest{padding:20px 14px;text-align:center;color:var(--dim)}
-.actbody{padding:14px}
+.schedtag{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--faint)}
+.schedtag i{width:7px;height:7px;border-radius:50%;background:var(--blue);display:inline-block;flex-shrink:0}
+.schedname{font-weight:700;font-size:16px;margin-top:2px;color:var(--ink)}
+.schedcheck{flex-shrink:0;width:28px;height:28px;border-radius:50%;border:1.5px solid var(--line);display:flex;align-items:center;justify-content:center;color:transparent;font-size:14px;transition:all .35s}
+.schedcheck.on{border-color:var(--ink);background:var(--ink);color:var(--bg)}
+.schedrow.done{border-color:var(--blue)}
+.schedsweep{position:absolute;inset:0;pointer-events:none;background:linear-gradient(100deg,transparent 30%,rgba(255,255,255,.55) 48%,rgba(122,168,220,.35) 52%,transparent 70%);transform:translateX(-120%);opacity:0}
+.schedsweep.go{animation:sweep .9s ease forwards}
+@keyframes sweep{0%{transform:translateX(-120%);opacity:1}70%{opacity:1}100%{transform:translateX(120%);opacity:0}}
+.schedrest{padding:20px 14px;text-align:center;color:var(--dim);font-size:14px}
+.actbody{padding:16px}
 .actrow{display:flex;justify-content:space-between;align-items:center}
-.actlab{font-family:var(--disp);font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
-.actsub{font-size:11px;color:var(--faint);margin-top:2px}
-.actring{position:relative;width:64px;height:64px;flex-shrink:0}
+.actlab{font-size:15px;font-weight:700;color:var(--ink)}
+.actsub{font-size:12px;color:var(--faint);margin-top:2px}
+.actring{position:relative;width:66px;height:66px;flex-shrink:0}
 .actring svg{width:100%;height:100%;transform:rotate(-90deg)}
-.actring .num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--disp);font-weight:800;font-size:20px}
+.actring circle{transition:stroke-dashoffset .8s cubic-bezier(.4,0,.2,1)}
+.actring .num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:20px;color:var(--ink)}
 .actdiv{margin:14px 0;border-top:1px solid var(--line)}
 .actweek{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
-.actweek b{font-family:var(--disp);font-size:16px}
-.actbar{height:9px;border-radius:99px;background:var(--panel2);border:1px solid var(--line);overflow:hidden}
-.actbar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--blue-deep),var(--blue))}
+.actweek span{font-size:13px;color:var(--dim)}
+.actweek b{font-size:14px;font-weight:700;color:var(--ink)}
+.actbar{height:7px;border-radius:99px;background:var(--panel2);border:1px solid var(--line);overflow:hidden}
+.actbar i{display:block;height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,var(--blue-deep),var(--blue));transition:width .8s cubic-bezier(.4,0,.2,1)}
 
 /* ---------- Workout detail screen ---------- */
 .wktopbar{position:sticky;top:0;z-index:40;background:rgba(242,236,224,.78);-webkit-backdrop-filter:blur(16px) saturate(160%);backdrop-filter:blur(16px) saturate(160%);border-bottom:1px solid var(--line);padding:calc(env(safe-area-inset-top) + 10px) 14px 10px}
@@ -308,28 +316,8 @@ input:focus,textarea:focus{border-color:var(--blue)}
 
 <div class="screens">
   <section class="screen active" id="screen-home">
-    <div class="hero">
-      <svg viewBox="0 0 400 220" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-        <defs>
-          <linearGradient id="heroGrad" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0" stop-color="#3C5744"/><stop offset="1" stop-color="#1F2E24"/>
-          </linearGradient>
-        </defs>
-        <rect width="400" height="220" fill="url(#heroGrad)"/>
-        <g stroke="#EFE7D6" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity=".92">
-          <circle cx="200" cy="60" r="16" fill="#EFE7D6" stroke="none"/>
-          <path d="M200 76 L200 130"/>
-          <path d="M200 90 L172 118 L160 150"/>
-          <path d="M200 90 L228 118 L240 150"/>
-          <path d="M200 130 L182 190"/>
-          <path d="M200 130 L218 190"/>
-          <path d="M112 118 H288" stroke-width="8"/>
-          <path d="M126 104 v28 M138 100 v36" stroke-width="7"/>
-          <path d="M274 104 v28 M262 100 v36" stroke-width="7"/>
-        </g>
-      </svg>
-    </div>
-    <div class="herocard">
+    <div class="hero" id="heroBanner"></div>
+    <div class="card herocard">
       <div class="herotop"><span class="sub">Terminator Training Method</span></div>
       <h1>Jacked Gazelle <em>2.0</em></h1>
       <div class="heroprogwrap">
@@ -930,7 +918,7 @@ async function setDone(v){
   dayData.done=v; scheduleSave();
   toast(v?'Day complete \u2713':'Marked incomplete');
   doneIdx[kDay()]=v; await sSet('doneidx',doneIdx);
-  renderDayRail(); renderDoneUI(); renderHome();
+  renderDayRail(); renderDoneUI(); refreshHomeAfterToggle(v);
 }
 
 /* =============== RENDER =============== */
@@ -954,45 +942,107 @@ function renderDayRail(){
     rail.appendChild(b);
   });
 }
-const heroIconSVG=`<svg viewBox="0 0 100 100" aria-hidden="true"><rect width="100" height="100" fill="#2A3B30"/><g stroke="#EFE7D6" stroke-width="4.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="50" cy="24" r="7" fill="#EFE7D6" stroke="none"/><path d="M50 31 L50 55"/><path d="M50 38 L36 52 L30 68"/><path d="M50 38 L64 52 L70 68"/><path d="M50 55 L40 84"/><path d="M50 55 L60 84"/><path d="M18 52 H82" stroke-width="6"/><path d="M25 45 v14 M32 43 v18" stroke-width="5"/><path d="M75 45 v14 M68 43 v18" stroke-width="5"/></g></svg>`;
+/* Real photos, once you drop them in the repo root, are picked up automatically —
+   no code change needed. Until then these probes fail silently and the CSS
+   gradient fallback shows. */
+let heroImgChecked=false;
+function ensureHeroImage(){
+  if(heroImgChecked)return; heroImgChecked=true;
+  const img=new Image();
+  img.onload=()=>{ $('heroBanner').style.setProperty('--hero-img',"url('hero.jpg')"); $('heroBanner').classList.add('has-img'); };
+  img.src='hero.jpg';
+}
+let schedImgOk=null;
+function applySchedImg(el){
+  if(!el)return;
+  if(schedImgOk===true){ el.style.setProperty('--sched-img',"url('workout.jpg')"); el.classList.add('has-img'); return; }
+  if(schedImgOk===false) return;
+  const img=new Image();
+  img.onload=()=>{ schedImgOk=true; el.style.setProperty('--sched-img',"url('workout.jpg')"); el.classList.add('has-img'); };
+  img.onerror=()=>{ schedImgOk=false; };
+  img.src='workout.jpg';
+}
 function renderHome(){
-  const prog=programProgress();
-  $('heroProgFill').style.width=prog.pct+'%';
-  $('heroProgLbl').textContent=`Day ${prog.day} of ${prog.total}`;
-
+  ensureHeroImage();
   const d=dy(), sc=$('schedCard');
   if(d.rest){
     sc.innerHTML=`<div class="schedrest">Rest day &mdash; nothing scheduled.</div>`;
   } else {
-    sc.innerHTML=`<button class="schedrow" id="schedOpen" style="width:100%">
-      <div class="schedimg">${heroIconSVG}</div>
-      <div class="schedmid">
-        <div class="schedtag"><i></i>${phTag()}</div>
-        <div class="schedname">${esc(d.f)}</div>
-      </div>
-      <span class="schedcheck${dayData.done?' on':''}" id="schedCheck">&#10003;</span>
-    </button>`;
+    sc.innerHTML=`<div class="schedrow${dayData.done?' done':''}" id="schedRow">
+      <div class="schedsweep" id="schedSweep"></div>
+      <button class="schedtap" id="schedOpen">
+        <div class="schedimg" id="schedImg"></div>
+        <div class="schedmid">
+          <div class="schedtag"><i></i>${phTag()}</div>
+          <div class="schedname">${esc(d.f)}</div>
+        </div>
+      </button>
+      <button class="schedcheck${dayData.done?' on':''}" id="schedCheck">&#10003;</button>
+    </div>`;
     $('schedOpen').onclick=()=>openWorkout('home');
     $('schedCheck').onclick=(e)=>{e.stopPropagation();setDone(!dayData.done)};
+    applySchedImg($('schedImg'));
   }
-
-  const wp=weekProgress(), allTime=Object.values(doneIdx).filter(Boolean).length;
-  const totalNonRest=P.phases.reduce((a,ph)=>a+ph.weeks.reduce((b,w)=>b+w.filter(x=>!x.rest).length,0),0)||1;
-  const pct=Math.min(100,Math.round(allTime/totalNonRest*100));
+  buildActSkeleton();
+  updateActivity();
+  updateHeroProgress();
+}
+function updateHeroProgress(){
+  const prog=programProgress();
+  $('heroProgFill').style.width=prog.pct+'%';
+  $('heroProgLbl').textContent=`Day ${prog.day} of ${prog.total}`;
+}
+function buildActSkeleton(){
+  if($('actRingFg'))return;
   const C2=2*Math.PI*27;
   $('actCard').innerHTML=`<div class="actbody">
     <div class="actrow">
       <div><div class="actlab">Total Activities</div><div class="actsub">All Time</div></div>
       <div class="actring"><svg viewBox="0 0 64 64">
-        <circle cx="32" cy="32" r="27" fill="none" stroke="var(--panel2)" stroke-width="7"/>
-        <circle cx="32" cy="32" r="27" fill="none" stroke="var(--blue)" stroke-width="7" stroke-linecap="round"
-          stroke-dasharray="${C2}" stroke-dashoffset="${C2*(1-pct/100)}"/>
-      </svg><span class="num">${allTime}</span></div>
+        <circle cx="32" cy="32" r="27" fill="none" stroke="var(--panel2)" stroke-width="6"/>
+        <circle id="actRingFg" cx="32" cy="32" r="27" fill="none" stroke="var(--blue)" stroke-width="6" stroke-linecap="round"
+          stroke-dasharray="${C2}" stroke-dashoffset="${C2}"/>
+      </svg><span class="num" id="actNum">0</span></div>
     </div>
     <div class="actdiv"></div>
-    <div class="actweek"><span class="actlab">This Week &middot; Week ${S.w+1}</span><b>Workouts ${wp.done}/${wp.total}</b></div>
-    <div class="actbar"><i style="width:${wp.total?Math.round(wp.done/wp.total*100):0}%"></i></div>
+    <div class="actweek"><span id="actWeekLbl">This Week</span><b id="actWeekCount">0/0</b></div>
+    <div class="actbar"><i id="actBarFill"></i></div>
   </div>`;
+}
+function updateActivity(){
+  const wp=weekProgress(), allTime=Object.values(doneIdx).filter(Boolean).length;
+  const pct=wp.total?Math.min(100,Math.round(wp.done/wp.total*100)):0;
+  const C2=2*Math.PI*27;
+  const ring=$('actRingFg'); if(ring) ring.style.strokeDashoffset=C2*(1-pct/100);
+  $('actWeekLbl').textContent=`This Week · Week ${S.w+1}`;
+  $('actWeekCount').textContent=`Workouts ${wp.done}/${wp.total}`;
+  $('actBarFill').style.width=(wp.total?Math.round(wp.done/wp.total*100):0)+'%';
+  countTo($('actNum'), allTime);
+}
+function countTo(el,target){
+  if(!el)return;
+  const from=parseInt(el.textContent,10)||0;
+  if(from===target){el.textContent=target;return}
+  const dur=650, t0=performance.now();
+  (function step(t){
+    const p=Math.min(1,(t-t0)/dur), e=1-Math.pow(1-p,3);
+    el.textContent=Math.round(from+(target-from)*e);
+    if(p<1) requestAnimationFrame(step);
+  })(t0);
+}
+function refreshHomeAfterToggle(v){
+  const row=$('schedRow'), chk=$('schedCheck');
+  if(row&&chk){
+    row.classList.toggle('done',v);
+    chk.classList.toggle('on',v);
+    if(v){
+      const sw=$('schedSweep');
+      if(sw){ sw.classList.remove('go'); void sw.offsetWidth; sw.classList.add('go'); }
+    }
+  }
+  buildActSkeleton();
+  updateActivity();
+  updateHeroProgress();
 }
 function programProgress(){
   let before=0, total=0;
