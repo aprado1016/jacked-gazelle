@@ -209,15 +209,20 @@ input:focus,textarea:focus{border-color:var(--blue)}
 .grlabel{font-size:13px;letter-spacing:.2em;text-transform:uppercase;color:var(--tdim)}
 .grnum{font-weight:800;font-size:96px;line-height:1;margin-top:10px;font-variant-numeric:tabular-nums}
 
-/* ---------- Vertical day list (Plan) ---------- */
-.daylist{display:flex;flex-direction:column;gap:8px;padding:2px 14px 12px}
-.dayrow{display:flex;align-items:center;gap:12px;background:var(--panel);border:1px solid var(--glass-brd);border-radius:16px;padding:12px 14px;text-align:left;-webkit-backdrop-filter:blur(var(--blur));backdrop-filter:blur(var(--blur))}
-.dayrow .d{font-family:var(--disp);font-weight:800;font-size:19px;letter-spacing:.05em;width:38px;flex-shrink:0}
-.dayrow .f{flex:1;font-size:14px;font-weight:600;color:var(--dim);text-transform:uppercase;letter-spacing:.03em}
-.dayrow.on{border-color:var(--blue);background:linear-gradient(180deg,var(--sel-a),var(--sel-b))}
-.dayrow.on .d{color:var(--blue)}
-.dayrow .dot{width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0;visibility:hidden}
-.dayrow.done .dot{visibility:visible}
+/* ---------- Day timeline (Plan) ---------- */
+.daytimeline{padding:4px 18px 28px}
+.tlrow{display:flex;width:100%;gap:14px;text-align:left;position:relative;padding-bottom:16px}
+.tlrow:last-child{padding-bottom:0}
+.tlrow:not(:last-child):before{content:'';position:absolute;left:19px;top:40px;bottom:0;width:2px;background:var(--line)}
+.tlnode{width:40px;height:40px;border-radius:50%;flex-shrink:0;background:var(--panel);border:1.5px solid var(--glass-brd);display:flex;align-items:center;justify-content:center;font-family:var(--disp);font-weight:800;font-size:15px;color:var(--dim);position:relative;z-index:1;-webkit-backdrop-filter:blur(var(--blur));backdrop-filter:blur(var(--blur));transition:all .25s}
+.tlrow.done .tlnode{background:linear-gradient(160deg,var(--done-a),var(--done-b));border-color:var(--done-a);color:var(--done-ink)}
+.tlrow.on .tlnode{border-color:var(--blue);box-shadow:0 0 0 4px var(--sel-a)}
+.tlrow.rest .tlnode{color:var(--faint);opacity:.55}
+.tlcard{flex:1;min-width:0;background:var(--panel);border:1px solid var(--glass-brd);border-radius:16px;padding:11px 14px;-webkit-backdrop-filter:blur(var(--blur));backdrop-filter:blur(var(--blur));transition:border-color .25s,background .25s;display:flex;flex-direction:column;justify-content:center}
+.tlrow.on .tlcard{border-color:var(--blue);background:linear-gradient(180deg,var(--sel-a),var(--sel-b))}
+.tlname{font-family:var(--disp);font-weight:700;font-size:16px;letter-spacing:.03em;text-transform:uppercase;color:var(--ink)}
+.tlmeta{font-size:12px;color:var(--dim);margin-top:2px}
+.tlrow.rest .tlname,.tlrow.rest .tlmeta{color:var(--faint)}
 
 /* ---------- Screens & tab bar ---------- */
 .screen{display:none}
@@ -234,10 +239,13 @@ body.workout-active{padding-bottom:0;background:var(--tbg)}
 .tabbar button.on{color:var(--blue)}
 .tabind{position:absolute;top:4px;bottom:4px;left:0;width:calc(20% - 4px);border-radius:16px;background:var(--sel-a);z-index:0;pointer-events:none;
   transition:transform .32s cubic-bezier(.65,0,.35,1)}
-.planhead{margin:calc(env(safe-area-inset-top) + 14px) 14px 2px}
+.planhead{position:relative;overflow:hidden;padding:calc(env(safe-area-inset-top) + 20px) 18px 20px;background:var(--bg);border-bottom:1px solid var(--line)}
+.planhead:before{content:'';position:absolute;inset:0;background:radial-gradient(130% 90% at 12% -25%,rgba(255,255,255,.75),transparent 62%),radial-gradient(150% 90% at 105% -15%,rgba(180,121,30,.14),transparent 55%);pointer-events:none}
+.planhead>*{position:relative}
 .planhead h2{font-family:var(--disp);font-weight:800;font-size:30px;letter-spacing:.03em;text-transform:uppercase}
 .planhead p{color:var(--dim);font-size:13px;margin-top:2px}
-.plancard{margin:14px}
+.planhead .selrow{margin:16px 0 0}
+.plansectitle{margin:20px 18px 10px;font-family:var(--disp);font-weight:700;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
 .toolstitle{margin:calc(env(safe-area-inset-top) + 14px) 14px 0;font-family:var(--disp);font-weight:800;font-size:22px;letter-spacing:.05em;text-transform:uppercase}
 
 /* ---------- Day ticket ---------- */
@@ -473,12 +481,16 @@ body.workout-active{padding-bottom:0;background:var(--tbg)}
   </div>
 
   <section class="screen" id="screen-plan">
-    <div class="planhead"><h2>Plan</h2><p>Pick a phase, week and day to jump to.</p></div>
-    <div class="selrow" style="margin:14px 14px 0">
-      <button class="selpill" id="phasePill"><span><span class="lab">Phase</span><span class="val" id="phaseVal">Phase 1</span></span><span class="car">&#9662;</span></button>
-      <button class="selpill" id="weekPill"><span><span class="lab">Week</span><span class="val" id="weekVal">Week 1</span></span><span class="car">&#9662;</span></button>
+    <div class="planhead">
+      <h2>Plan</h2>
+      <p>Pick a phase, week and day to jump to.</p>
+      <div class="selrow">
+        <button class="selpill" id="phasePill"><span><span class="lab">Phase</span><span class="val" id="phaseVal">Phase 1</span></span><span class="car">&#9662;</span></button>
+        <button class="selpill" id="weekPill"><span><span class="lab">Week</span><span class="val" id="weekVal">Week 1</span></span><span class="car">&#9662;</span></button>
+      </div>
     </div>
-    <div class="daylist" id="dayrail"></div>
+    <div class="plansectitle">This Week</div>
+    <div class="daytimeline" id="dayrail"></div>
   </section>
 
   <section class="screen" id="screen-progress">
@@ -1092,9 +1104,13 @@ function renderHeader(){
 function renderDayRail(){
   const rail=$('dayrail'); rail.innerHTML='';
   wk().forEach((d,i)=>{
+    const done=doneIdx[`log:${S.p}-${S.w}-${i}`];
     const b=document.createElement('button');
-    b.className='dayrow'+(i===S.d?' on':'')+(doneIdx[`log:${S.p}-${S.w}-${i}`]?' done':'');
-    b.innerHTML=`<span class="d">D${i+1}</span><span class="f">${d.rest?'Rest':d.f}</span><span class="dot"></span>`;
+    b.className='tlrow'+(i===S.d?' on':'')+(done?' done':'')+(d.rest?' rest':'');
+    const node=done?'&#10003;':String(i+1);
+    const meta=d.rest?'Recovery day':`${esc(dayTargets(d))} &middot; ${dayMinutes(d)} min`;
+    b.innerHTML=`<span class="tlnode">${node}</span>
+      <span class="tlcard"><span class="tlname">${d.rest?'Rest':esc(d.f)}</span><span class="tlmeta">${meta}</span></span>`;
     b.onclick=async()=>{await go({d:i}); openWorkout('plan')};
     rail.appendChild(b);
   });
