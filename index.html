@@ -128,6 +128,66 @@ input:focus,textarea:focus{border-color:var(--blue)}
 .wkstartbar.show{display:block}
 .startbtn2{width:100%;padding:17px;border-radius:16px;background:linear-gradient(180deg,#2B2620,#17130F);color:#F2ECE0;font-weight:700;font-size:16px;letter-spacing:.06em;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:var(--shadow)}
 
+/* ---------- Active workout log (dark) ---------- */
+.logtopbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:8px;
+  padding:calc(env(safe-area-inset-top) + 10px) 14px 10px;background:var(--tbg)}
+.logcircle{width:38px;height:38px;border-radius:50%;background:var(--tpanel);border:1px solid var(--tline);color:var(--tink);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.logseg{display:flex;background:var(--tpanel);border:1px solid var(--tline);border-radius:99px;padding:3px}
+.logseg button{padding:8px 15px;border-radius:99px;font-size:12.5px;font-weight:600;color:var(--tdim)}
+.logseg button.on{background:var(--tpanel2);color:var(--tink)}
+.logmeta{padding:0 14px 14px;background:var(--tbg)}
+.logtitle{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--tdim);margin-bottom:8px}
+.logtimerow{display:flex;align-items:center;gap:12px}
+.logtimerow span{font-weight:700;font-size:15px;color:var(--tink);font-variant-numeric:tabular-nums;flex-shrink:0}
+.logprogbar{flex:1;height:3px;border-radius:99px;background:var(--tline);overflow:hidden}
+.logprogbar i{display:block;height:100%;width:0;background:var(--tfaint);transition:width .4s}
+.logscreen{background:var(--tbg);min-height:100%;padding-bottom:40px}
+.logsectitle{margin:20px 14px 10px;font-weight:700;font-size:17px;color:var(--tink)}
+.logcard{background:var(--tpanel);border:1px solid var(--tline);border-radius:20px;margin:0 14px 14px;padding:14px}
+.logexhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:8px}
+.logtag{display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--tfaint);min-width:0}
+.logtag i{width:15px;height:15px;border:1px solid var(--tfaint);border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-style:normal;font-size:10px;color:var(--tfaint);flex-shrink:0}
+.logsetspill{display:flex;align-items:center;gap:6px;background:var(--tpanel2);border-radius:99px;padding:7px 12px;font-size:12px;font-weight:700;color:var(--tink);flex-shrink:0}
+.logsetspill .chev{font-size:10px;display:inline-block;transition:transform .2s;color:var(--tdim)}
+.logex.open .logsetspill .chev{transform:rotate(180deg)}
+.logexrow{display:flex;align-items:center;gap:12px;margin-bottom:4px}
+.logthumb{width:52px;height:52px;border-radius:14px;flex-shrink:0;background-image:linear-gradient(150deg,#4A6350,#26332A);background-size:cover;background-position:center}
+.logexmid{flex:1;min-width:0}
+.logexmid .nm{font-weight:700;font-size:17px;color:var(--tink)}
+.logexmid .rx{font-size:13px;color:var(--tdim);margin-top:2px}
+.logkebab{flex-shrink:0;color:var(--tfaint);font-size:18px;padding:4px 8px}
+.logbody2{display:none;margin-top:10px}
+.logex.open .logbody2{display:block}
+.logactions{display:flex;gap:8px;overflow-x:auto;padding-bottom:12px;scrollbar-width:none}
+.logactions::-webkit-scrollbar{display:none}
+.logactions button{flex-shrink:0;display:flex;align-items:center;gap:6px;background:var(--tpanel2);border:1px solid var(--tline);border-radius:12px;padding:10px 13px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--tink);white-space:nowrap}
+.logactions button svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2}
+.logtablehead{display:grid;grid-template-columns:30px 1fr 1fr 54px;gap:8px;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--tfaint);padding:2px 0 8px}
+.logtablehead span:nth-child(2),.logtablehead span:nth-child(3){text-align:center}
+.logsetrow{display:grid;grid-template-columns:30px 1fr 1fr 54px;gap:8px;align-items:center;margin-bottom:9px}
+.logsetnum{width:28px;height:28px;border-radius:50%;border:1.5px solid var(--tline);color:var(--tdim);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+.logsetnum.done{background:var(--tink);border-color:var(--tink);color:var(--tbg)}
+.loginput{width:100%;padding:11px 8px;text-align:center;font-size:15px;font-weight:700;border-radius:11px;background:var(--tpanel2);border:1px solid var(--tline);color:var(--tink)}
+.logweightwrap{position:relative}
+.logweightwrap .loginput{padding-right:24px}
+.logstep{position:absolute;right:2px;top:2px;bottom:2px;display:flex;flex-direction:column;justify-content:center}
+.logstep button{width:20px;height:14px;color:var(--tfaint);font-size:8px;display:flex;align-items:center;justify-content:center}
+.logprev{font-size:12px;color:var(--tfaint);text-align:center}
+.logrest{display:flex;align-items:center;gap:10px;margin-top:2px}
+.logrestplay{width:34px;height:34px;border-radius:10px;background:var(--tpanel2);border:1px solid var(--tline);color:var(--tink);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.logrest span{font-size:14px;color:var(--tdim)}
+.logdayfoot{padding:6px 14px 30px}
+.logdaynote{width:100%;min-height:70px;padding:12px;border-radius:14px;background:var(--tpanel2);border:1px solid var(--tline);color:var(--tink);font-size:14px}
+.logdonebtn{width:100%;margin-top:10px;padding:15px;border-radius:14px;font-weight:700;font-size:15px;letter-spacing:.06em;text-transform:uppercase;background:var(--tpanel2);border:1px solid var(--tline);color:var(--tink)}
+.logdonebtn.on{background:linear-gradient(180deg,var(--done-a),var(--done-b));border-color:var(--done-a);color:var(--done-ink)}
+.togglerow{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:4px 0}
+.toggle{position:relative;display:inline-block;width:44px;height:26px;flex-shrink:0}
+.toggle input{opacity:0;width:0;height:0}
+.toggle .slider{position:absolute;inset:0;background:var(--panel2);border:1px solid var(--line);border-radius:99px;transition:.2s;cursor:pointer}
+.toggle .slider:before{content:'';position:absolute;width:20px;height:20px;left:2px;top:2px;background:#fff;border-radius:50%;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.25)}
+.toggle input:checked+.slider{background:var(--blue)}
+.toggle input:checked+.slider:before{transform:translateX(18px)}
+
 /* ---------- Get-ready countdown ---------- */
 .grwrap{position:fixed;inset:0;z-index:96;background:radial-gradient(120% 70% at 50% -10%,rgba(255,255,255,.06),transparent 55%),var(--tbg);display:none;flex-direction:column;align-items:center;justify-content:center;color:var(--tink)}
 .grwrap.on{display:flex}
@@ -527,6 +587,30 @@ input:focus,textarea:focus{border-color:var(--blue)}
   <div class="expane" id="exPaneHist"></div>
   <div class="expane" id="exPaneNotes">
     <textarea class="exnotesta" id="exNotesTa" placeholder="Form cues, adjustments, thoughts for next time&hellip;"></textarea>
+  </div>
+</div>
+
+<div class="sheet" id="swapSheet">
+  <h3 id="swapTitle">Swap</h3>
+  <div id="swapBody" class="out"></div>
+</div>
+
+<div class="sheet" id="pauseSheet">
+  <h3>Workout Paused</h3>
+  <button class="bigbtn pri" id="pauseResume">&#9654;&nbsp; Resume Workout</button>
+  <button class="bigbtn" id="pauseRestart">&#8635;&nbsp; Restart Workout</button>
+  <button class="bigbtn" id="pauseEnd" style="color:var(--red)">&times;&nbsp; End Workout</button>
+</div>
+
+<div class="sheet" id="wkSettingsSheet">
+  <h3>Workout Settings</h3>
+  <div class="tool">
+    <label class="togglerow"><span>Audio Cues<br><span class="out" style="font-size:12px">Sounds for rest timers and the get-ready countdown</span></span>
+      <span class="toggle"><input type="checkbox" id="optAudio"><span class="slider"></span></span></label>
+  </div>
+  <div class="tool">
+    <label class="togglerow"><span>Expand Exercises by Default<br><span class="out" style="font-size:12px">Show sets and reps automatically when a workout opens</span></span>
+      <span class="toggle"><input type="checkbox" id="optExpand"><span class="slider"></span></span></label>
   </div>
 </div>
 
@@ -1112,9 +1196,14 @@ function weekProgress(){
 }
 let backTarget='home';
 let inLogView=false;
+function clearAllRestTimers(){
+  Object.values(restState).forEach(st=>{if(st.timer)clearInterval(st.timer)});
+}
 function openWorkout(from){
   backTarget=from||'home';
   inLogView=false;
+  pauseWkTimer();
+  clearAllRestTimers();
   document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('active',s.id==='screen-workout'));
   document.querySelectorAll('#tabbar button[data-tab]').forEach(b=>b.classList.toggle('on',b.dataset.tab==='home'));
   moveTabIndicator('home');
@@ -1204,6 +1293,7 @@ const ICO={
 };
 function renderDay(){
   const m=$('main'), d=dy();
+  $('wkTopbar').style.display='';
   $('wkTopbar').classList.toggle('overlay', !d.rest);
   if(d.rest){
     $('wkStartBar').classList.remove('show');
@@ -1254,84 +1344,135 @@ function renderDay(){
 let grInterval=null;
 function startWorkout(){
   inLogView=true;
+  wkElapsedSec=0;
   const wrap=$('grWrap'); wrap.classList.add('on');
-  let n=3; $('grNum').textContent=n; tBeep(660,.08);
+  let n=3; $('grNum').textContent=n; if(WKOPT.audio)tBeep(660,.08);
   clearInterval(grInterval);
   grInterval=setInterval(()=>{
     n--;
     if(n<=0){
       clearInterval(grInterval); wrap.classList.remove('on');
-      tBeep(900,.18); if(navigator.vibrate)navigator.vibrate([120,60,120]);
+      if(WKOPT.audio){tBeep(900,.18); if(navigator.vibrate)navigator.vibrate([120,60,120]);}
       renderDayLog();
+      startWkTimer();
       return;
     }
-    $('grNum').textContent=n; tBeep(660,.08); if(navigator.vibrate)navigator.vibrate(60);
+    $('grNum').textContent=n; if(WKOPT.audio)tBeep(660,.08); if(navigator.vibrate)navigator.vibrate(60);
   },1000);
 }
+/* =============== ACTIVE WORKOUT LOG (dark) =============== */
+let WKOPT={audio:true,expand:false};
+let wkElapsedSec=0, wkTimerId=null, wkRunning=false;
+const PLAY_SVG='<svg viewBox="0 0 24 24" width="13" height="13"><path d="M6 4l14 8-14 8z" fill="currentColor"/></svg>';
+const PAUSE_SVG='<svg viewBox="0 0 24 24" width="13" height="13"><rect x="6" y="4" width="4" height="16" fill="currentColor"/><rect x="14" y="4" width="4" height="16" fill="currentColor"/></svg>';
+function fmtMMSS(s){s=Math.max(0,Math.round(s));return `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`}
+function startWkTimer(){
+  if(wkTimerId)return;
+  wkRunning=true;
+  const btn=$('logPause'); if(btn)btn.innerHTML=PAUSE_SVG;
+  wkTimerId=setInterval(()=>{wkElapsedSec++;const el=$('logElapsed');if(el)el.textContent=fmtMMSS(wkElapsedSec)},1000);
+}
+function pauseWkTimer(){
+  clearInterval(wkTimerId); wkTimerId=null; wkRunning=false;
+  const btn=$('logPause'); if(btn)btn.innerHTML=PLAY_SVG;
+}
+function wkSetProgress(){
+  const d=dy(); let total=0,done=0;
+  (d.blocks||[]).forEach(b=>b.ex.forEach(e=>{
+    const sets=dayData.sets[e.n]||[]; total+=sets.length; done+=sets.filter(s=>s.done).length;
+  }));
+  return total?done/total:0;
+}
+function updateWkProgress(){
+  const el=$('logProgFill'); if(el)el.style.width=Math.round(wkSetProgress()*100)+'%';
+}
+function renderDoneUI(){
+  const b=$('donebtn')||$('logDoneBtn'); if(!b)return;
+  const on=dayData.done;
+  b.className=(b.id==='logDoneBtn'?'logdonebtn':'donebtn')+(on?' on':'');
+  b.innerHTML=on?'&#10003; Day Complete':'Mark Day Complete';
+}
+
+function renderDay_restBranch(m,d){
+  m.innerHTML=`<div class="ticket"><div class="meta">${phTag()}</div><h2>Rest Day</h2></div>
+  <div class="restday"><h3>Recover</h3><p>Training is only effective to the extent it's recovered from.<br>Sleep, eat, walk. That's the work today.</p></div>`;
+}
 function renderDayLog(){
-  $('wkTopbar').classList.remove('overlay');
+  $('wkTopbar').style.display='none';
   $('wkStartBar').classList.remove('show');
   const m=$('main'); const d=dy();
-  if(d.rest){
-    m.innerHTML=`<div class="ticket"><div class="meta">${phTag()}</div><h2>Rest Day</h2></div>
-    <div class="restday"><h3>Recover</h3><p>Training is only effective to the extent it's recovered from.<br>Sleep, eat, walk. That's the work today.</p></div>`;
-    return;
-  }
-  let h=`<div class="ticket"><div class="meta">${phTag()}</div><h2>${d.f}</h2>${dayData.done?'<span class="donetag">&#10003; Completed</span>':''}</div>`;
-  const wuk=(WUMAP[S.p]||{})[S.d];
-  if(wuk){const wu=WUV[wuk];
-    h+=`<div class="prep"><span>Prep: <b>${wu.n}</b> &mdash; add/subtract/adjust as needed</span><button class="vidbtn" onclick="openVideo('${wu.u}','${cssk(wu.n)}')">Watch &#9654;</button></div>`;}
-  if(d.notes&&d.notes.length){h+=`<div class="topnotes">${d.notes.map(n=>`<span>${n}</span>`).join('')}</div>`;}
-  // blocks
+  if(d.rest){ renderDay_restBranch(m,d); return; }
+
+  let h=`<div class="logtopbar">
+    <button class="logcircle" id="logPause">${wkRunning?PAUSE_SVG:PLAY_SVG}</button>
+    <div class="logseg"><button data-seg="guided">Guided</button><button data-seg="logbook" class="on">Logbook</button></div>
+    <button class="logcircle" id="logSettings"><svg viewBox="0 0 24 24" width="17" height="17" stroke="currentColor" fill="none" stroke-width="2"><path d="M12 15a3 3 0 100-6 3 3 0 000 6z"/><path d="M19.4 13a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V19a2 2 0 11-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H4a2 2 0 110-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H10a1.65 1.65 0 001-1.51V4a2 2 0 114 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V10a1.65 1.65 0 001.51 1H20a2 2 0 110 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></button>
+  </div>
+  <div class="logmeta">
+    <div class="logtitle">${esc(d.f)}</div>
+    <div class="logtimerow"><span id="logElapsed">${fmtMMSS(wkElapsedSec)}</span><div class="logprogbar"><i id="logProgFill"></i></div></div>
+  </div>
+  <div class="logscreen">`;
+
   d.blocks.forEach((b,bi)=>{
-    h+=`<div class="card"><div class="chead"><span class="t">${b.t}</span>${b.hr?`<span class="n">${b.hr}</span>`:''}</div>`;
+    h+=`<div class="logsectitle">${esc(b.t)}</div>`;
     const spans=[];let idx=0;
     (b.g||[]).forEach(sz=>{spans.push([idx,sz]);idx+=sz});
     while(idx<b.ex.length){spans.push([idx,1]);idx++}
-    const row=(ei,lt)=>{const e=b.ex[ei];return `<div class="exrow" id="ex-${bi}-${ei}">
-        <div class="exmain">
-          <button class="exmaintap" onclick="togEx(${bi},${ei})"><span class="nm">${lt?`<span class="lt">${lt}</span>`:''}${esc(e.n)}</span><span><span class="rx">${e.rx}</span><span class="chev">&#9654;</span></span></button>
-          <button class="infob" onclick="event.stopPropagation();openExMeta(${bi},${ei})" aria-label="Exercise info"><i>i</i></button>
+    const tagFor=sz=>sz===1?'Straight Set':sz===2?'Superset':sz===3?'Tri-set':'Circuit';
+    const row=(ei,lt,tag)=>{
+      const e=b.ex[ei], key=e.n;
+      const openDefault=WKOPT.expand;
+      const nSets=ensureSets(e).length;
+      return `<div class="logcard logex${openDefault?' open':''}" id="ex-${bi}-${ei}">
+        <div class="logexhead">
+          <span class="logtag">${lt?`<span class="lt">${lt}</span>`:''}${tag.toUpperCase()}<i>&#8505;</i></span>
+          <button class="logsetspill" onclick="togEx(${bi},${ei})">${nSets} SET${nSets===1?'':'S'} <span class="chev">&#9660;</span></button>
         </div>
-        ${e.nt?`<div class="exnote">${esc(e.nt)}</div>`:''}
-        <div class="logger" id="lg-${bi}-${ei}"></div>
-      </div>`};
+        <div class="logexrow">
+          <div class="logthumb"></div>
+          <div class="logexmid"><div class="nm">${esc(e.n)}</div><div class="rx">${e.rx}</div></div>
+          <button class="logkebab" onclick="openExMeta(${bi},${ei})" aria-label="Exercise info">&#8942;</button>
+        </div>
+        <div class="logbody2" id="lg-${bi}-${ei}"></div>
+        <div class="logrest">
+          <button class="logrestplay" id="restbtn-${bi}-${ei}" onclick="toggleRest(${bi},${ei})">${PLAY_SVG}</button>
+          <span id="restlbl-${bi}-${ei}">Rest ${fmtMMSS(restSecondsFor(b))}</span>
+        </div>
+      </div>`;
+    };
     spans.forEach(([st,sz])=>{
-      if(sz>1){
-        h+=`<div class="grp"><div class="grphead">${sz===2?'Superset':sz===3?'Tri-set':'Circuit'} &middot; ${b.ir||'alternate &middot; rest 60-90 sec between moves'}</div>`;
-        for(let k=0;k<sz;k++)h+=row(st+k,'ABCD'[k]);
-        h+=`</div>`;
-      } else h+=row(st,null);
+      const tag=tagFor(sz);
+      for(let k=0;k<sz;k++)h+=row(st+k,sz>1?'ABCD'[k]:null,tag);
     });
-    h+=`</div>`;
   });
-  // conditioning
+
   if(d.cond){
-    h+=`<div class="card cond"><div class="chead"><span class="t">${d.cond.t}</span></div><div class="condbody">`;
-    d.cond.l.forEach(l=>h+=`<p>${l}</p>`);
+    h+=`<div class="logsectitle">${esc(d.cond.t)}</div><div class="logcard">`;
+    d.cond.l.forEach(l=>h+=`<p style="font-size:14px;color:var(--tdim);margin-bottom:6px">${l}</p>`);
     h+=calcStrip(d.cond);
-    if(buildSession(d.cond)) h+=`<button class="startbtn" id="startTimer">&#9654;&nbsp; Start interval timer</button>`;
-    h+=`<div class="result"><label>Result / notes (pace, rounds, time&hellip;)</label><input id="condres" value="${(dayData.cond||'').replace(/"/g,'&quot;')}" placeholder="e.g. 200s avg 42.5 · felt smooth"></div></div></div>`;
+    if(buildSession(d.cond)) h+=`<button class="startbtn" id="startTimer" style="margin-top:10px">&#9654;&nbsp; Start interval timer</button>`;
+    h+=`<div class="result" style="margin-top:10px"><label style="color:var(--tfaint)">Result / notes (pace, rounds, time&hellip;)</label><input id="condres" value="${(dayData.cond||'').replace(/"/g,'&quot;')}" placeholder="e.g. 200s avg 42.5 · felt smooth"></div>`;
+    h+=`</div>`;
   }
-  h+=`<div class="dayfoot">
-    <textarea id="daynote" placeholder="Session notes — how it felt, PRs, tweaks for next week&hellip;">${esc(dayData.note||'')}</textarea>
-    <button class="donebtn ${dayData.done?'on':''}" id="donebtn">${dayData.done?'&#10003; Day Complete':'Mark Day Complete'}</button>
+
+  h+=`<div class="logdayfoot">
+    <textarea class="logdaynote" id="daynote" placeholder="Session notes — how it felt, PRs, tweaks for next week&hellip;">${esc(dayData.note||'')}</textarea>
+    <button class="logdonebtn ${dayData.done?'on':''}" id="logDoneBtn">${dayData.done?'&#10003; Day Complete':'Mark Day Complete'}</button>
   </div>`;
+  h+=`</div>`;
   m.innerHTML=h;
   const cr=$('condres'); if(cr) cr.oninput=()=>{dayData.cond=cr.value;scheduleSave()};
   if(d.cond) wireCalc(d.cond);
   if($('startTimer')) $('startTimer').onclick=()=>openTimer(d.cond);
   $('daynote').oninput=()=>{dayData.note=$('daynote').value;scheduleSave()};
-  $('donebtn').onclick=()=>setDone(!dayData.done);
-}
-function renderDoneUI(){
-  const b=$('donebtn'); if(!b) return;
-  b.className='donebtn '+(dayData.done?'on':'');
-  b.innerHTML=dayData.done?'&#10003; Day Complete':'Mark Day Complete';
-  const t=document.querySelector('.ticket');
-  const ex=t.querySelector('.donetag');
-  if(dayData.done&&!ex){const s=document.createElement('span');s.className='donetag';s.innerHTML='&#10003; Completed';t.appendChild(s)}
-  if(!dayData.done&&ex)ex.remove();
+  $('logDoneBtn').onclick=()=>setDone(!dayData.done);
+  $('logPause').onclick=()=>{pauseWkTimer();openSheet('pauseSheet')};
+  $('logSettings').onclick=()=>openSheet('wkSettingsSheet');
+  if(WKOPT.expand){
+    d.blocks.forEach((b,bi)=>b.ex.forEach((e,ei)=>renderLogger(bi,ei)));
+  }
+  updateWkProgress();
 }
 
 window.togEx=function(bi,ei){
@@ -1339,37 +1480,116 @@ window.togEx=function(bi,ei){
   row.classList.toggle('open');
   if(!was) renderLogger(bi,ei);
 };
+function restSecondsFor(b){
+  const t=((b.hr||'')+' '+(b.ir||''));
+  let m=t.match(/(\d+)\s*-\s*(\d+)\s*min/i); if(m)return Math.round(((+m[1]+ +m[2])/2)*60);
+  m=t.match(/(\d+)\s*min/i); if(m)return +m[1]*60;
+  m=t.match(/(\d+)\s*sec/i); if(m)return +m[1];
+  return 90;
+}
+const restState={};
+window.toggleRest=function(bi,ei){
+  const key=`${bi}-${ei}`, btn=$(`restbtn-${key}`), lbl=$(`restlbl-${key}`);
+  let st=restState[key];
+  if(!st){ const b=dy().blocks[bi]; const total=restSecondsFor(b); st=restState[key]={remaining:total,total,running:false,timer:null}; }
+  if(st.running){
+    clearInterval(st.timer); st.timer=null; st.running=false; btn.innerHTML=PLAY_SVG;
+    return;
+  }
+  st.running=true; btn.innerHTML=PAUSE_SVG;
+  st.timer=setInterval(()=>{
+    st.remaining--;
+    if(st.remaining<=0){
+      clearInterval(st.timer); st.running=false; st.remaining=st.total;
+      btn.innerHTML=PLAY_SVG; lbl.textContent=`Rest ${fmtMMSS(st.total)}`;
+      if(WKOPT.audio){tBeep(880,.18); if(navigator.vibrate)navigator.vibrate([150,80,150]);}
+      return;
+    }
+    lbl.textContent=`Rest ${fmtMMSS(st.remaining)}`;
+  },1000);
+};
+function prescribedCount(rx){const m=(rx||'').match(/^(\d+)\s*x/i);return m?Math.max(1,+m[1]):1}
+function prescribedReps(rx){const m=(rx||'').match(/x\s*(\d+)/i);return m?m[1]:''}
+function ensureSets(e){
+  const key=e.n;
+  if(!dayData.sets[key]){
+    const n=prescribedCount(e.rx), r=prescribedReps(e.rx);
+    dayData.sets[key]=Array.from({length:n},()=>({w:'',r,done:false}));
+  }
+  return dayData.sets[key];
+}
 function renderLogger(bi,ei){
   const e=dy().blocks[bi].ex[ei]; const key=e.n;
-  if(!dayData.sets[key]) dayData.sets[key]=[{w:'',r:''}];
+  ensureSets(e);
   const lg=$(`lg-${bi}-${ei}`);
   const last=lastLifts[key];
+  const prevSets=(last&&last.s)||[];
   const vu=vidFor(key);
-  const vl=vu?`<button class="vidlink" onclick="openVideo('${vu}','${cssk(key)}')">Demo &#9654;</button>`:'';
-  let h='';
-  if(last&&last.at!==phTag()){
-    h+=`<div class="last">${vl}Last (${last.at}): <b>${last.s.map(s=>`${s.w||'–'}×${s.r||'–'}`).join(' · ')}</b></div>`;
-  } else {
-    h+=`<div class="last">${vl}Log your working sets</div>`;
-  }
-  h+=`<div class="collab"><span></span><span>Weight</span><span>Reps</span><span></span></div>`;
+  let h=`<div class="logactions">
+    <button onclick="addSet('${cssk(key)}',${bi},${ei})"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Add Set</button>
+    <button onclick="openExMeta(${bi},${ei},'how')"><svg viewBox="0 0 24 24"><path d="M5 4l14 8-14 8z" fill="currentColor" stroke="none"/></svg>How To</button>
+    <button onclick="openSwap(${bi},${ei})"><svg viewBox="0 0 24 24"><path d="M7 7h11l-3-3M17 17H6l3 3"/></svg>Swap</button>
+    <button onclick="openExMeta(${bi},${ei},'hist')"><svg viewBox="0 0 24 24"><path d="M4 20V11M11 20V4M18 20v-7"/></svg>History</button>
+    <button onclick="openExMeta(${bi},${ei},'notes')"><svg viewBox="0 0 24 24"><path d="M4 20l1.5-4.5L16 5l3 3-10.5 10.5z"/></svg>Notes</button>
+    <button onclick="deleteLastSet('${cssk(key)}',${bi},${ei})"><svg viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg>Delete Set</button>
+  </div>`;
+  if(vu) h+=`<div style="margin-bottom:10px"><button class="vidlink" onclick="openVideo('${vu}','${cssk(key)}')">Demo &#9654;</button></div>`;
+  h+=`<div class="logtablehead"><span></span><span>Reps</span><span>Weight</span><span>Previous</span></div>`;
   dayData.sets[key].forEach((s,si)=>{
-    h+=`<div class="setrow"><span class="sn">${si+1}</span>
-    <input inputmode="decimal" placeholder="lb" value="${s.w}" oninput="upSet('${cssk(key)}',${si},'w',this.value)">
-    <input inputmode="numeric" placeholder="reps" value="${s.r}" oninput="upSet('${cssk(key)}',${si},'r',this.value)">
-    <button class="del" onclick="delSet('${cssk(key)}',${si},${bi},${ei})">&times;</button></div>`;
+    const prev=prevSets[si]?`${prevSets[si].w||'--'}&times;${prevSets[si].r||'--'}`:'--';
+    h+=`<div class="logsetrow">
+      <button class="logsetnum${s.done?' done':''}" onclick="toggleSetDone('${cssk(key)}',${si},${bi},${ei})">${s.done?'&#10003;':si+1}</button>
+      <input class="loginput" inputmode="numeric" placeholder="reps" value="${s.r}" oninput="upSet('${cssk(key)}',${si},'r',this.value)">
+      <div class="logweightwrap"><input class="loginput" inputmode="decimal" placeholder="lb" value="${s.w}" oninput="upSet('${cssk(key)}',${si},'w',this.value)">
+        <div class="logstep"><button onclick="stepWeight('${cssk(key)}',${si},2.5,${bi},${ei})">&#9650;</button><button onclick="stepWeight('${cssk(key)}',${si},-2.5,${bi},${ei})">&#9660;</button></div>
+      </div>
+      <div class="logprev">${prev}</div>
+    </div>`;
   });
-  h+=`<button class="addset" onclick="addSet('${cssk(key)}',${bi},${ei})">+ Add set</button>`;
   lg.innerHTML=h;
 }
 function cssk(k){return k.replace(/'/g,"\\'")}
 window.upSet=function(k,si,f,v){dayData.sets[k][si][f]=v;scheduleSave()};
-window.addSet=function(k,bi,ei){dayData.sets[k].push({w:dayData.sets[k].at(-1)?.w||'',r:''});renderLogger(bi,ei);scheduleSave()};
-window.delSet=function(k,si,bi,ei){dayData.sets[k].splice(si,1);if(!dayData.sets[k].length)dayData.sets[k].push({w:'',r:''});renderLogger(bi,ei);scheduleSave()};
+window.addSet=function(k,bi,ei){const last=dayData.sets[k].at(-1);dayData.sets[k].push({w:last?.w||'',r:last?.r||'',done:false});renderLogger(bi,ei);scheduleSave();refreshSetsPill(bi,ei)};
+window.deleteLastSet=function(k,bi,ei){const arr=dayData.sets[k]; if(arr.length>1)arr.pop(); renderLogger(bi,ei); scheduleSave(); updateWkProgress(); refreshSetsPill(bi,ei)};
+window.toggleSetDone=function(k,si,bi,ei){dayData.sets[k][si].done=!dayData.sets[k][si].done; scheduleSave(); renderLogger(bi,ei); updateWkProgress()};
+window.stepWeight=function(k,si,delta,bi,ei){
+  const cur=parseFloat(dayData.sets[k][si].w)||0;
+  dayData.sets[k][si].w=String(Math.max(0,cur+delta));
+  scheduleSave(); renderLogger(bi,ei);
+};
+function refreshSetsPill(bi,ei){
+  const row=$(`ex-${bi}-${ei}`); if(!row)return;
+  const e=dy().blocks[bi].ex[ei];
+  const pill=row.querySelector('.logsetspill');
+  const n=(dayData.sets[e.n]||[]).length;
+  if(pill) pill.innerHTML=`${n} SET${n===1?'':'S'} <span class="chev">&#9660;</span>`;
+}
+window.openSwap=function(bi,ei){
+  const e=dy().blocks[bi].ex[ei];
+  const n=e.n.toLowerCase();
+  const hit=SUBS.find(([name])=>n.includes(name.toLowerCase())||name.toLowerCase().includes(n));
+  $('swapTitle').textContent='Swap · '+e.n;
+  $('swapBody').innerHTML=hit
+    ? `<p style="margin-bottom:6px">Try one of these instead:</p><p><b>${esc(hit[1])}</b></p>`
+    : `<p>No specific suggestions on file for this one &mdash; check <b>Tools &rsaquo; Exercise Substitutions</b> to search manually.</p>`;
+  openSheet('swapSheet');
+};
+$('pauseResume').onclick=()=>{closeSheets(); startWkTimer()};
+$('pauseRestart').onclick=()=>{
+  closeSheets();
+  wkElapsedSec=0;
+  Object.values(dayData.sets).forEach(arr=>arr.forEach(s=>s.done=false));
+  scheduleSave();
+  if(inLogView){ renderDayLog(); startWkTimer(); }
+};
+$('pauseEnd').onclick=()=>{closeSheets(); pauseWkTimer(); showTab(backTarget)};
+$('optAudio').onchange=e=>{WKOPT.audio=e.target.checked; sSet('wkopt',WKOPT)};
+$('optExpand').onchange=e=>{WKOPT.expand=e.target.checked; sSet('wkopt',WKOPT)};
 
 /* =============== EXERCISE DETAIL MODAL =============== */
 let exNotes={}, curExName=null;
-window.openExMeta=async function(bi,ei){
+window.openExMeta=async function(bi,ei,tab){
   const e=dy().blocks[bi].ex[ei];
   curExName=e.n;
   $('exSheetTitle').textContent=e.n;
@@ -1383,7 +1603,7 @@ window.openExMeta=async function(bi,ei){
     ? `<div class="exhist">${es.slice(0,10).map(x=>`<div>${x.at}: <b>${x.w}×${x.r}</b>${x.e1?` · est 1RM ${Math.round(x.e1)}`:''}</div>`).join('')}</div>`
     : '<div class="exempty">No logged history for this exercise yet.</div>';
   $('exNotesTa').value=exNotes[e.n]||'';
-  setExTab('how');
+  setExTab(tab||'how');
   openSheet('exSheet');
 };
 function setExTab(tab){
@@ -2028,6 +2248,9 @@ if('serviceWorker' in navigator&&location.protocol==='https:'){
   exNotes=(await sGet('exnotes'))||{};
   CALC=(await sGet('calc'))||{};
   TPARAMS=(await sGet('tparams'))||{};
+  WKOPT=Object.assign({audio:true,expand:false},(await sGet('wkopt'))||{});
+  $('optAudio').checked=WKOPT.audio;
+  $('optExpand').checked=WKOPT.expand;
   if(S.p>=P.phases.length)S.p=1;
   if(S.w>=ph().weeks.length)S.w=0;
   if(S.d>=7)S.d=0;
