@@ -99,6 +99,37 @@ input:focus,textarea:focus{border-color:var(--blue)}
 /* ---------- Workout detail screen ---------- */
 .wktopbar{position:sticky;top:0;z-index:40;background:rgba(242,236,224,.78);-webkit-backdrop-filter:blur(16px) saturate(160%);backdrop-filter:blur(16px) saturate(160%);border-bottom:1px solid var(--line);padding:calc(env(safe-area-inset-top) + 10px) 14px 10px}
 .wktopbar button{font-family:var(--disp);font-size:14px;letter-spacing:.1em;text-transform:uppercase;color:var(--blue);font-weight:700}
+.wktopbar.overlay{position:absolute;top:0;left:0;right:0;background:none;border:none;-webkit-backdrop-filter:none;backdrop-filter:none;display:flex;justify-content:space-between;z-index:5}
+.wktopbar.overlay button{width:38px;height:38px;border-radius:50%;background:rgba(20,17,12,.4);color:#fff;display:flex;align-items:center;justify-content:center;font-size:16px}
+.wktopbar.overlay button span{display:none}
+
+/* ---------- Workout preview ---------- */
+.wkhero{position:relative;height:280px;background-image:linear-gradient(150deg,#4A6350,#26332A);background-size:cover;background-position:center}
+.wkinfo{padding:18px 16px 6px}
+.wklabel{font-size:11px;letter-spacing:.14em;color:var(--faint);text-transform:uppercase;font-weight:600}
+.wktitle{font-weight:700;font-size:28px;line-height:1.1;margin:4px 0 18px;color:var(--ink)}
+.wkfacts{display:flex;flex-direction:column;gap:16px;margin-bottom:18px}
+.wkfact{display:flex;align-items:center;gap:14px}
+.wkfact svg{width:22px;height:22px;stroke:var(--ink);fill:none;stroke-width:1.6;flex-shrink:0}
+.wkfact span{font-size:15px;color:var(--ink)}
+.wkdesc{font-size:14.5px;line-height:1.55;color:var(--dim);margin-bottom:6px}
+.wkdesc b{color:var(--ink);display:block;margin-bottom:4px;font-size:16px}
+.pvhead{margin:18px 14px 8px;font-weight:700;font-size:16px;color:var(--ink)}
+.pvrow{display:flex;align-items:center;gap:12px;padding:11px 14px}
+.pvimg{width:52px;height:52px;border-radius:12px;flex-shrink:0;background-image:linear-gradient(150deg,#4A6350,#26332A);background-size:cover;background-position:center}
+.pvmid{flex:1;min-width:0}
+.pvmid .nm{font-weight:600;font-size:15px;color:var(--ink)}
+.pvmid .rx{font-size:13px;color:var(--dim);margin-top:1px}
+.pvkebab{flex-shrink:0;color:var(--faint);font-size:18px;padding:4px 6px;letter-spacing:1px}
+.pvgrouplab{padding:10px 14px 0;font-size:11px;letter-spacing:.1em;color:var(--gold);text-transform:uppercase}
+.wkstartwrap{padding:18px 14px calc(env(safe-area-inset-bottom) + 90px)}
+.startbtn2{width:100%;padding:17px;border-radius:16px;background:linear-gradient(180deg,#2B2620,#17130F);color:#F2ECE0;font-weight:700;font-size:16px;letter-spacing:.06em;display:flex;align-items:center;justify-content:center;gap:8px}
+
+/* ---------- Get-ready countdown ---------- */
+.grwrap{position:fixed;inset:0;z-index:96;background:radial-gradient(120% 70% at 50% -10%,rgba(255,255,255,.06),transparent 55%),var(--tbg);display:none;flex-direction:column;align-items:center;justify-content:center;color:var(--tink)}
+.grwrap.on{display:flex}
+.grlabel{font-size:13px;letter-spacing:.2em;text-transform:uppercase;color:var(--tdim)}
+.grnum{font-weight:800;font-size:96px;line-height:1;margin-top:10px;font-variant-numeric:tabular-nums}
 
 /* ---------- Vertical day list (Plan) ---------- */
 .daylist{display:flex;flex-direction:column;gap:8px;padding:2px 14px 12px}
@@ -338,11 +369,16 @@ input:focus,textarea:focus{border-color:var(--blue)}
   </section>
 
   <section class="screen" id="screen-workout">
-    <div class="wktopbar">
-      <button id="wkBack">&#8592;&nbsp; Back</button>
+    <div class="wktopbar" id="wkTopbar">
+      <button id="wkBack">&#8592;<span>&nbsp;Back</span></button>
     </div>
     <main id="main"></main>
   </section>
+
+  <div class="grwrap" id="grWrap">
+    <div class="grlabel">Get Ready</div>
+    <div class="grnum" id="grNum">3</div>
+  </div>
 
   <section class="screen" id="screen-plan">
     <div class="planhead"><h2>Plan</h2><p>Pick a phase, week and day to jump to.</p></div>
@@ -966,6 +1002,7 @@ function applySchedImg(el){
   img.onerror=()=>{ schedImgOk=false; };
   img.src='workout.jpg';
 }
+function applyWkHero(el){ applySchedImg(el); }
 function renderHome(){
   ensureHeroImage();
   const d=dy(), sc=$('schedCard');
@@ -1067,8 +1104,10 @@ function weekProgress(){
   return {done,total};
 }
 let backTarget='home';
+let inLogView=false;
 function openWorkout(from){
   backTarget=from||'home';
+  inLogView=false;
   document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('active',s.id==='screen-workout'));
   document.querySelectorAll('#tabbar button[data-tab]').forEach(b=>b.classList.toggle('on',b.dataset.tab==='home'));
   renderDay();
@@ -1076,7 +1115,107 @@ function openWorkout(from){
 }
 $('wkBack').onclick=()=>showTab(backTarget);
 function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;')}
+function refreshMain(){ if(inLogView) renderDayLog(); else renderDay(); }
+
+/* =============== WORKOUT PREVIEW =============== */
+function dayEquipment(d){
+  const names=(d.blocks||[]).flatMap(b=>b.ex.map(e=>e.n.toLowerCase())).join(' | ');
+  if(/\bbarbell|\bbb\b|\bssb\b/.test(names)) return 'Barbell';
+  if(/dumbbell|\bdb\b/.test(names)) return 'Dumbbells';
+  if(/kettlebell|\bkb\b/.test(names)) return 'Kettlebell';
+  if(/machine|cable|smith|pulldown|leg press/.test(names)) return 'Machine';
+  if(/sandbag/.test(names)) return 'Sandbag';
+  if(/med ball|medicine ball/.test(names)) return 'Med Ball';
+  if(names.trim()) return 'Bodyweight';
+  return d.cond ? 'Cardio' : 'Bodyweight';
+}
+function dayFocus(d){
+  const t=d.f||''; const i=t.indexOf('·');
+  return (i>0?t.slice(0,i):t).trim()||'Full Body';
+}
+function dayMinutes(d){
+  const exCount=(d.blocks||[]).reduce((n,b)=>n+b.ex.length,0);
+  let mins=15+exCount*4; if(d.cond) mins+=20;
+  return Math.max(20,Math.round(mins/5)*5);
+}
+function dayDescription(d){
+  if(d.notes&&d.notes.length) return d.notes.map(esc).join(' ');
+  const parts=(d.blocks||[]).map(b=>b.t);
+  let s=parts.length?`Today's session covers ${esc(parts.join(', '))}.`:'';
+  if(d.cond) s+=` Finish with ${esc(d.cond.t)}.`;
+  return s||'A focused training session &mdash; follow the prescribed sets, reps and effort levels below.';
+}
+const ICO={
+  clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  target:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/>',
+  dumbbell:'<path d="M6.5 8.5l9 9M4 6l3 3M20 18l-3-3M2 4l3.5 3.5M18.5 15.5L22 19"/><rect x="6" y="12" width="4" height="4" rx="1" transform="rotate(-45 8 14)"/><rect x="14" y="12" width="4" height="4" rx="1" transform="rotate(-45 16 14)"/>'
+};
 function renderDay(){
+  const m=$('main'), d=dy();
+  $('wkTopbar').classList.toggle('overlay', !d.rest);
+  if(d.rest){
+    m.innerHTML=`<div class="ticket"><div class="meta">${phTag()}</div><h2>Rest Day</h2></div>
+    <div class="restday"><h3>Recover</h3><p>Training is only effective to the extent it's recovered from.<br>Sleep, eat, walk. That's the work today.</p></div>`;
+    return;
+  }
+  let h=`<div class="wkhero" id="wkHero"></div>
+  <div class="wkinfo">
+    <div class="wklabel">Workout</div>
+    <h1 class="wktitle">${esc(d.f)}</h1>
+    <div class="wkfacts">
+      <div class="wkfact"><svg viewBox="0 0 24 24">${ICO.clock}</svg><span>${dayMinutes(d)} min</span></div>
+      <div class="wkfact"><svg viewBox="0 0 24 24">${ICO.target}</svg><span>${esc(dayFocus(d))}</span></div>
+      <div class="wkfact"><svg viewBox="0 0 24 24">${ICO.dumbbell}</svg><span>${dayEquipment(d)}</span></div>
+    </div>
+    <div class="wkdesc"><b>${esc(d.f)}</b>${dayDescription(d)}</div>
+  </div>`;
+  d.blocks.forEach((b,bi)=>{
+    h+=`<div class="pvhead">${esc(b.t)}</div><div class="card">`;
+    const spans=[];let idx=0;
+    (b.g||[]).forEach(sz=>{spans.push([idx,sz]);idx+=sz});
+    while(idx<b.ex.length){spans.push([idx,1]);idx++}
+    const row=(ei,lt)=>{const e=b.ex[ei];return `<div class="pvrow">
+        <div class="pvimg" data-pv></div>
+        <div class="pvmid"><div class="nm">${lt?`<span class="lt">${lt}</span>`:''}${esc(e.n)}</div><div class="rx">${e.rx}</div></div>
+        <button class="pvkebab" onclick="openExMeta(${bi},${ei})" aria-label="Exercise info">&#8942;</button>
+      </div>`};
+    spans.forEach(([st,sz])=>{
+      if(sz>1){
+        h+=`<div class="pvgrouplab">${sz===2?'Superset':sz===3?'Tri-set':'Circuit'}</div>`;
+        for(let k=0;k<sz;k++)h+=row(st+k,'ABCD'[k]);
+      } else h+=row(st,null);
+    });
+    h+=`</div>`;
+  });
+  if(d.cond){
+    h+=`<div class="pvhead">${esc(d.cond.t)}</div><div class="card"><div class="condbody">`;
+    d.cond.l.forEach(l=>h+=`<p>${l}</p>`);
+    h+=`</div></div>`;
+  }
+  h+=`<div class="wkstartwrap"><button class="startbtn2" id="wkStart">&#9654;&nbsp; Start</button></div>`;
+  m.innerHTML=h;
+  applyWkHero($('wkHero'));
+  $('wkStart').onclick=startWorkout;
+}
+let grInterval=null;
+function startWorkout(){
+  inLogView=true;
+  const wrap=$('grWrap'); wrap.classList.add('on');
+  let n=3; $('grNum').textContent=n; tBeep(660,.08);
+  clearInterval(grInterval);
+  grInterval=setInterval(()=>{
+    n--;
+    if(n<=0){
+      clearInterval(grInterval); wrap.classList.remove('on');
+      tBeep(900,.18); if(navigator.vibrate)navigator.vibrate([120,60,120]);
+      renderDayLog();
+      return;
+    }
+    $('grNum').textContent=n; tBeep(660,.08); if(navigator.vibrate)navigator.vibrate(60);
+  },1000);
+}
+function renderDayLog(){
+  $('wkTopbar').classList.remove('overlay');
   const m=$('main'); const d=dy();
   if(d.rest){
     m.innerHTML=`<div class="ticket"><div class="meta">${phTag()}</div><h2>Rest Day</h2></div>
@@ -1223,7 +1362,7 @@ async function go(chg){
   if(chg.w!==undefined&&chg.d===undefined){S.d=0}
   await sSet('state',S);
   await loadDay();
-  renderHeader();renderDayRail();renderDay();
+  renderHeader();renderDayRail();refreshMain();
   window.scrollTo({top:0});
 }
 
@@ -1768,7 +1907,7 @@ function buildThemeGrid(){
     const b=document.createElement('button');
     b.className='swatch'+(id===curTheme?' on':''); b.dataset.id=id;
     b.innerHTML=`<span class="dots"><i style="background:${t.v['--blue']}"></i><i style="background:${t.v['--gold']}"></i><i style="background:${t.v['--panel']};border:1px solid ${t.v['--line']}"></i></span><span class="nm">${t.n}</span>`;
-    b.onclick=()=>{applyTheme(id,true); if(!dy().rest) renderDay();};
+    b.onclick=()=>{applyTheme(id,true); if(!dy().rest) refreshMain();};
     g.appendChild(b);
   }
 }
@@ -1826,7 +1965,7 @@ if('serviceWorker' in navigator&&location.protocol==='https:'){
   if(S.w>=ph().weeks.length)S.w=0;
   if(S.d>=7)S.d=0;
   await loadDay();
-  renderHeader();renderDayRail();renderDay();renderHome();
+  renderHeader();renderDayRail();refreshMain();renderHome();
   syncTools();
 })();
 window.addEventListener('pagehide',()=>{if(dirty)saveDay()});
