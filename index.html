@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="theme-color" content="#050A06">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#F2ECE0">
 <meta name="apple-mobile-web-app-title" content="Jacked Gazelle">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
@@ -15,24 +15,31 @@
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#050A06; --panel:#152619; --panel2:#1E3324; --line:#33503E;
-  --ink:#EDF5EE; --dim:#AAC6B1; --faint:#78957F;
-  --blue:#3ECF8E; --blue-deep:#1E7A52; --gold:#E9C46A; --green:#3FD68F; --red:#FF6B5E;
-  --sel-a:#1B3B26; --sel-b:#142B1A; --gold-tint:rgba(233,196,106,.07); --gold-line:rgba(233,196,106,.5);
-  --done-a:#45DB98; --done-b:#2FA871; --done-ink:#04150C; --done-glow:rgba(62,207,142,.4);
+  /* -- Cream glassmorphism (default surface) -- */
+  --bg:#F2ECE0; --panel:rgba(255,255,255,.6); --panel2:rgba(255,255,255,.42); --line:rgba(43,38,32,.14);
+  --ink:#26221D; --dim:#6E6559; --faint:#9C9284;
+  --blue:#2F6B4F; --blue-deep:#1F4C37; --gold:#B4791E; --green:#2F6B4F; --red:#C1443A;
+  --sel-a:rgba(47,107,79,.16); --sel-b:rgba(47,107,79,.05); --gold-tint:rgba(180,121,30,.09); --gold-line:rgba(180,121,30,.42);
+  --done-a:#33795A; --done-b:#1F4C37; --done-ink:#F2ECE0; --done-glow:rgba(47,107,79,.35);
+  --blur:18px; --glass-brd:rgba(255,255,255,.55); --shadow:0 10px 30px rgba(43,38,32,.10);
+  /* -- Fixed dark charcoal/olive glass, used only for the active-workout timer overlay -- */
+  --tbg:#17140F; --tpanel:rgba(255,255,255,.07); --tpanel2:rgba(255,255,255,.11); --tline:rgba(255,255,255,.15);
+  --tink:#F4EFE6; --tdim:#C9C0B2; --tfaint:#8F8676;
   --disp:'Barlow Condensed',-apple-system,sans-serif;
   --body:-apple-system,BlinkMacSystemFont,'SF Pro Text',Segoe UI,Roboto,sans-serif;
+  --tabbar-h:64px;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.45}
-body{padding-bottom:110px;overscroll-behavior-y:contain}
+body{padding-bottom:calc(var(--tabbar-h) + env(safe-area-inset-bottom) + 14px);overscroll-behavior-y:contain;background:radial-gradient(120% 60% at 15% -10%,rgba(255,255,255,.65),transparent 55%),radial-gradient(140% 70% at 100% 0%,rgba(180,121,30,.10),transparent 45%),var(--bg);background-attachment:fixed}
 button{font-family:inherit;border:none;background:none;color:inherit;cursor:pointer}
 input,textarea{font-family:inherit;color:var(--ink);background:var(--panel2);border:1px solid var(--line);border-radius:8px;outline:none}
 input:focus,textarea:focus{border-color:var(--blue)}
 ::placeholder{color:var(--faint)}
+.glass{background:var(--panel);border:1px solid var(--glass-brd);-webkit-backdrop-filter:blur(var(--blur)) saturate(150%);backdrop-filter:blur(var(--blur)) saturate(150%);box-shadow:var(--shadow)}
 
 /* ---------- Header ---------- */
-header{position:sticky;top:0;z-index:40;background:linear-gradient(180deg,rgba(5,10,6,.98),rgba(5,10,6,.92));backdrop-filter:blur(10px);border-bottom:1px solid var(--line);padding:calc(env(safe-area-inset-top) + 10px) 14px 0}
+header{position:sticky;top:0;z-index:40;background:rgba(242,236,224,.72);-webkit-backdrop-filter:blur(16px) saturate(160%);backdrop-filter:blur(16px) saturate(160%);border-bottom:1px solid var(--line);padding:calc(env(safe-area-inset-top) + 10px) 14px 12px}
 .brand{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
 .brand>div:first-child{min-width:0}
 .brand h1{font-family:var(--disp);font-weight:800;font-size:clamp(17px,5.4vw,24px);letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}
@@ -41,28 +48,45 @@ header{position:sticky;top:0;z-index:40;background:linear-gradient(180deg,rgba(5
 .toolbtn{font-family:var(--disp);font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--blue);padding:6px 2px;white-space:nowrap}
 .hbtns{display:flex;gap:13px;flex-shrink:0}
 .toolbtn.hi{color:var(--gold)}
-.bigbtn{width:100%;padding:15px;border-radius:12px;font-family:var(--disp);font-weight:700;font-size:17px;letter-spacing:.1em;text-transform:uppercase;background:var(--panel2);border:1px solid var(--line);color:var(--ink);margin-bottom:9px}
+.bigbtn{width:100%;padding:15px;border-radius:14px;font-family:var(--disp);font-weight:700;font-size:17px;letter-spacing:.1em;text-transform:uppercase;background:var(--panel2);border:1px solid var(--line);color:var(--ink);margin-bottom:9px}
 .bigbtn.pri{background:linear-gradient(180deg,var(--done-a),var(--done-b));border-color:var(--done-a);color:var(--done-ink)}
 .themegrid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}
-.swatch{display:flex;align-items:center;gap:9px;padding:11px 12px;border-radius:11px;border:1px solid var(--line);background:var(--panel2);text-align:left}
+.swatch{display:flex;align-items:center;gap:9px;padding:11px 12px;border-radius:14px;border:1px solid var(--line);background:var(--panel2);text-align:left}
 .swatch.on{border-color:var(--blue)}
 .swatch .dots{display:flex;gap:4px;flex-shrink:0}
 .swatch .dots i{width:13px;height:13px;border-radius:50%;display:block}
 .swatch .nm{font-family:var(--disp);font-size:15px;font-weight:600;letter-spacing:.05em;text-transform:uppercase}
 .selrow{display:flex;gap:8px;margin:10px 0}
-.selpill{flex:1;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px 12px;text-align:left;display:flex;justify-content:space-between;align-items:center}
+.selpill{flex:1;background:var(--panel);border:1px solid var(--glass-brd);border-radius:14px;padding:8px 12px;text-align:left;display:flex;justify-content:space-between;align-items:center;-webkit-backdrop-filter:blur(var(--blur));backdrop-filter:blur(var(--blur))}
 .selpill .lab{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--faint);display:block}
 .selpill .val{font-family:var(--disp);font-size:19px;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
 .selpill .car{color:var(--faint);font-size:11px}
 .dayrail{display:flex;gap:6px;overflow-x:auto;padding:2px 0 12px;scrollbar-width:none}
 .dayrail::-webkit-scrollbar{display:none}
-.daychip{min-width:66px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:7px 6px 6px;text-align:center;position:relative;flex-shrink:0}
+.daychip{min-width:66px;background:var(--panel);border:1px solid var(--glass-brd);border-radius:14px;padding:7px 6px 6px;text-align:center;position:relative;flex-shrink:0;-webkit-backdrop-filter:blur(var(--blur));backdrop-filter:blur(var(--blur))}
 .daychip .d{font-family:var(--disp);font-weight:700;font-size:17px;letter-spacing:.05em}
 .daychip .f{font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:.05em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
 .daychip.on{border-color:var(--blue);background:linear-gradient(180deg,var(--sel-a),var(--sel-b))}
 .daychip.on .d{color:var(--blue)}
 .daychip .dot{position:absolute;top:5px;right:6px;width:6px;height:6px;border-radius:50%;background:var(--green);display:none}
 .daychip.done .dot{display:block}
+
+/* ---------- Screens & tab bar ---------- */
+.screen{display:none}
+.screen.active{display:block}
+.tabbar{position:fixed;left:10px;right:10px;bottom:calc(env(safe-area-inset-bottom) + 8px);z-index:70;height:var(--tabbar-h);
+  background:rgba(255,255,255,.55);border:1px solid var(--glass-brd);border-radius:22px;box-shadow:var(--shadow);
+  -webkit-backdrop-filter:blur(22px) saturate(160%);backdrop-filter:blur(22px) saturate(160%);
+  display:flex;align-items:stretch;justify-content:space-around;padding:4px}
+.tabbar button{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border-radius:16px;color:var(--faint)}
+.tabbar button svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.8}
+.tabbar button span{font-family:var(--disp);font-size:10px;letter-spacing:.06em;text-transform:uppercase;font-weight:600}
+.tabbar button.on{color:var(--blue);background:var(--sel-a)}
+.planhead{margin:14px 14px 2px}
+.planhead h2{font-family:var(--disp);font-weight:800;font-size:30px;letter-spacing:.03em;text-transform:uppercase}
+.planhead p{color:var(--dim);font-size:13px;margin-top:2px}
+.plancard{margin:14px}
+.toolstitle{margin:14px 14px 0;font-family:var(--disp);font-weight:800;font-size:22px;letter-spacing:.05em;text-transform:uppercase}
 
 /* ---------- Day ticket ---------- */
 .ticket{margin:16px 14px 6px;border-left:3px solid var(--gold);padding-left:12px}
@@ -71,18 +95,20 @@ header{position:sticky;top:0;z-index:40;background:linear-gradient(180deg,rgba(5
 .ticket .donetag{display:inline-block;margin-top:6px;font-family:var(--disp);font-size:12px;letter-spacing:.14em;color:var(--green);text-transform:uppercase}
 
 /* ---------- Cards ---------- */
-.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;margin:12px 14px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.35)}
+.card{background:var(--panel);border:1px solid var(--glass-brd);border-radius:18px;margin:12px 14px;overflow:hidden;box-shadow:var(--shadow);-webkit-backdrop-filter:blur(var(--blur)) saturate(150%);backdrop-filter:blur(var(--blur)) saturate(150%)}
 .card>.chead{display:flex;justify-content:space-between;align-items:center;padding:11px 14px;border-bottom:1px solid var(--line)}
 .card>.chead .t{font-family:var(--disp);font-weight:700;font-size:16px;letter-spacing:.14em;text-transform:uppercase}
 .card>.chead .n{font-size:11px;color:var(--faint)}
 .cond .chead .t{color:var(--blue)}
 .exrow{border-bottom:1px solid var(--line)}
 .exrow:last-child{border-bottom:none}
-.exmain{width:100%;display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 14px;text-align:left}
+.exmain{width:100%;display:flex;justify-content:space-between;align-items:center;gap:8px;padding:12px 14px}
+.exmaintap{flex:1;min-width:0;display:flex;justify-content:space-between;align-items:center;gap:10px;text-align:left}
 .exmain .nm{font-weight:600;font-size:15px}
 .exmain .rx{font-family:var(--disp);font-size:16px;font-weight:600;letter-spacing:.03em;color:var(--gold);white-space:nowrap}
 .exmain .chev{color:var(--faint);font-size:11px;margin-left:2px;transition:transform .15s}
 .exrow.open .chev{transform:rotate(90deg)}
+.infob{flex-shrink:0;width:26px;height:26px;border-radius:50%;border:1px solid var(--line);color:var(--dim);font-family:var(--disp);font-size:13px;font-style:italic;font-weight:700;display:flex;align-items:center;justify-content:center;background:var(--panel2)}
 .exnote{font-size:12.5px;color:var(--dim);padding:0 14px 10px;margin-top:-6px}
 .logger{display:none;padding:0 14px 12px;background:var(--panel2)}
 .exrow.open .logger{display:block}
@@ -132,7 +158,7 @@ header{position:sticky;top:0;z-index:40;background:linear-gradient(180deg,rgba(5
 .restday{margin:40px 14px;text-align:center}
 .restday h3{font-family:var(--disp);font-size:44px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--panel2);-webkit-text-stroke:1px var(--faint)}
 .restday p{color:var(--dim);margin-top:8px}
-.savemsg{position:fixed;left:50%;bottom:96px;transform:translateX(-50%) translateY(8px);background:var(--panel2);border:1px solid var(--line);color:var(--dim);font-size:12px;padding:6px 14px;border-radius:99px;opacity:0;transition:.25s;pointer-events:none;z-index:60}
+.savemsg{position:fixed;left:50%;bottom:calc(var(--tabbar-h) + env(safe-area-inset-bottom) + 20px);transform:translateX(-50%) translateY(8px);background:var(--panel);border:1px solid var(--glass-brd);-webkit-backdrop-filter:blur(var(--blur));backdrop-filter:blur(var(--blur));color:var(--dim);font-size:12px;padding:6px 14px;border-radius:99px;opacity:0;transition:.25s;pointer-events:none;z-index:60;box-shadow:var(--shadow)}
 .savemsg.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
 /* ---------- Prep / video / progress ---------- */
@@ -143,52 +169,53 @@ header{position:sticky;top:0;z-index:40;background:linear-gradient(180deg,rgba(5
 #exSel{width:100%;padding:10px;background:var(--panel);border:1px solid var(--line);border-radius:8px;color:var(--ink);font-size:15px;margin-bottom:10px;-webkit-appearance:none}
 .chart{width:100%;height:auto;display:block;margin-bottom:8px;background:var(--panel);border-radius:8px}
 
-/* ---------- Sheets ---------- */
-.timerwrap{position:fixed;inset:0;z-index:95;background:var(--bg);display:none;flex-direction:column;
+/* ---------- Timer overlay — always dark charcoal/olive glass (active-workout mode) ---------- */
+.timerwrap{position:fixed;inset:0;z-index:95;background:radial-gradient(120% 70% at 50% -10%,rgba(255,255,255,.06),transparent 55%),var(--tbg);display:none;flex-direction:column;color:var(--tink);
   padding:calc(env(safe-area-inset-top) + 12px) 16px calc(env(safe-area-inset-bottom) + 16px)}
 .timerwrap.on{display:flex}
 .tbar{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:6px}
-.tbar span{font-family:var(--disp);font-size:16px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);
+.tbar span{font-family:var(--disp);font-size:16px;letter-spacing:.1em;text-transform:uppercase;color:var(--tdim);
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.tbar button{font-family:var(--disp);font-size:14px;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);flex-shrink:0}
-.tbarb{display:flex;gap:16px;flex-shrink:0}
+.tbar button{font-family:var(--disp);font-size:14px;letter-spacing:.12em;text-transform:uppercase;color:var(--tink);flex-shrink:0;background:var(--tpanel);border:1px solid var(--tline);padding:8px 12px;border-radius:12px}
+.tbarb{display:flex;gap:10px;flex-shrink:0}
 .tbarb #tCfg{color:var(--gold)}
-.tcfgwrap{position:absolute;inset:0;background:rgba(0,0,0,.66);display:none;align-items:flex-end;z-index:5}
+.tcfgwrap{position:absolute;inset:0;background:rgba(0,0,0,.5);display:none;align-items:flex-end;z-index:5}
 .tcfgwrap.on{display:flex}
-.tcfg{width:100%;background:var(--panel);border-top:1px solid var(--line);border-radius:18px 18px 0 0;
+.tcfg{width:100%;background:var(--tbg);border-top:1px solid var(--tline);border-radius:22px 22px 0 0;color:var(--tink);
+  -webkit-backdrop-filter:blur(24px);backdrop-filter:blur(24px);
   padding:15px 16px calc(env(safe-area-inset-bottom) + 18px);max-height:86%;overflow-y:auto}
 .tcfghead{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px}
 .tcfghead span:first-child{font-family:var(--disp);font-size:19px;letter-spacing:.12em;text-transform:uppercase}
-.tcfghead span:last-child{font-size:12px;color:var(--faint)}
-.tfield{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--line)}
-.tfield span{font-size:14px;color:var(--dim)}
-.tfield i{font-style:normal;color:var(--faint);font-size:12px}
-.tfield input{width:92px;text-align:center;padding:9px;font-size:17px;background:var(--panel2);border:1px solid var(--line);border-radius:9px;color:var(--ink);outline:none}
+.tcfghead span:last-child{font-size:12px;color:var(--tfaint)}
+.tfield{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--tline)}
+.tfield span{font-size:14px;color:var(--tdim)}
+.tfield i{font-style:normal;color:var(--tfaint);font-size:12px}
+.tfield input{width:92px;text-align:center;padding:9px;font-size:17px;background:var(--tpanel2);border:1px solid var(--tline);border-radius:9px;color:var(--tink);outline:none}
 .tfield input:focus{border-color:var(--blue)}
 .tcfgbtns{display:flex;gap:10px;margin-top:14px}
-.tcfgbtns button{flex:1;padding:14px;border-radius:12px;font-family:var(--disp);font-size:16px;letter-spacing:.12em;
-  text-transform:uppercase;background:var(--panel2);border:1px solid var(--line);color:var(--ink)}
+.tcfgbtns button{flex:1;padding:14px;border-radius:14px;font-family:var(--disp);font-size:16px;letter-spacing:.12em;
+  text-transform:uppercase;background:var(--tpanel2);border:1px solid var(--tline);color:var(--tink)}
 .tcfgbtns .ok{background:linear-gradient(180deg,var(--done-a),var(--done-b));border-color:var(--done-a);color:var(--done-ink)}
 .tdial{position:relative;flex:1;display:flex;align-items:center;justify-content:center;min-height:0}
 .tdial svg{width:min(84vw,380px);height:auto}
 .tcenter{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none}
 .tphase{font-family:var(--disp);font-size:19px;font-weight:600;letter-spacing:.16em;text-transform:uppercase}
-.tclock{font-family:var(--disp);font-weight:800;font-size:clamp(64px,22vw,112px);line-height:.92;font-variant-numeric:tabular-nums;margin:4px 0 2px}
+.tclock{font-family:var(--disp);font-weight:800;font-size:clamp(64px,22vw,112px);line-height:.92;font-variant-numeric:tabular-nums;margin:4px 0 2px;color:var(--tink)}
 .tclock.warn{animation:tick 1s steps(2,end) infinite}
 @keyframes tick{50%{opacity:.45}}
-.tcount{font-family:var(--disp);font-size:16px;letter-spacing:.12em;color:var(--faint);text-transform:uppercase}
-.tnext{text-align:center;font-size:13px;color:var(--dim);margin-top:4px;min-height:18px}
-.tnext b{color:var(--ink);font-weight:600}
+.tcount{font-family:var(--disp);font-size:16px;letter-spacing:.12em;color:var(--tfaint);text-transform:uppercase}
+.tnext{text-align:center;font-size:13px;color:var(--tdim);margin-top:4px;min-height:18px}
+.tnext b{color:var(--tink);font-weight:600}
 .tctrls{display:flex;gap:10px;margin-top:14px}
-.tctrls button{flex:1;padding:16px 0;border-radius:13px;font-family:var(--disp);font-weight:700;font-size:19px;
-  letter-spacing:.12em;text-transform:uppercase;background:var(--panel);border:1px solid var(--line)}
+.tctrls button{flex:1;padding:16px 0;border-radius:16px;font-family:var(--disp);font-weight:700;font-size:19px;
+  letter-spacing:.12em;text-transform:uppercase;background:var(--tpanel);border:1px solid var(--tline);color:var(--tink)}
 .tctrls .go{flex:2;background:linear-gradient(180deg,var(--done-a),var(--done-b));border-color:var(--done-a);color:var(--done-ink)}
 .tctrls button:active{transform:scale(.975)}
-.startbtn{width:100%;margin-top:10px;padding:13px;border-radius:11px;background:var(--panel2);border:1px solid var(--blue);
+.startbtn{width:100%;margin-top:10px;padding:13px;border-radius:14px;background:var(--panel2);border:1px solid var(--blue);
   color:var(--blue);font-family:var(--disp);font-weight:700;font-size:16px;letter-spacing:.12em;text-transform:uppercase}
-.scrim{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:80;display:none}
+.scrim{position:fixed;inset:0;background:rgba(20,17,12,.42);-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);z-index:80;display:none}
 .scrim.show{display:block}
-.sheet{position:fixed;left:0;right:0;bottom:0;z-index:90;background:var(--panel);border-top:1px solid var(--line);border-radius:18px 18px 0 0;padding:14px 16px calc(env(safe-area-inset-bottom) + 20px);transform:translateY(105%);transition:transform .22s ease;max-height:82vh;overflow-y:auto}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:90;background:var(--panel);border-top:1px solid var(--glass-brd);border-radius:22px 22px 0 0;padding:14px 16px calc(env(safe-area-inset-bottom) + 20px);transform:translateY(105%);transition:transform .22s ease;max-height:82vh;overflow-y:auto;-webkit-backdrop-filter:blur(28px) saturate(160%);backdrop-filter:blur(28px) saturate(160%);box-shadow:var(--shadow)}
 .sheet.show{transform:translateY(0)}
 .sheet h3{font-family:var(--disp);font-weight:700;font-size:19px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:12px}
 .optbtn{display:flex;width:100%;justify-content:space-between;align-items:center;padding:13px 12px;border-bottom:1px solid var(--line);text-align:left}
@@ -203,10 +230,10 @@ header{position:sticky;top:0;z-index:40;background:linear-gradient(180deg,rgba(5
 .timerbig{text-align:center;font-family:var(--disp);font-weight:800;font-size:64px;letter-spacing:.04em;margin:6px 0 10px;font-variant-numeric:tabular-nums}
 .trow{display:flex;gap:8px}
 .trow button{flex:1;padding:12px;border-radius:10px;background:var(--panel2);border:1px solid var(--line);font-family:var(--disp);font-size:15px;letter-spacing:.1em;text-transform:uppercase}
-.trow .stop{color:var(--red);border-color:#4A2622}
+.trow .stop{color:var(--red);border-color:rgba(193,68,58,.35)}
 
 /* tools */
-.tool{border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:12px;background:var(--panel2)}
+.tool{border:1px solid var(--line);border-radius:16px;padding:12px;margin-bottom:12px;background:var(--panel2)}
 .tool h4{font-family:var(--disp);font-size:15px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:8px}
 .tool .frow{display:flex;gap:8px;align-items:center;margin-bottom:8px}
 .tool input{padding:9px 10px;font-size:15px;width:100%;background:var(--panel)}
@@ -219,6 +246,31 @@ header{position:sticky;top:0;z-index:40;background:linear-gradient(180deg,rgba(5
 .subres div{padding:7px 0;border-bottom:1px solid var(--line);font-size:13px}
 .subres b{color:var(--ink)}
 .subres span{color:var(--dim)}
+
+/* ---------- Exercise detail sheet ---------- */
+.vidbtn{color:var(--blue);font-weight:600;white-space:nowrap;font-size:13px}
+.extabs{display:flex;gap:2px;border-bottom:1px solid var(--line);margin-bottom:12px}
+.extabs button{flex:1;padding:9px 4px;font-family:var(--disp);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);border-bottom:2px solid transparent}
+.extabs button.on{color:var(--blue);border-color:var(--blue)}
+.expane{display:none}
+.expane.on{display:block}
+.exempty{text-align:center;color:var(--faint);font-size:13px;padding:26px 10px}
+.exhist div{padding:7px 0;border-bottom:1px solid var(--line);font-size:13px;color:var(--dim)}
+.exhist b{color:var(--ink)}
+.exnotesta{width:100%;min-height:110px;padding:11px 12px;font-size:14px;resize:vertical}
+
+/* ---------- Embedded video modal ---------- */
+.videomodal{position:fixed;inset:0;z-index:110;background:rgba(10,8,5,.78);display:none;align-items:center;justify-content:center;padding:16px}
+.videomodal.show{display:flex}
+.videobox{width:100%;max-width:520px;background:#000;border-radius:16px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.12)}
+.videobar{display:flex;justify-content:flex-end;padding:8px}
+.videobar button{color:#fff;font-family:var(--disp);font-size:13px;letter-spacing:.1em;text-transform:uppercase;padding:4px 6px}
+.videoframe{position:relative;width:100%;aspect-ratio:16/9;background:#000}
+.videoframe iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+
+/* ---------- Quick timer presets sheet ---------- */
+.qtgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}
+.qtgrid button{background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:16px 0;font-family:var(--disp);font-size:17px;font-weight:700;letter-spacing:.05em}
 @media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
@@ -230,16 +282,101 @@ header{position:sticky;top:0;z-index:40;background:linear-gradient(180deg,rgba(5
       <div class="sub">Terminator Training Method</div>
       <h1>Jacked Gazelle <em>2.0</em></h1>
     </div>
-    <div class="hbtns"><button class="toolbtn" id="progOpen">Progress</button><button class="toolbtn hi" id="backupOpen">Backup</button><button class="toolbtn" id="toolsOpen">Tools</button></div>
   </div>
-  <div class="selrow">
-    <button class="selpill" id="phasePill"><span><span class="lab">Phase</span><span class="val" id="phaseVal">Phase 1</span></span><span class="car">&#9662;</span></button>
-    <button class="selpill" id="weekPill"><span><span class="lab">Week</span><span class="val" id="weekVal">Week 1</span></span><span class="car">&#9662;</span></button>
-  </div>
-  <div class="dayrail" id="dayrail"></div>
 </header>
 
-<main id="main"></main>
+<div class="screens">
+  <section class="screen active" id="screen-home">
+    <main id="main"></main>
+  </section>
+
+  <section class="screen" id="screen-plan">
+    <div class="planhead"><h2>Plan</h2><p>Pick a phase, week and day to jump to.</p></div>
+    <div class="selrow" style="margin:14px 14px 0">
+      <button class="selpill" id="phasePill"><span><span class="lab">Phase</span><span class="val" id="phaseVal">Phase 1</span></span><span class="car">&#9662;</span></button>
+      <button class="selpill" id="weekPill"><span><span class="lab">Week</span><span class="val" id="weekVal">Week 1</span></span><span class="car">&#9662;</span></button>
+    </div>
+    <div class="dayrail" id="dayrail" style="margin:0 14px;padding:12px 0"></div>
+    <div id="planPreview"></div>
+  </section>
+
+  <section class="screen" id="screen-progress">
+    <div class="toolstitle">Progress</div>
+    <div style="padding:14px">
+      <div class="tool">
+        <h4>Lift Progression</h4>
+        <select id="exSel"></select>
+        <div id="chartWrap"></div>
+      </div>
+      <div class="tool">
+        <h4>PR Board</h4>
+        <div class="subres" id="prBoard" style="max-height:none"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="screen" id="screen-tools">
+    <div class="toolstitle">Tools</div>
+    <div style="padding:14px">
+      <div class="tool">
+        <h4>Appearance</h4>
+        <div class="themegrid" id="themeGrid"></div>
+      </div>
+      <div class="tool">
+        <h4>Repeat Pace &middot; from 2-mile TT</h4>
+        <div class="frow"><input id="tt2" placeholder="2-mi time e.g. 13:30" inputmode="numeric"></div>
+        <div class="out" id="tt2out">Enter your 2-mile time to get your 200m repeat window (15&ndash;20 sec/mi faster than TT pace).</div>
+      </div>
+      <div class="tool">
+        <h4>Tempo Pace &middot; from 5-mile TT</h4>
+        <div class="frow"><input id="tt5" placeholder="5-mi time e.g. 36:00" inputmode="numeric"></div>
+        <div class="out" id="tt5out">Enter your 5-mile time to get your tempo window (8&ndash;15 sec/mi slower than TT pace).</div>
+      </div>
+      <div class="tool">
+        <h4>Plate Math</h4>
+        <div class="frow"><input id="pcW" placeholder="Target weight (lb)" inputmode="decimal"><input id="pcB" placeholder="Bar: 45" inputmode="decimal" style="max-width:92px"></div>
+        <div class="out" id="pcOut">Per-side plate breakdown for any target weight.</div>
+      </div>
+      <div class="tool">
+        <h4>Zone 2 Heart Rate</h4>
+        <div class="frow"><input id="age" placeholder="Your age" inputmode="numeric"></div>
+        <div class="out" id="ageout">MAF method: top of zone = 180 &minus; age; bottom &asymp; 15&ndash;20 bpm below.</div>
+      </div>
+      <div class="tool">
+        <h4>Exercise Substitutions</h4>
+        <div class="frow"><input id="subq" placeholder="Search an exercise&hellip;"></div>
+        <div class="subres" id="subres"></div>
+      </div>
+      <div class="tool">
+        <h4>Effort Reference</h4>
+        <table class="rpetab">
+          <tr><td>RIR 1&ndash;2</td><td>1&ndash;2 clean reps left in the tank</td></tr>
+          <tr><td>RIR 0</td><td>Last good rep &mdash; form never breaks</td></tr>
+          <tr><td>F</td><td>Failure &mdash; can't complete another rep</td></tr>
+          <tr><td>Zone 2</td><td>RPE 4&ndash;5, conversational, nasal breathing</td></tr>
+          <tr><td>Tempo</td><td>RPE 6.5&ndash;7.5 &middot; 4&ndash;5 words per breath</td></tr>
+          <tr><td>Threshold</td><td>RPE 7.5&ndash;8.5</td></tr>
+          <tr><td>Speed/VO2</td><td>RPE 8.5&ndash;10 (10 = time trials only)</td></tr>
+        </table>
+      </div>
+      <div class="tool">
+        <h4>Backup &amp; Restore</h4>
+        <button class="bigbtn pri" id="expBtn">&#8681;&nbsp; Export my logs</button>
+        <button class="bigbtn" id="impBtn">&#8679;&nbsp; Import a backup</button>
+        <input type="file" id="impFile" accept="application/json,.json" style="display:none">
+        <div class="out" id="bkOut" style="margin-top:4px">Export saves every set, note and result to a file &mdash; keep it in Files or iCloud. Import restores it here or on a new phone. Your logs live only on this device, so back up every few weeks.</div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<nav class="tabbar" id="tabbar">
+  <button data-tab="home" class="on"><svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"/><path d="M5 10v9a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9"/></svg><span>Home</span></button>
+  <button data-tab="plan"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span>Plan</span></button>
+  <button id="timerTab"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2M10 2h4"/></svg><span>Timer</span></button>
+  <button data-tab="progress"><svg viewBox="0 0 24 24"><path d="M4 20V11M11 20V4M18 20v-7"/><path d="M2 20h20"/></svg><span>Progress</span></button>
+  <button data-tab="tools"><svg viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 0 1-5.4 5.4L4 17l3 3 5.3-5.3a4 4 0 0 1 5.4-5.4l-3 3z"/></svg><span>Tools</span></button>
+</nav>
 
 <div class="savemsg" id="savemsg">Saved</div>
 
@@ -272,67 +409,35 @@ header{position:sticky;top:0;z-index:40;background:linear-gradient(180deg,rgba(5
 <div class="scrim" id="scrim"></div>
 <div class="sheet" id="phaseSheet"><h3>Select Phase</h3><div id="phaseOpts"></div></div>
 <div class="sheet" id="weekSheet"><h3>Select Week</h3><div id="weekOpts"></div></div>
-<div class="sheet" id="progSheet">
-  <h3>Progress</h3>
-  <div class="tool">
-    <h4>Lift Progression</h4>
-    <select id="exSel"></select>
-    <div id="chartWrap"></div>
+
+<div class="sheet" id="quickTimerSheet">
+  <h3>Quick Timer</h3>
+  <div class="qtgrid">
+    <button data-qt="60">1:00</button><button data-qt="90">1:30</button><button data-qt="120">2:00</button>
+    <button data-qt="180">3:00</button><button data-qt="300">5:00</button><button data-qt="600">10:00</button>
   </div>
-  <div class="tool">
-    <h4>PR Board</h4>
-    <div class="subres" id="prBoard" style="max-height:none"></div>
+  <div class="frow"><input id="qtCustom" placeholder="Custom minutes, e.g. 4.5" inputmode="decimal"></div>
+  <button class="bigbtn pri" id="qtGoCustom">Start custom timer</button>
+</div>
+
+<div class="sheet" id="exSheet">
+  <h3 id="exSheetTitle">Exercise</h3>
+  <div class="extabs">
+    <button data-extab="how" class="on">How To</button>
+    <button data-extab="hist">History</button>
+    <button data-extab="notes">My Notes</button>
+  </div>
+  <div class="expane on" id="exPaneHow"></div>
+  <div class="expane" id="exPaneHist"></div>
+  <div class="expane" id="exPaneNotes">
+    <textarea class="exnotesta" id="exNotesTa" placeholder="Form cues, adjustments, thoughts for next time&hellip;"></textarea>
   </div>
 </div>
-<div class="sheet" id="backupSheet">
-  <h3>Backup &amp; Restore</h3>
-  <button class="bigbtn pri" id="expBtn">&#8681;&nbsp; Export my logs</button>
-  <button class="bigbtn" id="impBtn">&#8679;&nbsp; Import a backup</button>
-  <input type="file" id="impFile" accept="application/json,.json" style="display:none">
-  <div class="out" id="bkOut" style="margin-top:4px">Export saves every set, note and result to a file &mdash; keep it in Files or iCloud. Import restores it here or on a new phone. Your logs live only on this device, so back up every few weeks.</div>
-</div>
-<div class="sheet" id="toolsSheet">
-  <h3>Tools</h3>
-  <div class="tool">
-    <h4>Theme</h4>
-    <div class="themegrid" id="themeGrid"></div>
-  </div>
-  <div class="tool">
-    <h4>Repeat Pace &middot; from 2-mile TT</h4>
-    <div class="frow"><input id="tt2" placeholder="2-mi time e.g. 13:30" inputmode="numeric"></div>
-    <div class="out" id="tt2out">Enter your 2-mile time to get your 200m repeat window (15&ndash;20 sec/mi faster than TT pace).</div>
-  </div>
-  <div class="tool">
-    <h4>Tempo Pace &middot; from 5-mile TT</h4>
-    <div class="frow"><input id="tt5" placeholder="5-mi time e.g. 36:00" inputmode="numeric"></div>
-    <div class="out" id="tt5out">Enter your 5-mile time to get your tempo window (8&ndash;15 sec/mi slower than TT pace).</div>
-  </div>
-  <div class="tool">
-    <h4>Plate Math</h4>
-    <div class="frow"><input id="pcW" placeholder="Target weight (lb)" inputmode="decimal"><input id="pcB" placeholder="Bar: 45" inputmode="decimal" style="max-width:92px"></div>
-    <div class="out" id="pcOut">Per-side plate breakdown for any target weight.</div>
-  </div>
-  <div class="tool">
-    <h4>Zone 2 Heart Rate</h4>
-    <div class="frow"><input id="age" placeholder="Your age" inputmode="numeric"></div>
-    <div class="out" id="ageout">MAF method: top of zone = 180 &minus; age; bottom &asymp; 15&ndash;20 bpm below.</div>
-  </div>
-  <div class="tool">
-    <h4>Exercise Substitutions</h4>
-    <div class="frow"><input id="subq" placeholder="Search an exercise&hellip;"></div>
-    <div class="subres" id="subres"></div>
-  </div>
-  <div class="tool">
-    <h4>Effort Reference</h4>
-    <table class="rpetab">
-      <tr><td>RIR 1&ndash;2</td><td>1&ndash;2 clean reps left in the tank</td></tr>
-      <tr><td>RIR 0</td><td>Last good rep &mdash; form never breaks</td></tr>
-      <tr><td>F</td><td>Failure &mdash; can't complete another rep</td></tr>
-      <tr><td>Zone 2</td><td>RPE 4&ndash;5, conversational, nasal breathing</td></tr>
-      <tr><td>Tempo</td><td>RPE 6.5&ndash;7.5 &middot; 4&ndash;5 words per breath</td></tr>
-      <tr><td>Threshold</td><td>RPE 7.5&ndash;8.5</td></tr>
-      <tr><td>Speed/VO2</td><td>RPE 8.5&ndash;10 (10 = time trials only)</td></tr>
-    </table>
+
+<div class="videomodal" id="videoModal">
+  <div class="videobox">
+    <div class="videobar"><button id="videoClose">&times;&nbsp; Close</button></div>
+    <div class="videoframe" id="videoFrame"></div>
   </div>
 </div>
 
@@ -784,9 +889,11 @@ function renderDayRail(){
     const b=document.createElement('button');
     b.className='daychip'+(i===S.d?' on':'')+(doneIdx[`log:${S.p}-${S.w}-${i}`]?' done':'');
     b.innerHTML=`<span class="dot"></span><div class="d">D${i+1}</div><span class="f">${d.rest?'Rest':d.f}</span>`;
-    b.onclick=()=>{go({d:i})};
+    b.onclick=()=>{go({d:i}); showTab('home')};
     rail.appendChild(b);
   });
+  const pv=$('planPreview');
+  if(pv) pv.innerHTML='<div class="plancard tool">Tap a day above to open its workout on Home.</div>';
 }
 function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;')}
 function renderDay(){
@@ -799,7 +906,7 @@ function renderDay(){
   let h=`<div class="ticket"><div class="meta">${phTag()}</div><h2>${d.f}</h2>${dayData.done?'<span class="donetag">&#10003; Completed</span>':''}</div>`;
   const wuk=(WUMAP[S.p]||{})[S.d];
   if(wuk){const wu=WUV[wuk];
-    h+=`<div class="prep"><span>Prep: <b>${wu.n}</b> &mdash; add/subtract/adjust as needed</span><a href="${wu.u}" target="_blank" rel="noopener">Watch &#9654;</a></div>`;}
+    h+=`<div class="prep"><span>Prep: <b>${wu.n}</b> &mdash; add/subtract/adjust as needed</span><button class="vidbtn" onclick="openVideo('${wu.u}','${cssk(wu.n)}')">Watch &#9654;</button></div>`;}
   if(d.notes&&d.notes.length){h+=`<div class="topnotes">${d.notes.map(n=>`<span>${n}</span>`).join('')}</div>`;}
   // blocks
   d.blocks.forEach((b,bi)=>{
@@ -808,7 +915,10 @@ function renderDay(){
     (b.g||[]).forEach(sz=>{spans.push([idx,sz]);idx+=sz});
     while(idx<b.ex.length){spans.push([idx,1]);idx++}
     const row=(ei,lt)=>{const e=b.ex[ei];return `<div class="exrow" id="ex-${bi}-${ei}">
-        <button class="exmain" onclick="togEx(${bi},${ei})"><span class="nm">${lt?`<span class="lt">${lt}</span>`:''}${esc(e.n)}</span><span><span class="rx">${e.rx}</span><span class="chev">&#9654;</span></span></button>
+        <div class="exmain">
+          <button class="exmaintap" onclick="togEx(${bi},${ei})"><span class="nm">${lt?`<span class="lt">${lt}</span>`:''}${esc(e.n)}</span><span><span class="rx">${e.rx}</span><span class="chev">&#9654;</span></span></button>
+          <button class="infob" onclick="event.stopPropagation();openExMeta(${bi},${ei})" aria-label="Exercise info"><i>i</i></button>
+        </div>
         ${e.nt?`<div class="exnote">${esc(e.nt)}</div>`:''}
         <div class="logger" id="lg-${bi}-${ei}"></div>
       </div>`};
@@ -861,7 +971,7 @@ function renderLogger(bi,ei){
   const lg=$(`lg-${bi}-${ei}`);
   const last=lastLifts[key];
   const vu=vidFor(key);
-  const vl=vu?`<a class="vidlink" href="${vu}" target="_blank" rel="noopener">Demo &#9654;</a>`:'';
+  const vl=vu?`<button class="vidlink" onclick="openVideo('${vu}','${cssk(key)}')">Demo &#9654;</button>`:'';
   let h='';
   if(last&&last.at!==phTag()){
     h+=`<div class="last">${vl}Last (${last.at}): <b>${last.s.map(s=>`${s.w||'–'}×${s.r||'–'}`).join(' · ')}</b></div>`;
@@ -882,6 +992,49 @@ function cssk(k){return k.replace(/'/g,"\\'")}
 window.upSet=function(k,si,f,v){dayData.sets[k][si][f]=v;scheduleSave()};
 window.addSet=function(k,bi,ei){dayData.sets[k].push({w:dayData.sets[k].at(-1)?.w||'',r:''});renderLogger(bi,ei);scheduleSave()};
 window.delSet=function(k,si,bi,ei){dayData.sets[k].splice(si,1);if(!dayData.sets[k].length)dayData.sets[k].push({w:'',r:''});renderLogger(bi,ei);scheduleSave()};
+
+/* =============== EXERCISE DETAIL MODAL =============== */
+let exNotes={}, curExName=null;
+window.openExMeta=async function(bi,ei){
+  const e=dy().blocks[bi].ex[ei];
+  curExName=e.n;
+  $('exSheetTitle').textContent=e.n;
+  const vu=vidFor(e.n);
+  let how=e.nt?`<p style="margin-bottom:10px">${esc(e.nt)}</p>`:'<p class="exempty" style="padding:0 0 10px;text-align:left">No extra cues for this exercise yet.</p>';
+  how+=vu?`<button class="bigbtn" onclick="openVideo('${vu}','${cssk(e.n)}')">&#9654;&nbsp; Watch demo</button>`:'';
+  $('exPaneHow').innerHTML=how;
+  const H=(await sGet('hist'))||{};
+  const es=H[e.n]?Object.values(H[e.n]).sort((a,b)=>b.o-a.o):[];
+  $('exPaneHist').innerHTML=es.length
+    ? `<div class="exhist">${es.slice(0,10).map(x=>`<div>${x.at}: <b>${x.w}×${x.r}</b>${x.e1?` · est 1RM ${Math.round(x.e1)}`:''}</div>`).join('')}</div>`
+    : '<div class="exempty">No logged history for this exercise yet.</div>';
+  $('exNotesTa').value=exNotes[e.n]||'';
+  setExTab('how');
+  openSheet('exSheet');
+};
+function setExTab(tab){
+  document.querySelectorAll('#exSheet [data-extab]').forEach(b=>b.classList.toggle('on',b.dataset.extab===tab));
+  document.querySelectorAll('#exSheet .expane').forEach(p=>p.classList.remove('on'));
+  $(tab==='how'?'exPaneHow':tab==='hist'?'exPaneHist':'exPaneNotes').classList.add('on');
+}
+document.querySelectorAll('#exSheet [data-extab]').forEach(b=>b.onclick=()=>setExTab(b.dataset.extab));
+let exNoteT=null;
+$('exNotesTa').oninput=()=>{
+  if(!curExName)return;
+  exNotes[curExName]=$('exNotesTa').value;
+  clearTimeout(exNoteT); exNoteT=setTimeout(()=>sSet('exnotes',exNotes),700);
+};
+
+/* =============== EMBEDDED VIDEO =============== */
+function ytId(url){ if(!url) return null; const m=url.match(/(?:v=|youtu\.be\/|shorts\/)([A-Za-z0-9_-]{6,})/); return m?m[1]:null; }
+window.openVideo=function(url,title){
+  const id=ytId(url); if(!id) return;
+  $('videoFrame').innerHTML=`<iframe src="https://www.youtube-nocookie.com/embed/${id}?autoplay=1&playsinline=1&rel=0&modestbranding=1" title="${esc(title||'')}" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>`;
+  $('videoModal').classList.add('show');
+};
+function closeVideo(){ $('videoModal').classList.remove('show'); $('videoFrame').innerHTML=''; }
+$('videoClose').onclick=closeVideo;
+$('videoModal').addEventListener('click',e=>{ if(e.target.id==='videoModal') closeVideo(); });
 
 async function go(chg){
   await saveDay();
@@ -968,7 +1121,6 @@ const VID=[
 function vidFor(n){const s=n.toLowerCase();for(const [k,u] of VID){if(s.includes(k))return vu_(u)}return null}
 
 /* =============== PROGRESS =============== */
-$('progOpen').onclick=openProg;
 async function openProg(){
   await saveDay();
   const H=(await sGet('hist'))||{};
@@ -977,7 +1129,6 @@ async function openProg(){
   sel.onchange=()=>drawChart(H,sel.value);
   drawChart(H,names[0]);
   renderPR(H);
-  openSheet('progSheet');
 }
 function drawChart(H,name){
   const w=$('chartWrap');
@@ -1037,9 +1188,24 @@ function calcPlates(){
 }
 $('pcW').oninput=calcPlates;$('pcB').oninput=calcPlates;
 
+/* =============== TABS =============== */
+function showTab(name){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('active',s.id==='screen-'+name));
+  document.querySelectorAll('#tabbar button[data-tab]').forEach(b=>b.classList.toggle('on',b.dataset.tab===name));
+  if(name==='progress')openProg();
+  if(name==='plan'){renderHeader();renderDayRail();}
+}
+document.querySelectorAll('#tabbar button[data-tab]').forEach(b=>b.onclick=()=>showTab(b.dataset.tab));
+$('timerTab').onclick=()=>openSheet('quickTimerSheet');
+document.querySelectorAll('#quickTimerSheet [data-qt]').forEach(b=>b.onclick=()=>{
+  closeSheets(); openTimer({t:'Quick Timer',l:[`${(+b.dataset.qt/60)} minute session`]});
+});
+$('qtGoCustom').onclick=()=>{
+  const m=parseFloat($('qtCustom').value); if(!m||m<=0)return;
+  closeSheets(); openTimer({t:'Quick Timer',l:[`${m} minute session`]});
+};
+
 /* =============== TOOLS =============== */
-$('toolsOpen').onclick=()=>openSheet('toolsSheet');
-$('backupOpen').onclick=()=>openSheet('backupSheet');
 $('tClose').onclick=closeTimer;
 $('tCfg').onclick=openTCfg;
 $('tCfgCancel').onclick=closeTCfg;
@@ -1398,7 +1564,8 @@ document.addEventListener('visibilitychange',()=>{if(document.visibilityState===
 /* =============== THEMES =============== */
 const CSSV=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
 const THEMES={
- evergreen:{n:'Evergreen',v:{'--bg':'#050A06','--panel':'#152619','--panel2':'#1E3324','--line':'#33503E','--ink':'#EDF5EE','--dim':'#AAC6B1','--faint':'#78957F','--blue':'#3ECF8E','--blue-deep':'#1E7A52','--gold':'#E9C46A','--green':'#3FD68F','--red':'#FF6B5E','--sel-a':'#1B3B26','--sel-b':'#142B1A','--gold-tint':'rgba(233,196,106,.07)','--gold-line':'rgba(233,196,106,.5)','--done-a':'#45DB98','--done-b':'#2FA871','--done-ink':'#04150C','--done-glow':'rgba(62,207,142,.4)'}},
+ cream:{n:'Cream Glass',v:{'--bg':'#F2ECE0','--panel':'rgba(255,255,255,.6)','--panel2':'rgba(255,255,255,.42)','--line':'rgba(43,38,32,.14)','--ink':'#26221D','--dim':'#6E6559','--faint':'#9C9284','--blue':'#2F6B4F','--blue-deep':'#1F4C37','--gold':'#B4791E','--green':'#2F6B4F','--red':'#C1443A','--sel-a':'rgba(47,107,79,.16)','--sel-b':'rgba(47,107,79,.05)','--gold-tint':'rgba(180,121,30,.09)','--gold-line':'rgba(180,121,30,.42)','--done-a':'#33795A','--done-b':'#1F4C37','--done-ink':'#F2ECE0','--done-glow':'rgba(47,107,79,.35)'}},
+ evergreen:{n:'Evergreen (Dark)',v:{'--bg':'#050A06','--panel':'#152619','--panel2':'#1E3324','--line':'#33503E','--ink':'#EDF5EE','--dim':'#AAC6B1','--faint':'#78957F','--blue':'#3ECF8E','--blue-deep':'#1E7A52','--gold':'#E9C46A','--green':'#3FD68F','--red':'#FF6B5E','--sel-a':'#1B3B26','--sel-b':'#142B1A','--gold-tint':'rgba(233,196,106,.07)','--gold-line':'rgba(233,196,106,.5)','--done-a':'#45DB98','--done-b':'#2FA871','--done-ink':'#04150C','--done-glow':'rgba(62,207,142,.4)'}},
  steel:{n:'Steel Blue',v:{'--bg':'#060910','--panel':'#141C29','--panel2':'#1C2738','--line':'#31435C','--ink':'#EDF2FA','--dim':'#A6BAD2','--faint':'#748AA6','--blue':'#3FA9F5','--blue-deep':'#1B6FB8','--gold':'#F0C36B','--green':'#3FD68F','--red':'#FF6B5E','--sel-a':'#1B3350','--sel-b':'#132338','--gold-tint':'rgba(240,195,107,.07)','--gold-line':'rgba(240,195,107,.5)','--done-a':'#42B4F7','--done-b':'#1E7FC4','--done-ink':'#041322','--done-glow':'rgba(63,169,245,.4)'}},
  engineer:{n:'Engineer Red',v:{'--bg':'#0B0505','--panel':'#221312','--panel2':'#2E1B19','--line':'#4E2C29','--ink':'#F8EEEC','--dim':'#D3ADA8','--faint':'#A07E79','--blue':'#E4392F','--blue-deep':'#9E211A','--gold':'#E8D5B0','--green':'#3FD68F','--red':'#FF6B5E','--sel-a':'#3E1A17','--sel-b':'#2A100E','--gold-tint':'rgba(232,213,176,.07)','--gold-line':'rgba(232,213,176,.5)','--done-a':'#EF5247','--done-b':'#B62A22','--done-ink':'#1A0503','--done-glow':'rgba(228,57,47,.4)'}},
  coyote:{n:'Coyote Tan',v:{'--bg':'#0A0805','--panel':'#1E1913','--panel2':'#2A231A','--line':'#483D2C','--ink':'#F6F0E6','--dim':'#C9B79B','--faint':'#96856C','--blue':'#D7A55C','--blue-deep':'#96702F','--gold':'#8FA05E','--green':'#3FD68F','--red':'#FF6B5E','--sel-a':'#3A2E1D','--sel-b':'#241C11','--gold-tint':'rgba(143,160,94,.08)','--gold-line':'rgba(143,160,94,.5)','--done-a':'#E0AE64','--done-b':'#A87B32','--done-ink':'#180F03','--done-glow':'rgba(215,165,92,.4)'}},
@@ -1470,7 +1637,8 @@ if('serviceWorker' in navigator&&location.protocol==='https:'){
 /* =============== INIT =============== */
 (async function(){
   await loadState(); await loadDone();
-  applyTheme((await sGet('theme'))||'evergreen',false); buildThemeGrid();
+  applyTheme((await sGet('theme'))||'cream',false); buildThemeGrid();
+  exNotes=(await sGet('exnotes'))||{};
   CALC=(await sGet('calc'))||{};
   TPARAMS=(await sGet('tparams'))||{};
   if(S.p>=P.phases.length)S.p=1;
