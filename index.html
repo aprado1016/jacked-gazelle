@@ -316,8 +316,7 @@ body.workout-active{padding-bottom:0;background:var(--tbg)}
 /* ---------- Prep / video / progress ---------- */
 .prep{margin:12px 14px -2px;padding:10px 12px;background:var(--panel);border:1px solid var(--line);border-radius:10px;font-size:13px;color:var(--dim);display:flex;justify-content:space-between;align-items:center;gap:10px}
 .prep b{color:var(--ink);font-weight:600}
-.prep a,.vidlink{color:var(--blue);text-decoration:none;font-weight:600;white-space:nowrap}
-.vidlink{float:right}
+.prep a{color:var(--blue);text-decoration:none;font-weight:600;white-space:nowrap}
 #exSel{width:100%;padding:10px;background:var(--panel);border:1px solid var(--line);border-radius:8px;color:var(--ink);font-size:15px;margin-bottom:10px;-webkit-appearance:none}
 .chart{width:100%;height:auto;display:block;margin-bottom:8px;background:var(--panel);border-radius:8px}
 
@@ -1341,6 +1340,9 @@ function renderDay(){
     </div>
     <div class="wkdesc"><b>${esc(d.f)}</b>${dayDescription(d)}</div>
   </div>`;
+  const wuk=(WUMAP[S.p]||{})[S.d];
+  if(wuk){const wu=WUV[wuk];
+    h+=`<div class="prep"><span>Warm-up: <b>${esc(wu.n)}</b> &mdash; add/subtract/adjust as needed</span><a href="#" onclick="event.preventDefault();openVideo('${wu.u}','${cssk(wu.n)}')">Watch &#9654;</a></div>`;}
   d.blocks.forEach((b,bi)=>{
     h+=`<div class="pvhead">${esc(b.t)}</div><div class="card">`;
     const spans=[];let idx=0;
@@ -1644,7 +1646,6 @@ function renderLogger(bi,ei){
   const lg=$(`lg-${bi}-${ei}`);
   const last=lastLifts[key];
   const prevSets=(last&&last.s)||[];
-  const vu=vidFor(key);
   let h=`<div class="logactions">
     <button onclick="addSet('${cssk(key)}',${bi},${ei})"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Add Set</button>
     <button onclick="openExMeta(${bi},${ei},'how')"><svg viewBox="0 0 24 24"><path d="M5 4l14 8-14 8z" fill="currentColor" stroke="none"/></svg>How To</button>
@@ -1653,7 +1654,6 @@ function renderLogger(bi,ei){
     <button onclick="openExMeta(${bi},${ei},'notes')"><svg viewBox="0 0 24 24"><path d="M4 20l1.5-4.5L16 5l3 3-10.5 10.5z"/></svg>Notes</button>
     <button onclick="deleteLastSet('${cssk(key)}',${bi},${ei})"><svg viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg>Delete Set</button>
   </div>`;
-  if(vu) h+=`<div style="margin-bottom:10px"><button class="vidlink" onclick="openVideo('${vu}','${cssk(key)}')">Demo &#9654;</button></div>`;
   h+=`<div class="logtablehead"><span></span><span>Reps</span><span>Weight</span><span>Previous</span></div>`;
   dayData.sets[key].forEach((s,si)=>{
     const prev=prevSets[si]?`${prevSets[si].w||'--'}&times;${prevSets[si].r||'--'}`:'--';
