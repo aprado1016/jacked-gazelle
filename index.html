@@ -140,22 +140,22 @@ input:focus,textarea:focus{border-color:var(--blue)}
 .logprogbar{flex:1;height:3px;border-radius:99px;background:rgba(255,255,255,.07);overflow:hidden}
 .logprogbar i{display:block;height:100%;width:0;background:var(--tfaint);transition:width .4s}
 .logscreen{background:var(--tbg);min-height:100%;padding-top:1px;padding-bottom:calc(env(safe-area-inset-bottom) + 120px)}
-.logsectitle{margin:20px 14px 10px;font-weight:700;font-size:17px;color:var(--tink)}
-.logcard{background:var(--tpanel);border:1px solid var(--tline);border-radius:20px;margin:0 14px 24px;padding:14px}
+.logsectitle{margin:20px 6px 10px;font-weight:700;font-size:17px;color:var(--tink)}
+.logcard{background:var(--tpanel);border:1px solid var(--tline);border-radius:20px;margin:0 6px 24px;padding:14px}
 .logexhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:8px}
 .logtag{display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--tfaint);min-width:0}
-.logtag i{width:15px;height:15px;border:1px solid var(--tfaint);border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-style:normal;font-size:10px;color:var(--tfaint);flex-shrink:0}
+.logtag i{width:15px;height:15px;display:inline-flex;align-items:center;justify-content:center;color:var(--tfaint);flex-shrink:0}
+.logtag i svg{width:100%;height:100%}
 .logsetspill{display:flex;align-items:center;gap:6px;background:var(--tpanel2);border-radius:99px;padding:7px 12px;font-size:12px;font-weight:700;color:var(--tink);flex-shrink:0}
 .logsetspill .chev{font-size:10px;display:inline-block;transition:transform .2s;color:var(--tdim)}
 .logex.open .logsetspill .chev{transform:rotate(180deg)}
-.logexrow{display:flex;align-items:center;gap:12px;margin-bottom:4px}
+.logexrow{display:flex;align-items:center;gap:12px;margin-bottom:16px}
 .logthumb{width:52px;height:52px;border-radius:14px;flex-shrink:0;background-image:linear-gradient(150deg,#4A6350,#26332A);background-size:cover;background-position:center}
 .logexmid{flex:1;min-width:0}
 .logexmid .nm{font-weight:700;font-size:17px;color:var(--tink)}
 .logexmid .rx{font-size:13px;color:var(--tdim);margin-top:2px}
 .logkebab{flex-shrink:0;color:var(--tfaint);font-size:18px;padding:4px 8px}
-.logbody2{display:none;margin-top:10px}
-.logex.open .logbody2{display:block}
+.logbody2{max-height:0;opacity:0;overflow:hidden;margin-top:0;transition:max-height .38s cubic-bezier(.4,0,.2,1),opacity .28s ease,margin-top .38s cubic-bezier(.4,0,.2,1)}
 .logactions{display:flex;gap:8px;overflow-x:auto;padding-bottom:12px;scrollbar-width:none}
 .logactions::-webkit-scrollbar{display:none}
 .logactions button{flex-shrink:0;display:flex;align-items:center;gap:6px;background:var(--tpanel2);border:1px solid var(--tline);border-radius:12px;padding:10px 13px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--tink);white-space:nowrap}
@@ -177,8 +177,9 @@ input:focus,textarea:focus{border-color:var(--blue)}
 .logrest.dimmed .logrestplay,.logrest.dimmed span{opacity:.4}
 .restrow{display:flex;align-items:center;gap:14px;margin-top:4px;margin-bottom:10px}
 .restring{position:relative;width:52px;height:52px;flex-shrink:0}
-.restring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.restring>svg{width:100%;height:100%;transform:rotate(-90deg)}
 .restring button{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--tink)}
+.restring button svg{width:20px;height:20px}
 .restlabel{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--tfaint)}
 .resttime{font-size:22px;font-weight:800;color:var(--tink);font-variant-numeric:tabular-nums;margin-top:1px}
 .restcomplete{width:100%;background:#F2ECE0;color:#17130F;border-radius:14px;padding:13px;font-weight:700;font-size:13px;letter-spacing:.05em;text-transform:uppercase;display:flex;align-items:center;justify-content:center;gap:6px}
@@ -186,10 +187,11 @@ input:focus,textarea:focus{border-color:var(--blue)}
 .restfloat.show{display:block}
 .restfloat .restrow{margin:0}
 .restfloat .restring{width:60px;height:60px}
+.restfloat .restring button svg{width:23px;height:23px}
 .restfloat .resttime{font-size:26px}
 .restfloat .restcomplete{display:none;margin-top:16px}
 .restfloat.paused .restcomplete{display:flex}
-.logdayfoot{padding:6px 14px 30px}
+.logdayfoot{padding:6px 6px 30px}
 .logdaynote{width:100%;min-height:70px;padding:12px;border-radius:14px;background:var(--tpanel2);border:1px solid var(--tline);color:var(--tink);font-size:14px}
 .logdonebtn{width:100%;margin-top:10px;padding:15px;border-radius:14px;font-weight:700;font-size:15px;letter-spacing:.06em;text-transform:uppercase;background:var(--tpanel2);border:1px solid var(--tline);color:var(--tink)}
 .logdonebtn.on{background:linear-gradient(180deg,var(--done-a),var(--done-b));border-color:var(--done-a);color:var(--done-ink)}
@@ -1390,8 +1392,9 @@ function startWorkout(){
 /* =============== ACTIVE WORKOUT LOG (dark) =============== */
 let WKOPT={audio:true,expand:false};
 let wkElapsedSec=0, wkTimerId=null, wkRunning=false;
-const PLAY_SVG='<svg viewBox="0 0 24 24" width="13" height="13"><path d="M6 4l14 8-14 8z" fill="currentColor"/></svg>';
-const PAUSE_SVG='<svg viewBox="0 0 24 24" width="13" height="13"><rect x="6" y="4" width="4" height="16" fill="currentColor"/><rect x="14" y="4" width="4" height="16" fill="currentColor"/></svg>';
+const PLAY_SVG='<svg viewBox="0 0 24 24" width="13" height="13"><path d="M7 4.5v15a1 1 0 0 0 1.53.85l12-7.5a1 1 0 0 0 0-1.7l-12-7.5A1 1 0 0 0 7 4.5Z" fill="currentColor" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>';
+const PAUSE_SVG='<svg viewBox="0 0 24 24" width="13" height="13"><rect x="6" y="4" width="4.5" height="16" rx="2" fill="currentColor"/><rect x="13.5" y="4" width="4.5" height="16" rx="2" fill="currentColor"/></svg>';
+const INFO_SVG='<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="11" x2="12" y2="16"/><circle cx="12" cy="7.6" r=".9" fill="currentColor" stroke="none"/></svg>';
 function fmtMMSS(s){s=Math.max(0,Math.round(s));return `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`}
 function startWkTimer(){
   if(wkTimerId)return;
@@ -1455,7 +1458,7 @@ function renderDayLog(){
         const nSets=ensureSets(b.ex[st]).length;
         h+=`<div class="logcard logex${openDefault?' open':''}" id="grp-${bi}-${st}" data-size="${sz}">
           <div class="logexhead">
-            <span class="logtag">GROUP<i>&#8505;</i></span>
+            <span class="logtag">GROUP<i>${INFO_SVG}</i></span>
             <button class="logsetspill" onclick="toggleGroup(${bi},${st},${sz})">${nSets} SET${nSets===1?'':'S'} <span class="chev">&#9660;</span></button>
           </div>`;
         for(let k=0;k<sz;k++){
@@ -1474,7 +1477,7 @@ function renderDayLog(){
         const nSets=ensureSets(e).length;
         h+=`<div class="logcard logex${openDefault?' open':''}" id="ex-${bi}-${ei}">
           <div class="logexhead">
-            <span class="logtag">STRAIGHT SET<i>&#8505;</i></span>
+            <span class="logtag">STRAIGHT SET<i>${INFO_SVG}</i></span>
             <button class="logsetspill" onclick="togEx(${bi},${ei})">${nSets} SET${nSets===1?'':'S'} <span class="chev">&#9660;</span></button>
           </div>
           <div class="logexrow">
@@ -1512,21 +1515,48 @@ function renderDayLog(){
   $('logPause').onclick=()=>{pauseWkTimer();openSheet('pauseSheet')};
   $('logSettings').onclick=()=>openSheet('wkSettingsSheet');
   if(WKOPT.expand){
-    d.blocks.forEach((b,bi)=>b.ex.forEach((e,ei)=>renderLogger(bi,ei)));
+    d.blocks.forEach((b,bi)=>b.ex.forEach((e,ei)=>{
+      renderLogger(bi,ei);
+      const body=$(`lg-${bi}-${ei}`); if(!body)return;
+      body.style.transition='none';
+      body.classList.add('lgopen');
+      body.style.maxHeight=body.scrollHeight+'px'; body.style.opacity='1'; body.style.marginTop='10px';
+      void body.offsetHeight; body.style.transition='';
+    }));
   }
   if(floatRest) dimRestBtn(floatRest.bi,floatRest.idx,true);
   updateWkProgress();
 }
 
+function openLogBody(el){
+  if(!el)return;
+  el.classList.add('lgopen');
+  el.style.maxHeight=el.scrollHeight+'px';
+  el.style.opacity='1';
+  el.style.marginTop='10px';
+}
+function closeLogBody(el){
+  if(!el)return;
+  el.classList.remove('lgopen');
+  el.style.maxHeight='0px';
+  el.style.opacity='0';
+  el.style.marginTop='0px';
+}
 window.togEx=function(bi,ei){
   const row=$(`ex-${bi}-${ei}`); const was=row.classList.contains('open');
-  row.classList.toggle('open');
-  if(!was) renderLogger(bi,ei);
+  const body=$(`lg-${bi}-${ei}`);
+  if(!was){ row.classList.add('open'); renderLogger(bi,ei); openLogBody(body); }
+  else { row.classList.remove('open'); closeLogBody(body); }
 };
 window.toggleGroup=function(bi,st,sz){
   const card=$(`grp-${bi}-${st}`); const was=card.classList.contains('open');
-  card.classList.toggle('open');
-  if(!was){ for(let k=0;k<sz;k++) renderLogger(bi,st+k); }
+  if(!was){
+    card.classList.add('open');
+    for(let k=0;k<sz;k++){ renderLogger(bi,st+k); openLogBody($(`lg-${bi}-${st+k}`)); }
+  } else {
+    card.classList.remove('open');
+    for(let k=0;k<sz;k++) closeLogBody($(`lg-${bi}-${st+k}`));
+  }
 };
 function restSecondsFor(b){
   const t=((b.hr||'')+' '+(b.ir||''));
@@ -1637,6 +1667,11 @@ function renderLogger(bi,ei){
     </div>`;
   });
   lg.innerHTML=h;
+  if(lg.classList.contains('lgopen')){
+    const prevT=lg.style.transition; lg.style.transition='none';
+    lg.style.maxHeight=lg.scrollHeight+'px';
+    void lg.offsetHeight; lg.style.transition=prevT;
+  }
 }
 function cssk(k){return k.replace(/'/g,"\\'")}
 window.upSet=function(k,si,f,v){dayData.sets[k][si][f]=v;scheduleSave()};
