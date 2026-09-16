@@ -30,8 +30,9 @@
   --tabbar-h:64px;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.45}
-body{padding-bottom:calc(var(--tabbar-h) + env(safe-area-inset-bottom) + 14px);overscroll-behavior-y:contain;background:radial-gradient(120% 60% at 15% -10%,rgba(255,255,255,.65),transparent 55%),radial-gradient(140% 70% at 100% 0%,rgba(180,121,30,.10),transparent 45%),var(--bg);background-attachment:fixed}
+html{background:var(--bg);height:100%}
+html,body{color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.45}
+body{min-height:100vh;min-height:100dvh;padding-bottom:calc(var(--tabbar-h) + env(safe-area-inset-bottom) + 14px);overscroll-behavior-y:contain;background:radial-gradient(120% 60% at 15% -10%,rgba(255,255,255,.65),transparent 55%),radial-gradient(140% 70% at 100% 0%,rgba(180,121,30,.10),transparent 45%),var(--bg);background-attachment:fixed}
 button{font-family:inherit;border:none;background:none;color:inherit;cursor:pointer}
 input,textarea{font-family:inherit;color:var(--ink);background:var(--panel2);border:1px solid var(--line);border-radius:8px;outline:none}
 input:focus,textarea:focus{border-color:var(--blue)}
@@ -150,10 +151,12 @@ input:focus,textarea:focus{border-color:var(--blue)}
   background:rgba(255,255,255,.55);border:1px solid var(--glass-brd);border-radius:22px;box-shadow:var(--shadow);
   -webkit-backdrop-filter:blur(22px) saturate(160%);backdrop-filter:blur(22px) saturate(160%);
   display:flex;align-items:stretch;justify-content:space-around;padding:4px}
-.tabbar button{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border-radius:16px;color:var(--faint)}
+.tabbar button{position:relative;z-index:1;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border-radius:16px;color:var(--faint);transition:color .25s}
 .tabbar button svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.8}
 .tabbar button span{font-family:var(--disp);font-size:10px;letter-spacing:.06em;text-transform:uppercase;font-weight:600}
-.tabbar button.on{color:var(--blue);background:var(--sel-a)}
+.tabbar button.on{color:var(--blue)}
+.tabind{position:absolute;top:4px;bottom:4px;left:0;width:calc(20% - 4px);border-radius:16px;background:var(--sel-a);z-index:0;pointer-events:none;
+  transition:transform .32s cubic-bezier(.65,0,.35,1)}
 .planhead{margin:14px 14px 2px}
 .planhead h2{font-family:var(--disp);font-weight:800;font-size:30px;letter-spacing:.03em;text-transform:uppercase}
 .planhead p{color:var(--dim);font-size:13px;margin-top:2px}
@@ -463,6 +466,7 @@ input:focus,textarea:focus{border-color:var(--blue)}
 </div>
 
 <nav class="tabbar" id="tabbar">
+  <span class="tabind" id="tabInd"></span>
   <button data-tab="home" class="on"><svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"/><path d="M5 10v9a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9"/></svg><span>Home</span></button>
   <button data-tab="plan"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span>Plan</span></button>
   <button id="timerTab"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2M10 2h4"/></svg><span>Timer</span></button>
@@ -1113,6 +1117,7 @@ function openWorkout(from){
   inLogView=false;
   document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('active',s.id==='screen-workout'));
   document.querySelectorAll('#tabbar button[data-tab]').forEach(b=>b.classList.toggle('on',b.dataset.tab==='home'));
+  moveTabIndicator('home');
   renderDay();
   window.scrollTo({top:0});
 }
@@ -1121,20 +1126,64 @@ function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;')}
 function refreshMain(){ if(inLogView) renderDayLog(); else renderDay(); }
 
 /* =============== WORKOUT PREVIEW =============== */
-function dayEquipment(d){
-  const names=(d.blocks||[]).flatMap(b=>b.ex.map(e=>e.n.toLowerCase())).join(' | ');
-  if(/\bbarbell|\bbb\b|\bssb\b/.test(names)) return 'Barbell';
-  if(/dumbbell|\bdb\b/.test(names)) return 'Dumbbells';
-  if(/kettlebell|\bkb\b/.test(names)) return 'Kettlebell';
-  if(/machine|cable|smith|pulldown|leg press/.test(names)) return 'Machine';
-  if(/sandbag/.test(names)) return 'Sandbag';
-  if(/med ball|medicine ball/.test(names)) return 'Med Ball';
-  if(names.trim()) return 'Bodyweight';
-  return d.cond ? 'Cardio' : 'Bodyweight';
+/* Rank the top N labels in a frequency count, most-hit first. */
+function topLabels(counts,n){
+  return Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,n).map(x=>x[0]);
 }
-function dayFocus(d){
-  const t=d.f||''; const i=t.indexOf('·');
-  return (i>0?t.slice(0,i):t).trim()||'Full Body';
+function dayEquipment(d){
+  const names=(d.blocks||[]).flatMap(b=>b.ex.map(e=>e.n.toLowerCase()));
+  const counts={};
+  names.forEach(n=>{
+    let k;
+    if(/barbell|\bbb\b|\bssb\b|swiss bar|trap bar|hex bar/.test(n)) k='Barbell';
+    else if(/dumbbell|\bdb\b/.test(n)) k='Dumbbells';
+    else if(/kettlebell|\bkb\b/.test(n)) k='Kettlebell';
+    else if(/machine|cable|smith|pulldown|pushdown|leg press|pec deck|leg curl|leg extension|calf raise|face pull|lat prayer|plate raise|rear delt|chest supported|t-bar|extra rom/.test(n)) k='Machine';
+    else if(/sandbag/.test(n)) k='Sandbag';
+    else if(/med(?:icine)? ?ball/.test(n)) k='Med Ball';
+    else if(/band/.test(n)) k='Bands';
+    else k='Bodyweight';
+    counts[k]=(counts[k]||0)+1;
+  });
+  const top=topLabels(counts,2);
+  if(!top.length) return d.cond?'Cardio':'Bodyweight';
+  return top.join(' / ');
+}
+/* Classify each exercise by primary muscle group (real, not fabricated —
+   pattern-matched against the exercise name using standard strength-
+   training anatomy), then report the muscle groups hit most across the
+   day's actual exercises. */
+const MUSCLE_MAP=[
+  [/leg curl/,'Hamstrings'],
+  [/leg extension/,'Quads'],
+  [/hip thrust|glute ham|nordic|\bglute/,'Glutes'],
+  [/rdl|deadlift|stiff leg|good morning|back raise/,'Hamstrings'],
+  [/squat|hack|leg press|lunge|split squat|step up|goblet|pistol|box jump/,'Quads'],
+  [/calf|tib raise/,'Calves'],
+  [/bench|chest press|push ?up|\bfly\b|dip|chest pass|jm press/,'Chest'],
+  [/shrug/,'Traps'],
+  [/row|pulldown|pull ?up|\bchin|lat prayer|pullover|t-bar/,'Back'],
+  [/overhead press|push press|shoulder press|delt|lateral raise|face pull|y raise|overhead kb|overhead carry/,'Shoulders'],
+  [/tricep|pushdown|skull crusher|overhead.*extension/,'Triceps'],
+  [/curl/,'Biceps'],
+  [/plank|crunch|leg raise|farmer|carry|suitcase|side raise|ab mat/,'Core'],
+  [/jump|hop|skip|pogo|drag/,'Power'],
+  [/kb swing|clean|snatch|med ball|sandbag|getup|gtos/,'Full Body']
+];
+function classifyMuscle(name){
+  const n=name.toLowerCase();
+  for(const [re,cat] of MUSCLE_MAP) if(re.test(n)) return cat;
+  return 'Full Body';
+}
+function dayTargets(d){
+  const counts={};
+  (d.blocks||[]).forEach(b=>b.ex.forEach(e=>{
+    const cat=classifyMuscle(e.n);
+    counts[cat]=(counts[cat]||0)+1;
+  }));
+  const top=topLabels(counts,2);
+  if(!top.length) return d.cond?'Cardio':'Full Body';
+  return top.join(' / ');
 }
 function dayMinutes(d){
   const exCount=(d.blocks||[]).reduce((n,b)=>n+b.ex.length,0);
@@ -1168,7 +1217,7 @@ function renderDay(){
     <h1 class="wktitle">${esc(d.f)}</h1>
     <div class="wkfacts">
       <div class="wkfact"><svg viewBox="0 0 24 24">${ICO.clock}</svg><span>${dayMinutes(d)} min</span></div>
-      <div class="wkfact"><svg viewBox="0 0 24 24">${ICO.target}</svg><span>${esc(dayFocus(d))}</span></div>
+      <div class="wkfact"><svg viewBox="0 0 24 24">${ICO.target}</svg><span>${esc(dayTargets(d))}</span></div>
       <div class="wkfact"><svg viewBox="0 0 24 24">${ICO.dumbbell}</svg><span>${dayEquipment(d)}</span></div>
     </div>
     <div class="wkdesc"><b>${esc(d.f)}</b>${dayDescription(d)}</div>
@@ -1514,13 +1563,25 @@ function calcPlates(){
 $('pcW').oninput=calcPlates;$('pcB').oninput=calcPlates;
 
 /* =============== TABS =============== */
+function moveTabIndicator(name){
+  const btn=document.querySelector(`#tabbar button[data-tab="${name}"]`), ind=$('tabInd');
+  if(!btn||!ind)return;
+  ind.style.width=btn.offsetWidth+'px';
+  ind.style.transform=`translateX(${btn.offsetLeft}px)`;
+}
 function showTab(name){
   document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('active',s.id==='screen-'+name));
   document.querySelectorAll('#tabbar button[data-tab]').forEach(b=>b.classList.toggle('on',b.dataset.tab===name));
+  moveTabIndicator(name);
+  window.scrollTo({top:0});
   if(name==='home')renderHome();
   if(name==='progress')openProg();
   if(name==='plan'){renderHeader();renderDayRail();}
 }
+window.addEventListener('resize',()=>{
+  const on=document.querySelector('#tabbar button[data-tab].on');
+  if(on) moveTabIndicator(on.dataset.tab);
+});
 document.querySelectorAll('#tabbar button[data-tab]').forEach(b=>b.onclick=()=>showTab(b.dataset.tab));
 $('timerTab').onclick=()=>openSheet('quickTimerSheet');
 document.querySelectorAll('#quickTimerSheet [data-qt]').forEach(b=>b.onclick=()=>{
@@ -1973,6 +2034,7 @@ if('serviceWorker' in navigator&&location.protocol==='https:'){
   await loadDay();
   renderHeader();renderDayRail();refreshMain();renderHome();
   syncTools();
+  moveTabIndicator('home');
 })();
 window.addEventListener('pagehide',()=>{if(dirty)saveDay()});
 </script>
