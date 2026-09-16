@@ -56,7 +56,7 @@ input:focus,textarea:focus{border-color:var(--blue)}
 .hero{margin:0 0 14px;height:min(34vh,220px);border-radius:0 0 26px 26px;overflow:hidden;position:relative;
   background-image:linear-gradient(150deg,#4A6350,#26332A);background-size:cover;background-position:center}
 .hero.has-img{background-image:var(--hero-img,none),linear-gradient(150deg,#4A6350,#26332A)}
-.herocard{margin:0 14px 4px;padding:16px}
+.herocard{margin:0 10px 6px;padding:16px 8px 4px}
 .herotop .sub{font-size:11px;letter-spacing:.14em;color:var(--faint);text-transform:uppercase;font-weight:600}
 .herocard h1{font-weight:700;font-size:22px;letter-spacing:0;margin:2px 0 14px;color:var(--ink)}
 .herocard h1 em{font-style:normal;color:var(--gold)}
@@ -76,9 +76,11 @@ input:focus,textarea:focus{border-color:var(--blue)}
 .schedcheck{flex-shrink:0;width:28px;height:28px;border-radius:50%;border:1.5px solid var(--line);display:flex;align-items:center;justify-content:center;color:transparent;font-size:14px;transition:all .35s}
 .schedcheck.on{border-color:var(--ink);background:var(--ink);color:var(--bg)}
 .schedrow.done{border-color:var(--blue)}
-.schedsweep{position:absolute;inset:0;pointer-events:none;background:linear-gradient(100deg,transparent 30%,rgba(255,255,255,.55) 48%,rgba(122,168,220,.35) 52%,transparent 70%);transform:translateX(-120%);opacity:0}
-.schedsweep.go{animation:sweep .9s ease forwards}
-@keyframes sweep{0%{transform:translateX(-120%);opacity:1}70%{opacity:1}100%{transform:translateX(120%);opacity:0}}
+.schedsweep{position:absolute;inset:0;pointer-events:none;background:linear-gradient(100deg,transparent 30%,rgba(255,255,255,.55) 48%,rgba(122,168,220,.4) 52%,transparent 70%);transform:translateX(-120%);opacity:0}
+.schedsweep.go{animation:sweep 1.8s cubic-bezier(.22,.61,.36,1) forwards}
+@keyframes sweep{0%{transform:translateX(-120%);opacity:1}75%{opacity:1}100%{transform:translateX(120%);opacity:0}}
+.schedrow.ringglow{animation:ringglow 1.6s ease-out forwards}
+@keyframes ringglow{0%{box-shadow:inset 0 0 0 2.5px rgba(74,133,209,.55)}100%{box-shadow:inset 0 0 0 2.5px rgba(74,133,209,0)}}
 .schedrest{padding:20px 14px;text-align:center;color:var(--dim);font-size:14px}
 .actbody{padding:16px}
 .actrow{display:flex;justify-content:space-between;align-items:center}
@@ -317,7 +319,7 @@ input:focus,textarea:focus{border-color:var(--blue)}
 <div class="screens">
   <section class="screen active" id="screen-home">
     <div class="hero" id="heroBanner"></div>
-    <div class="card herocard">
+    <div class="herocard">
       <div class="herotop"><span class="sub">Terminator Training Method</span></div>
       <h1>Jacked Gazelle <em>2.0</em></h1>
       <div class="heroprogwrap">
@@ -1038,6 +1040,9 @@ function refreshHomeAfterToggle(v){
     if(v){
       const sw=$('schedSweep');
       if(sw){ sw.classList.remove('go'); void sw.offsetWidth; sw.classList.add('go'); }
+      row.classList.remove('ringglow'); void row.offsetWidth; row.classList.add('ringglow');
+    } else {
+      row.classList.remove('ringglow');
     }
   }
   buildActSkeleton();
