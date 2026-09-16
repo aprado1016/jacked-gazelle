@@ -129,17 +129,15 @@ input:focus,textarea:focus{border-color:var(--blue)}
 .startbtn2{width:100%;padding:17px;border-radius:16px;background:linear-gradient(180deg,#2B2620,#17130F);color:#F2ECE0;font-weight:700;font-size:16px;letter-spacing:.06em;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:var(--shadow)}
 
 /* ---------- Active workout log (dark) ---------- */
-.logtopbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:8px;
-  padding:calc(env(safe-area-inset-top) + 10px) 14px 10px;background:var(--tbg)}
+.logheader{position:sticky;top:0;z-index:20;background:var(--tbg)}
+.logtopbar{display:flex;align-items:center;justify-content:space-between;gap:8px;
+  padding:calc(env(safe-area-inset-top) + 10px) 14px 10px}
 .logcircle{width:38px;height:38px;border-radius:50%;background:var(--tpanel);border:1px solid var(--tline);color:var(--tink);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.logseg{display:flex;background:var(--tpanel);border:1px solid var(--tline);border-radius:99px;padding:3px}
-.logseg button{padding:8px 15px;border-radius:99px;font-size:12.5px;font-weight:600;color:var(--tdim)}
-.logseg button.on{background:var(--tpanel2);color:var(--tink)}
-.logmeta{padding:0 14px 14px;background:var(--tbg)}
+.logmeta{padding:0 14px 14px}
 .logtitle{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--tdim);margin-bottom:8px}
 .logtimerow{display:flex;align-items:center;gap:12px}
 .logtimerow span{font-weight:700;font-size:15px;color:var(--tink);font-variant-numeric:tabular-nums;flex-shrink:0}
-.logprogbar{flex:1;height:3px;border-radius:99px;background:var(--tline);overflow:hidden}
+.logprogbar{flex:1;height:3px;border-radius:99px;background:rgba(255,255,255,.07);overflow:hidden}
 .logprogbar i{display:block;height:100%;width:0;background:var(--tfaint);transition:width .4s}
 .logscreen{background:var(--tbg);min-height:100%;padding-bottom:40px}
 .logsectitle{margin:20px 14px 10px;font-weight:700;font-size:17px;color:var(--tink)}
@@ -176,6 +174,13 @@ input:focus,textarea:focus{border-color:var(--blue)}
 .logrest{display:flex;align-items:center;gap:10px;margin-top:2px}
 .logrestplay{width:34px;height:34px;border-radius:10px;background:var(--tpanel2);border:1px solid var(--tline);color:var(--tink);display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .logrest span{font-size:14px;color:var(--tdim)}
+.restrow{display:flex;align-items:center;gap:14px;margin-top:4px;margin-bottom:10px}
+.restring{position:relative;width:52px;height:52px;flex-shrink:0}
+.restring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.restring button{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--tink)}
+.restlabel{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--tfaint)}
+.resttime{font-size:22px;font-weight:800;color:var(--tink);font-variant-numeric:tabular-nums;margin-top:1px}
+.restcomplete{width:100%;background:#F2ECE0;color:#17130F;border-radius:14px;padding:13px;font-weight:700;font-size:13px;letter-spacing:.05em;text-transform:uppercase;display:flex;align-items:center;justify-content:center;gap:6px}
 .logdayfoot{padding:6px 14px 30px}
 .logdaynote{width:100%;min-height:70px;padding:12px;border-radius:14px;background:var(--tpanel2);border:1px solid var(--tline);color:var(--tink);font-size:14px}
 .logdonebtn{width:100%;margin-top:10px;padding:15px;border-radius:14px;font-weight:700;font-size:15px;letter-spacing:.06em;text-transform:uppercase;background:var(--tpanel2);border:1px solid var(--tline);color:var(--tink)}
@@ -207,6 +212,7 @@ input:focus,textarea:focus{border-color:var(--blue)}
 /* ---------- Screens & tab bar ---------- */
 .screen{display:none}
 .screen.active{display:block}
+body.workout-active .tabbar{display:none}
 .tabbar{position:fixed;left:10px;right:10px;bottom:calc(env(safe-area-inset-bottom) + 8px);z-index:70;height:var(--tabbar-h);
   background:rgba(255,255,255,.55);border:1px solid var(--glass-brd);border-radius:22px;box-shadow:var(--shadow);
   -webkit-backdrop-filter:blur(22px) saturate(160%);backdrop-filter:blur(22px) saturate(160%);
@@ -1293,6 +1299,7 @@ const ICO={
 };
 function renderDay(){
   const m=$('main'), d=dy();
+  document.body.classList.remove('workout-active');
   $('wkTopbar').style.display='';
   $('wkTopbar').classList.toggle('overlay', !d.rest);
   if(d.rest){
@@ -1401,49 +1408,64 @@ function renderDayLog(){
   $('wkTopbar').style.display='none';
   $('wkStartBar').classList.remove('show');
   const m=$('main'); const d=dy();
-  if(d.rest){ renderDay_restBranch(m,d); return; }
+  if(d.rest){ document.body.classList.remove('workout-active'); renderDay_restBranch(m,d); return; }
+  document.body.classList.add('workout-active');
 
-  let h=`<div class="logtopbar">
+  let h=`<div class="logheader">
+  <div class="logtopbar">
     <button class="logcircle" id="logPause">${wkRunning?PAUSE_SVG:PLAY_SVG}</button>
-    <div class="logseg"><button data-seg="guided">Guided</button><button data-seg="logbook" class="on">Logbook</button></div>
     <button class="logcircle" id="logSettings"><svg viewBox="0 0 24 24" width="17" height="17" stroke="currentColor" fill="none" stroke-width="2"><path d="M12 15a3 3 0 100-6 3 3 0 000 6z"/><path d="M19.4 13a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V19a2 2 0 11-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H4a2 2 0 110-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H10a1.65 1.65 0 001-1.51V4a2 2 0 114 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V10a1.65 1.65 0 001.51 1H20a2 2 0 110 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></button>
   </div>
   <div class="logmeta">
     <div class="logtitle">${esc(d.f)}</div>
     <div class="logtimerow"><span id="logElapsed">${fmtMMSS(wkElapsedSec)}</span><div class="logprogbar"><i id="logProgFill"></i></div></div>
   </div>
+  </div>
   <div class="logscreen">`;
 
+  const openDefault=WKOPT.expand;
   d.blocks.forEach((b,bi)=>{
     h+=`<div class="logsectitle">${esc(b.t)}</div>`;
     const spans=[];let idx=0;
     (b.g||[]).forEach(sz=>{spans.push([idx,sz]);idx+=sz});
     while(idx<b.ex.length){spans.push([idx,1]);idx++}
-    const tagFor=sz=>sz===1?'Straight Set':sz===2?'Superset':sz===3?'Tri-set':'Circuit';
-    const row=(ei,lt,tag)=>{
-      const e=b.ex[ei], key=e.n;
-      const openDefault=WKOPT.expand;
-      const nSets=ensureSets(e).length;
-      return `<div class="logcard logex${openDefault?' open':''}" id="ex-${bi}-${ei}">
-        <div class="logexhead">
-          <span class="logtag">${lt?`<span class="lt">${lt}</span>`:''}${tag.toUpperCase()}<i>&#8505;</i></span>
-          <button class="logsetspill" onclick="togEx(${bi},${ei})">${nSets} SET${nSets===1?'':'S'} <span class="chev">&#9660;</span></button>
-        </div>
-        <div class="logexrow">
-          <div class="logthumb"></div>
-          <div class="logexmid"><div class="nm">${esc(e.n)}</div><div class="rx">${e.rx}</div></div>
-          <button class="logkebab" onclick="openExMeta(${bi},${ei})" aria-label="Exercise info">&#8942;</button>
-        </div>
-        <div class="logbody2" id="lg-${bi}-${ei}"></div>
-        <div class="logrest">
-          <button class="logrestplay" id="restbtn-${bi}-${ei}" onclick="toggleRest(${bi},${ei})">${PLAY_SVG}</button>
-          <span id="restlbl-${bi}-${ei}">Rest ${fmtMMSS(restSecondsFor(b))}</span>
-        </div>
-      </div>`;
-    };
     spans.forEach(([st,sz])=>{
-      const tag=tagFor(sz);
-      for(let k=0;k<sz;k++)h+=row(st+k,sz>1?'ABCD'[k]:null,tag);
+      if(sz>1){
+        const tag=sz===2?'Superset':sz===3?'Tri-set':'Circuit';
+        const nSets=ensureSets(b.ex[st]).length;
+        h+=`<div class="logcard logex${openDefault?' open':''}" id="grp-${bi}-${st}" data-size="${sz}">
+          <div class="logexhead">
+            <span class="logtag">GROUP<i>&#8505;</i></span>
+            <button class="logsetspill" onclick="toggleGroup(${bi},${st},${sz})">${nSets} SET${nSets===1?'':'S'} <span class="chev">&#9660;</span></button>
+          </div>`;
+        for(let k=0;k<sz;k++){
+          const ei=st+k, e=b.ex[ei];
+          h+=`<div class="logexrow">
+            <div class="logthumb"></div>
+            <div class="logexmid"><div class="nm"><span class="lt">${'ABCD'[k]}</span>${esc(e.n)}</div><div class="rx">${e.rx}</div></div>
+            <button class="logkebab" onclick="openExMeta(${bi},${ei})" aria-label="Exercise info">&#8942;</button>
+          </div>
+          <div class="logbody2" id="lg-${bi}-${ei}"></div>`;
+        }
+        h+=`<div class="logrest" id="restwrap-${bi}-${st}">${restCompactHTML(bi,st,restSecondsFor(b))}</div>
+        </div>`;
+      } else {
+        const ei=st, e=b.ex[ei];
+        const nSets=ensureSets(e).length;
+        h+=`<div class="logcard logex${openDefault?' open':''}" id="ex-${bi}-${ei}">
+          <div class="logexhead">
+            <span class="logtag">STRAIGHT SET<i>&#8505;</i></span>
+            <button class="logsetspill" onclick="togEx(${bi},${ei})">${nSets} SET${nSets===1?'':'S'} <span class="chev">&#9660;</span></button>
+          </div>
+          <div class="logexrow">
+            <div class="logthumb"></div>
+            <div class="logexmid"><div class="nm">${esc(e.n)}</div><div class="rx">${e.rx}</div></div>
+            <button class="logkebab" onclick="openExMeta(${bi},${ei})" aria-label="Exercise info">&#8942;</button>
+          </div>
+          <div class="logbody2" id="lg-${bi}-${ei}"></div>
+          <div class="logrest" id="restwrap-${bi}-${ei}">${restCompactHTML(bi,ei,restSecondsFor(b))}</div>
+        </div>`;
+      }
     });
   });
 
@@ -1480,6 +1502,11 @@ window.togEx=function(bi,ei){
   row.classList.toggle('open');
   if(!was) renderLogger(bi,ei);
 };
+window.toggleGroup=function(bi,st,sz){
+  const card=$(`grp-${bi}-${st}`); const was=card.classList.contains('open');
+  card.classList.toggle('open');
+  if(!was){ for(let k=0;k<sz;k++) renderLogger(bi,st+k); }
+};
 function restSecondsFor(b){
   const t=((b.hr||'')+' '+(b.ir||''));
   let m=t.match(/(\d+)\s*-\s*(\d+)\s*min/i); if(m)return Math.round(((+m[1]+ +m[2])/2)*60);
@@ -1488,26 +1515,48 @@ function restSecondsFor(b){
   return 90;
 }
 const restState={};
-window.toggleRest=function(bi,ei){
-  const key=`${bi}-${ei}`, btn=$(`restbtn-${key}`), lbl=$(`restlbl-${key}`);
+const REST_C2=2*Math.PI*26;
+function restCompactHTML(bi,idx,secs){
+  return `<button class="logrestplay" onclick="toggleRest(${bi},${idx})">${PLAY_SVG}</button><span>Rest ${fmtMMSS(secs)}</span>`;
+}
+function restActiveHTML(bi,idx,remaining,total){
+  const key=`${bi}-${idx}`;
+  return `<div class="restrow">
+    <div class="restring"><svg viewBox="0 0 60 60">
+      <circle cx="30" cy="30" r="26" fill="none" stroke="var(--tpanel2)" stroke-width="5"/>
+      <circle id="restring-${key}" cx="30" cy="30" r="26" fill="none" stroke="var(--tink)" stroke-width="5" stroke-linecap="round"
+        stroke-dasharray="${REST_C2}" stroke-dashoffset="${REST_C2*(1-remaining/total)}"/>
+    </svg><button onclick="toggleRest(${bi},${idx})">${PAUSE_SVG}</button></div>
+    <div><div class="restlabel">Rest</div><div class="resttime" id="resttime-${key}">${fmtMMSS(remaining)}</div></div>
+  </div>
+  <button class="restcomplete" onclick="completeRest(${bi},${idx})">&#10003;&nbsp; Complete</button>`;
+}
+window.toggleRest=function(bi,idx){
+  const key=`${bi}-${idx}`, wrap=$(`restwrap-${key}`);
   let st=restState[key];
   if(!st){ const b=dy().blocks[bi]; const total=restSecondsFor(b); st=restState[key]={remaining:total,total,running:false,timer:null}; }
   if(st.running){
-    clearInterval(st.timer); st.timer=null; st.running=false; btn.innerHTML=PLAY_SVG;
+    clearInterval(st.timer); st.timer=null; st.running=false;
+    wrap.innerHTML=restCompactHTML(bi,idx,st.remaining);
     return;
   }
-  st.running=true; btn.innerHTML=PAUSE_SVG;
+  st.running=true;
+  wrap.innerHTML=restActiveHTML(bi,idx,st.remaining,st.total);
   st.timer=setInterval(()=>{
     st.remaining--;
-    if(st.remaining<=0){
-      clearInterval(st.timer); st.running=false; st.remaining=st.total;
-      btn.innerHTML=PLAY_SVG; lbl.textContent=`Rest ${fmtMMSS(st.total)}`;
-      if(WKOPT.audio){tBeep(880,.18); if(navigator.vibrate)navigator.vibrate([150,80,150]);}
-      return;
-    }
-    lbl.textContent=`Rest ${fmtMMSS(st.remaining)}`;
+    if(st.remaining<=0){ finishRest(bi,idx); return; }
+    const ring=$(`restring-${key}`), t=$(`resttime-${key}`);
+    if(ring) ring.style.strokeDashoffset=REST_C2*(1-st.remaining/st.total);
+    if(t) t.textContent=fmtMMSS(st.remaining);
   },1000);
 };
+function finishRest(bi,idx){
+  const key=`${bi}-${idx}`, st=restState[key]; if(!st)return;
+  clearInterval(st.timer); st.timer=null; st.running=false; st.remaining=st.total;
+  if(WKOPT.audio){tBeep(880,.18); if(navigator.vibrate)navigator.vibrate([150,80,150]);}
+  const wrap=$(`restwrap-${key}`); if(wrap) wrap.innerHTML=restCompactHTML(bi,idx,st.total);
+}
+window.completeRest=function(bi,idx){ finishRest(bi,idx); };
 function prescribedCount(rx){const m=(rx||'').match(/^(\d+)\s*x/i);return m?Math.max(1,+m[1]):1}
 function prescribedReps(rx){const m=(rx||'').match(/x\s*(\d+)/i);return m?m[1]:''}
 function ensureSets(e){
@@ -1790,6 +1839,7 @@ function moveTabIndicator(name){
   ind.style.transform=`translateX(${btn.offsetLeft}px)`;
 }
 function showTab(name){
+  document.body.classList.remove('workout-active');
   document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('active',s.id==='screen-'+name));
   document.querySelectorAll('#tabbar button[data-tab]').forEach(b=>b.classList.toggle('on',b.dataset.tab===name));
   moveTabIndicator(name);
