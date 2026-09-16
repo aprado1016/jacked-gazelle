@@ -38,16 +38,6 @@ input:focus,textarea:focus{border-color:var(--blue)}
 ::placeholder{color:var(--faint)}
 .glass{background:var(--panel);border:1px solid var(--glass-brd);-webkit-backdrop-filter:blur(var(--blur)) saturate(150%);backdrop-filter:blur(var(--blur)) saturate(150%);box-shadow:var(--shadow)}
 
-/* ---------- Header ---------- */
-header{position:sticky;top:0;z-index:40;background:rgba(242,236,224,.72);-webkit-backdrop-filter:blur(16px) saturate(160%);backdrop-filter:blur(16px) saturate(160%);border-bottom:1px solid var(--line);padding:calc(env(safe-area-inset-top) + 10px) 14px 12px}
-.brand{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
-.brand>div:first-child{min-width:0}
-.brand h1{font-family:var(--disp);font-weight:800;font-size:clamp(17px,5.4vw,24px);letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}
-.brand h1 em{font-style:normal;color:var(--gold)}
-.brand .sub{font-family:var(--disp);font-size:10px;letter-spacing:.2em;color:var(--faint);text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.toolbtn{font-family:var(--disp);font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--blue);padding:6px 2px;white-space:nowrap}
-.hbtns{display:flex;gap:13px;flex-shrink:0}
-.toolbtn.hi{color:var(--gold)}
 .bigbtn{width:100%;padding:15px;border-radius:14px;font-family:var(--disp);font-weight:700;font-size:17px;letter-spacing:.1em;text-transform:uppercase;background:var(--panel2);border:1px solid var(--line);color:var(--ink);margin-bottom:9px}
 .bigbtn.pri{background:linear-gradient(180deg,var(--done-a),var(--done-b));border-color:var(--done-a);color:var(--done-ink)}
 .themegrid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}
@@ -61,15 +51,55 @@ header{position:sticky;top:0;z-index:40;background:rgba(242,236,224,.72);-webkit
 .selpill .lab{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--faint);display:block}
 .selpill .val{font-family:var(--disp);font-size:19px;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
 .selpill .car{color:var(--faint);font-size:11px}
-.dayrail{display:flex;gap:6px;overflow-x:auto;padding:2px 0 12px;scrollbar-width:none}
-.dayrail::-webkit-scrollbar{display:none}
-.daychip{min-width:66px;background:var(--panel);border:1px solid var(--glass-brd);border-radius:14px;padding:7px 6px 6px;text-align:center;position:relative;flex-shrink:0;-webkit-backdrop-filter:blur(var(--blur));backdrop-filter:blur(var(--blur))}
-.daychip .d{font-family:var(--disp);font-weight:700;font-size:17px;letter-spacing:.05em}
-.daychip .f{font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:.05em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
-.daychip.on{border-color:var(--blue);background:linear-gradient(180deg,var(--sel-a),var(--sel-b))}
-.daychip.on .d{color:var(--blue)}
-.daychip .dot{position:absolute;top:5px;right:6px;width:6px;height:6px;border-radius:50%;background:var(--green);display:none}
-.daychip.done .dot{display:block}
+
+/* ---------- Home dashboard ---------- */
+.hero{margin:0 0 -34px;height:min(38vh,240px);overflow:hidden;position:relative}
+.hero svg{width:100%;height:calc(100% + 34px);display:block}
+.herocard{margin:0 14px 4px;padding:16px;border-radius:20px;position:relative;background:var(--panel);border:1px solid var(--glass-brd);box-shadow:var(--shadow);-webkit-backdrop-filter:blur(var(--blur)) saturate(150%);backdrop-filter:blur(var(--blur)) saturate(150%)}
+.herotop .sub{font-family:var(--disp);font-size:10px;letter-spacing:.2em;color:var(--faint);text-transform:uppercase}
+.herocard h1{font-family:var(--disp);font-weight:800;font-size:clamp(20px,6vw,27px);letter-spacing:.03em;text-transform:uppercase;margin:1px 0 12px}
+.herocard h1 em{font-style:normal;color:var(--gold)}
+.heroprogwrap{display:flex;flex-direction:column;gap:6px}
+.heroprogbar{height:8px;border-radius:99px;background:var(--panel2);border:1px solid var(--line);overflow:hidden}
+.heroprogbar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--blue-deep),var(--blue));transition:width .3s}
+.heroproglbl{font-size:12px;color:var(--dim)}
+.dashtitle{margin:20px 14px 0;font-family:var(--disp);font-weight:800;font-size:20px;letter-spacing:.05em;text-transform:uppercase}
+.schedrow{display:flex;align-items:center;gap:12px;padding:13px 14px}
+.schedimg{width:56px;height:56px;border-radius:14px;flex-shrink:0;overflow:hidden}
+.schedimg svg{width:100%;height:100%;display:block}
+.schedmid{flex:1;min-width:0}
+.schedtag{display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+.schedtag i{width:7px;height:7px;border-radius:50%;background:var(--blue);display:inline-block}
+.schedname{font-weight:700;font-size:16px;margin-top:2px}
+.schedcheck{flex-shrink:0;width:30px;height:30px;border-radius:50%;border:2px solid var(--line);display:flex;align-items:center;justify-content:center;color:transparent;font-size:15px}
+.schedcheck.on{border-color:var(--done-a);background:linear-gradient(180deg,var(--done-a),var(--done-b));color:var(--done-ink)}
+.schedrest{padding:20px 14px;text-align:center;color:var(--dim)}
+.actbody{padding:14px}
+.actrow{display:flex;justify-content:space-between;align-items:center}
+.actlab{font-family:var(--disp);font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
+.actsub{font-size:11px;color:var(--faint);margin-top:2px}
+.actring{position:relative;width:64px;height:64px;flex-shrink:0}
+.actring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.actring .num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--disp);font-weight:800;font-size:20px}
+.actdiv{margin:14px 0;border-top:1px solid var(--line)}
+.actweek{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+.actweek b{font-family:var(--disp);font-size:16px}
+.actbar{height:9px;border-radius:99px;background:var(--panel2);border:1px solid var(--line);overflow:hidden}
+.actbar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--blue-deep),var(--blue))}
+
+/* ---------- Workout detail screen ---------- */
+.wktopbar{position:sticky;top:0;z-index:40;background:rgba(242,236,224,.78);-webkit-backdrop-filter:blur(16px) saturate(160%);backdrop-filter:blur(16px) saturate(160%);border-bottom:1px solid var(--line);padding:calc(env(safe-area-inset-top) + 10px) 14px 10px}
+.wktopbar button{font-family:var(--disp);font-size:14px;letter-spacing:.1em;text-transform:uppercase;color:var(--blue);font-weight:700}
+
+/* ---------- Vertical day list (Plan) ---------- */
+.daylist{display:flex;flex-direction:column;gap:8px;padding:2px 14px 12px}
+.dayrow{display:flex;align-items:center;gap:12px;background:var(--panel);border:1px solid var(--glass-brd);border-radius:16px;padding:12px 14px;text-align:left;-webkit-backdrop-filter:blur(var(--blur));backdrop-filter:blur(var(--blur))}
+.dayrow .d{font-family:var(--disp);font-weight:800;font-size:19px;letter-spacing:.05em;width:38px;flex-shrink:0}
+.dayrow .f{flex:1;font-size:14px;font-weight:600;color:var(--dim);text-transform:uppercase;letter-spacing:.03em}
+.dayrow.on{border-color:var(--blue);background:linear-gradient(180deg,var(--sel-a),var(--sel-b))}
+.dayrow.on .d{color:var(--blue)}
+.dayrow .dot{width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0;visibility:hidden}
+.dayrow.done .dot{visibility:visible}
 
 /* ---------- Screens & tab bar ---------- */
 .screen{display:none}
@@ -276,17 +306,49 @@ header{position:sticky;top:0;z-index:40;background:rgba(242,236,224,.72);-webkit
 </head>
 <body>
 
-<header>
-  <div class="brand">
-    <div>
-      <div class="sub">Terminator Training Method</div>
-      <h1>Jacked Gazelle <em>2.0</em></h1>
-    </div>
-  </div>
-</header>
-
 <div class="screens">
   <section class="screen active" id="screen-home">
+    <div class="hero">
+      <svg viewBox="0 0 400 220" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <defs>
+          <linearGradient id="heroGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#3C5744"/><stop offset="1" stop-color="#1F2E24"/>
+          </linearGradient>
+        </defs>
+        <rect width="400" height="220" fill="url(#heroGrad)"/>
+        <g stroke="#EFE7D6" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity=".92">
+          <circle cx="200" cy="60" r="16" fill="#EFE7D6" stroke="none"/>
+          <path d="M200 76 L200 130"/>
+          <path d="M200 90 L172 118 L160 150"/>
+          <path d="M200 90 L228 118 L240 150"/>
+          <path d="M200 130 L182 190"/>
+          <path d="M200 130 L218 190"/>
+          <path d="M112 118 H288" stroke-width="8"/>
+          <path d="M126 104 v28 M138 100 v36" stroke-width="7"/>
+          <path d="M274 104 v28 M262 100 v36" stroke-width="7"/>
+        </g>
+      </svg>
+    </div>
+    <div class="herocard">
+      <div class="herotop"><span class="sub">Terminator Training Method</span></div>
+      <h1>Jacked Gazelle <em>2.0</em></h1>
+      <div class="heroprogwrap">
+        <div class="heroprogbar"><i id="heroProgFill"></i></div>
+        <span id="heroProgLbl" class="heroproglbl">Day 1 of 56</span>
+      </div>
+    </div>
+
+    <div class="dashtitle">Today's Schedule</div>
+    <div class="card schedcard" id="schedCard"></div>
+
+    <div class="dashtitle">Activities Completed</div>
+    <div class="card actcard" id="actCard"></div>
+  </section>
+
+  <section class="screen" id="screen-workout">
+    <div class="wktopbar">
+      <button id="wkBack">&#8592;&nbsp; Back</button>
+    </div>
     <main id="main"></main>
   </section>
 
@@ -296,8 +358,7 @@ header{position:sticky;top:0;z-index:40;background:rgba(242,236,224,.72);-webkit
       <button class="selpill" id="phasePill"><span><span class="lab">Phase</span><span class="val" id="phaseVal">Phase 1</span></span><span class="car">&#9662;</span></button>
       <button class="selpill" id="weekPill"><span><span class="lab">Week</span><span class="val" id="weekVal">Week 1</span></span><span class="car">&#9662;</span></button>
     </div>
-    <div class="dayrail" id="dayrail" style="margin:0 14px;padding:12px 0"></div>
-    <div id="planPreview"></div>
+    <div class="daylist" id="dayrail"></div>
   </section>
 
   <section class="screen" id="screen-progress">
@@ -869,7 +930,7 @@ async function setDone(v){
   dayData.done=v; scheduleSave();
   toast(v?'Day complete \u2713':'Marked incomplete');
   doneIdx[kDay()]=v; await sSet('doneidx',doneIdx);
-  renderDayRail(); renderDoneUI();
+  renderDayRail(); renderDoneUI(); renderHome();
 }
 
 /* =============== RENDER =============== */
@@ -887,14 +948,77 @@ function renderDayRail(){
   const rail=$('dayrail'); rail.innerHTML='';
   wk().forEach((d,i)=>{
     const b=document.createElement('button');
-    b.className='daychip'+(i===S.d?' on':'')+(doneIdx[`log:${S.p}-${S.w}-${i}`]?' done':'');
-    b.innerHTML=`<span class="dot"></span><div class="d">D${i+1}</div><span class="f">${d.rest?'Rest':d.f}</span>`;
-    b.onclick=()=>{go({d:i}); showTab('home')};
+    b.className='dayrow'+(i===S.d?' on':'')+(doneIdx[`log:${S.p}-${S.w}-${i}`]?' done':'');
+    b.innerHTML=`<span class="d">D${i+1}</span><span class="f">${d.rest?'Rest':d.f}</span><span class="dot"></span>`;
+    b.onclick=async()=>{await go({d:i}); openWorkout('plan')};
     rail.appendChild(b);
   });
-  const pv=$('planPreview');
-  if(pv) pv.innerHTML='<div class="plancard tool">Tap a day above to open its workout on Home.</div>';
 }
+const heroIconSVG=`<svg viewBox="0 0 100 100" aria-hidden="true"><rect width="100" height="100" fill="#2A3B30"/><g stroke="#EFE7D6" stroke-width="4.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="50" cy="24" r="7" fill="#EFE7D6" stroke="none"/><path d="M50 31 L50 55"/><path d="M50 38 L36 52 L30 68"/><path d="M50 38 L64 52 L70 68"/><path d="M50 55 L40 84"/><path d="M50 55 L60 84"/><path d="M18 52 H82" stroke-width="6"/><path d="M25 45 v14 M32 43 v18" stroke-width="5"/><path d="M75 45 v14 M68 43 v18" stroke-width="5"/></g></svg>`;
+function renderHome(){
+  const prog=programProgress();
+  $('heroProgFill').style.width=prog.pct+'%';
+  $('heroProgLbl').textContent=`Day ${prog.day} of ${prog.total}`;
+
+  const d=dy(), sc=$('schedCard');
+  if(d.rest){
+    sc.innerHTML=`<div class="schedrest">Rest day &mdash; nothing scheduled.</div>`;
+  } else {
+    sc.innerHTML=`<button class="schedrow" id="schedOpen" style="width:100%">
+      <div class="schedimg">${heroIconSVG}</div>
+      <div class="schedmid">
+        <div class="schedtag"><i></i>${phTag()}</div>
+        <div class="schedname">${esc(d.f)}</div>
+      </div>
+      <span class="schedcheck${dayData.done?' on':''}" id="schedCheck">&#10003;</span>
+    </button>`;
+    $('schedOpen').onclick=()=>openWorkout('home');
+    $('schedCheck').onclick=(e)=>{e.stopPropagation();setDone(!dayData.done)};
+  }
+
+  const wp=weekProgress(), allTime=Object.values(doneIdx).filter(Boolean).length;
+  const totalNonRest=P.phases.reduce((a,ph)=>a+ph.weeks.reduce((b,w)=>b+w.filter(x=>!x.rest).length,0),0)||1;
+  const pct=Math.min(100,Math.round(allTime/totalNonRest*100));
+  const C2=2*Math.PI*27;
+  $('actCard').innerHTML=`<div class="actbody">
+    <div class="actrow">
+      <div><div class="actlab">Total Activities</div><div class="actsub">All Time</div></div>
+      <div class="actring"><svg viewBox="0 0 64 64">
+        <circle cx="32" cy="32" r="27" fill="none" stroke="var(--panel2)" stroke-width="7"/>
+        <circle cx="32" cy="32" r="27" fill="none" stroke="var(--blue)" stroke-width="7" stroke-linecap="round"
+          stroke-dasharray="${C2}" stroke-dashoffset="${C2*(1-pct/100)}"/>
+      </svg><span class="num">${allTime}</span></div>
+    </div>
+    <div class="actdiv"></div>
+    <div class="actweek"><span class="actlab">This Week &middot; Week ${S.w+1}</span><b>Workouts ${wp.done}/${wp.total}</b></div>
+    <div class="actbar"><i style="width:${wp.total?Math.round(wp.done/wp.total*100):0}%"></i></div>
+  </div>`;
+}
+function programProgress(){
+  let before=0, total=0;
+  P.phases.forEach((phase,pi)=>{
+    const days=phase.weeks.length*7;
+    if(pi<S.p) before+=days;
+    else if(pi===S.p) before+=S.w*7+S.d+1;
+    total+=days;
+  });
+  return {day:before, total, pct:total?Math.min(100,Math.round(before/total*100)):0};
+}
+function weekProgress(){
+  const days=wk();
+  const total=days.filter(x=>!x.rest).length;
+  const done=days.reduce((n,x,i)=>n+(!x.rest&&doneIdx[`log:${S.p}-${S.w}-${i}`]?1:0),0);
+  return {done,total};
+}
+let backTarget='home';
+function openWorkout(from){
+  backTarget=from||'home';
+  document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('active',s.id==='screen-workout'));
+  document.querySelectorAll('#tabbar button[data-tab]').forEach(b=>b.classList.toggle('on',b.dataset.tab==='home'));
+  renderDay();
+  window.scrollTo({top:0});
+}
+$('wkBack').onclick=()=>showTab(backTarget);
 function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;')}
 function renderDay(){
   const m=$('main'); const d=dy();
@@ -1192,6 +1316,7 @@ $('pcW').oninput=calcPlates;$('pcB').oninput=calcPlates;
 function showTab(name){
   document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('active',s.id==='screen-'+name));
   document.querySelectorAll('#tabbar button[data-tab]').forEach(b=>b.classList.toggle('on',b.dataset.tab===name));
+  if(name==='home')renderHome();
   if(name==='progress')openProg();
   if(name==='plan'){renderHeader();renderDayRail();}
 }
@@ -1645,7 +1770,7 @@ if('serviceWorker' in navigator&&location.protocol==='https:'){
   if(S.w>=ph().weeks.length)S.w=0;
   if(S.d>=7)S.d=0;
   await loadDay();
-  renderHeader();renderDayRail();renderDay();
+  renderHeader();renderDayRail();renderDay();renderHome();
   syncTools();
 })();
 window.addEventListener('pagehide',()=>{if(dirty)saveDay()});
