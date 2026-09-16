@@ -139,9 +139,9 @@ input:focus,textarea:focus{border-color:var(--blue)}
 .logtimerow span{font-weight:700;font-size:15px;color:var(--tink);font-variant-numeric:tabular-nums;flex-shrink:0}
 .logprogbar{flex:1;height:3px;border-radius:99px;background:rgba(255,255,255,.07);overflow:hidden}
 .logprogbar i{display:block;height:100%;width:0;background:var(--tfaint);transition:width .4s}
-.logscreen{background:var(--tbg);min-height:100%;padding-bottom:40px}
+.logscreen{background:var(--tbg);min-height:100%;padding-top:1px;padding-bottom:calc(env(safe-area-inset-bottom) + 120px)}
 .logsectitle{margin:20px 14px 10px;font-weight:700;font-size:17px;color:var(--tink)}
-.logcard{background:var(--tpanel);border:1px solid var(--tline);border-radius:20px;margin:0 14px 14px;padding:14px}
+.logcard{background:var(--tpanel);border:1px solid var(--tline);border-radius:20px;margin:0 14px 24px;padding:14px}
 .logexhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:8px}
 .logtag{display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--tfaint);min-width:0}
 .logtag i{width:15px;height:15px;border:1px solid var(--tfaint);border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-style:normal;font-size:10px;color:var(--tfaint);flex-shrink:0}
@@ -171,9 +171,10 @@ input:focus,textarea:focus{border-color:var(--blue)}
 .logstep{position:absolute;right:2px;top:2px;bottom:2px;display:flex;flex-direction:column;justify-content:center}
 .logstep button{width:20px;height:14px;color:var(--tfaint);font-size:8px;display:flex;align-items:center;justify-content:center}
 .logprev{font-size:12px;color:var(--tfaint);text-align:center}
-.logrest{display:flex;align-items:center;gap:10px;margin-top:2px}
-.logrestplay{width:34px;height:34px;border-radius:10px;background:var(--tpanel2);border:1px solid var(--tline);color:var(--tink);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.logrest span{font-size:14px;color:var(--tdim)}
+.logrest{display:flex;align-items:center;gap:10px;margin-top:18px}
+.logrestplay{width:34px;height:34px;border-radius:10px;background:var(--tpanel2);border:1px solid var(--tline);color:var(--tink);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:opacity .25s}
+.logrest span{font-size:14px;color:var(--tdim);transition:opacity .25s}
+.logrest.dimmed .logrestplay,.logrest.dimmed span{opacity:.4}
 .restrow{display:flex;align-items:center;gap:14px;margin-top:4px;margin-bottom:10px}
 .restring{position:relative;width:52px;height:52px;flex-shrink:0}
 .restring svg{width:100%;height:100%;transform:rotate(-90deg)}
@@ -181,6 +182,13 @@ input:focus,textarea:focus{border-color:var(--blue)}
 .restlabel{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--tfaint)}
 .resttime{font-size:22px;font-weight:800;color:var(--tink);font-variant-numeric:tabular-nums;margin-top:1px}
 .restcomplete{width:100%;background:#F2ECE0;color:#17130F;border-radius:14px;padding:13px;font-weight:700;font-size:13px;letter-spacing:.05em;text-transform:uppercase;display:flex;align-items:center;justify-content:center;gap:6px}
+.restfloat{position:fixed;left:14px;right:14px;bottom:calc(env(safe-area-inset-bottom) + 18px);z-index:70;background:#211D17;border:1px solid var(--tline);border-radius:24px;padding:16px 18px;box-shadow:0 16px 40px rgba(0,0,0,.5);display:none}
+.restfloat.show{display:block}
+.restfloat .restrow{margin:0}
+.restfloat .restring{width:60px;height:60px}
+.restfloat .resttime{font-size:26px}
+.restfloat .restcomplete{display:none;margin-top:16px}
+.restfloat.paused .restcomplete{display:flex}
 .logdayfoot{padding:6px 14px 30px}
 .logdaynote{width:100%;min-height:70px;padding:12px;border-radius:14px;background:var(--tpanel2);border:1px solid var(--tline);color:var(--tink);font-size:14px}
 .logdonebtn{width:100%;margin-top:10px;padding:15px;border-radius:14px;font-weight:700;font-size:15px;letter-spacing:.06em;text-transform:uppercase;background:var(--tpanel2);border:1px solid var(--tline);color:var(--tink)}
@@ -213,6 +221,7 @@ input:focus,textarea:focus{border-color:var(--blue)}
 .screen{display:none}
 .screen.active{display:block}
 body.workout-active .tabbar{display:none}
+body.workout-active{padding-bottom:0;background:var(--tbg)}
 .tabbar{position:fixed;left:10px;right:10px;bottom:calc(env(safe-area-inset-bottom) + 8px);z-index:70;height:var(--tabbar-h);
   background:rgba(255,255,255,.55);border:1px solid var(--glass-brd);border-radius:22px;box-shadow:var(--shadow);
   -webkit-backdrop-filter:blur(22px) saturate(160%);backdrop-filter:blur(22px) saturate(160%);
@@ -445,6 +454,16 @@ body.workout-active .tabbar{display:none}
     </div>
     <main id="main"></main>
     <div class="wkstartbar" id="wkStartBar"><button class="startbtn2" id="wkStart">&#9654;&nbsp; Start</button></div>
+    <div class="restfloat" id="restFloat">
+      <div class="restrow">
+        <div class="restring"><svg viewBox="0 0 60 60">
+          <circle cx="30" cy="30" r="26" fill="none" stroke="var(--tpanel2)" stroke-width="5"/>
+          <circle id="restFloatRing" cx="30" cy="30" r="26" fill="none" stroke="var(--tink)" stroke-width="5" stroke-linecap="round" stroke-dasharray="163.36" stroke-dashoffset="0"/>
+        </svg><button id="restFloatBtn" onclick="toggleFloatingRestPause()"></button></div>
+        <div><div class="restlabel">Rest</div><div class="resttime" id="restFloatTime">00:00</div></div>
+      </div>
+      <button class="restcomplete" onclick="completeFloatingRest()">&#10003;&nbsp; Complete</button>
+    </div>
   </section>
 
   <div class="grwrap" id="grWrap">
@@ -1203,7 +1222,8 @@ function weekProgress(){
 let backTarget='home';
 let inLogView=false;
 function clearAllRestTimers(){
-  Object.values(restState).forEach(st=>{if(st.timer)clearInterval(st.timer)});
+  if(floatRest){ clearInterval(floatRest.timer); dimRestBtn(floatRest.bi,floatRest.idx,false); floatRest=null; }
+  hideFloatingRest();
 }
 function openWorkout(from){
   backTarget=from||'home';
@@ -1494,6 +1514,7 @@ function renderDayLog(){
   if(WKOPT.expand){
     d.blocks.forEach((b,bi)=>b.ex.forEach((e,ei)=>renderLogger(bi,ei)));
   }
+  if(floatRest) dimRestBtn(floatRest.bi,floatRest.idx,true);
   updateWkProgress();
 }
 
@@ -1514,49 +1535,69 @@ function restSecondsFor(b){
   m=t.match(/(\d+)\s*sec/i); if(m)return +m[1];
   return 90;
 }
-const restState={};
 const REST_C2=2*Math.PI*26;
 function restCompactHTML(bi,idx,secs){
-  return `<button class="logrestplay" onclick="toggleRest(${bi},${idx})">${PLAY_SVG}</button><span>Rest ${fmtMMSS(secs)}</span>`;
+  return `<button class="logrestplay" onclick="openFloatingRest(${bi},${idx})">${PLAY_SVG}</button><span>Rest ${fmtMMSS(secs)}</span>`;
 }
-function restActiveHTML(bi,idx,remaining,total){
-  const key=`${bi}-${idx}`;
-  return `<div class="restrow">
-    <div class="restring"><svg viewBox="0 0 60 60">
-      <circle cx="30" cy="30" r="26" fill="none" stroke="var(--tpanel2)" stroke-width="5"/>
-      <circle id="restring-${key}" cx="30" cy="30" r="26" fill="none" stroke="var(--tink)" stroke-width="5" stroke-linecap="round"
-        stroke-dasharray="${REST_C2}" stroke-dashoffset="${REST_C2*(1-remaining/total)}"/>
-    </svg><button onclick="toggleRest(${bi},${idx})">${PAUSE_SVG}</button></div>
-    <div><div class="restlabel">Rest</div><div class="resttime" id="resttime-${key}">${fmtMMSS(remaining)}</div></div>
-  </div>
-  <button class="restcomplete" onclick="completeRest(${bi},${idx})">&#10003;&nbsp; Complete</button>`;
+let floatRest=null;
+function dimRestBtn(bi,idx,on){
+  const wrap=$(`restwrap-${bi}-${idx}`);
+  if(wrap) wrap.classList.toggle('dimmed',on);
 }
-window.toggleRest=function(bi,idx){
-  const key=`${bi}-${idx}`, wrap=$(`restwrap-${key}`);
-  let st=restState[key];
-  if(!st){ const b=dy().blocks[bi]; const total=restSecondsFor(b); st=restState[key]={remaining:total,total,running:false,timer:null}; }
-  if(st.running){
-    clearInterval(st.timer); st.timer=null; st.running=false;
-    wrap.innerHTML=restCompactHTML(bi,idx,st.remaining);
-    return;
-  }
-  st.running=true;
-  wrap.innerHTML=restActiveHTML(bi,idx,st.remaining,st.total);
-  st.timer=setInterval(()=>{
-    st.remaining--;
-    if(st.remaining<=0){ finishRest(bi,idx); return; }
-    const ring=$(`restring-${key}`), t=$(`resttime-${key}`);
-    if(ring) ring.style.strokeDashoffset=REST_C2*(1-st.remaining/st.total);
-    if(t) t.textContent=fmtMMSS(st.remaining);
+function updateFloatRestUI(){
+  if(!floatRest)return;
+  const ring=$('restFloatRing'), t=$('restFloatTime');
+  if(ring) ring.style.strokeDashoffset=REST_C2*(1-floatRest.remaining/floatRest.total);
+  if(t) t.textContent=fmtMMSS(floatRest.remaining);
+}
+function showFloatingRest(){
+  const el=$('restFloat'); if(!el)return;
+  el.classList.add('show');
+  el.classList.remove('paused');
+  updateFloatRestUI();
+}
+function hideFloatingRest(){
+  const el=$('restFloat'); if(el){el.classList.remove('show'); el.classList.remove('paused');}
+}
+function startFloatRestTick(){
+  if(!floatRest)return;
+  floatRest.running=true;
+  const el=$('restFloat'); if(el)el.classList.remove('paused');
+  const btn=$('restFloatBtn'); if(btn)btn.innerHTML=PAUSE_SVG;
+  clearInterval(floatRest.timer);
+  floatRest.timer=setInterval(()=>{
+    floatRest.remaining--;
+    if(floatRest.remaining<=0){ finishFloatRest(); return; }
+    updateFloatRestUI();
   },1000);
-};
-function finishRest(bi,idx){
-  const key=`${bi}-${idx}`, st=restState[key]; if(!st)return;
-  clearInterval(st.timer); st.timer=null; st.running=false; st.remaining=st.total;
-  if(WKOPT.audio){tBeep(880,.18); if(navigator.vibrate)navigator.vibrate([150,80,150]);}
-  const wrap=$(`restwrap-${key}`); if(wrap) wrap.innerHTML=restCompactHTML(bi,idx,st.total);
 }
-window.completeRest=function(bi,idx){ finishRest(bi,idx); };
+function pauseFloatRestTick(){
+  if(!floatRest)return;
+  clearInterval(floatRest.timer); floatRest.timer=null; floatRest.running=false;
+  const el=$('restFloat'); if(el)el.classList.add('paused');
+  const btn=$('restFloatBtn'); if(btn)btn.innerHTML=PLAY_SVG;
+}
+window.toggleFloatingRestPause=function(){
+  if(!floatRest)return;
+  if(floatRest.running) pauseFloatRestTick(); else startFloatRestTick();
+};
+window.openFloatingRest=function(bi,idx){
+  if(floatRest){ clearInterval(floatRest.timer); dimRestBtn(floatRest.bi,floatRest.idx,false); }
+  const b=dy().blocks[bi], total=restSecondsFor(b);
+  floatRest={bi,idx,remaining:total,total,running:false,timer:null};
+  dimRestBtn(bi,idx,true);
+  showFloatingRest();
+  startFloatRestTick();
+};
+function finishFloatRest(){
+  if(!floatRest)return;
+  clearInterval(floatRest.timer);
+  if(WKOPT.audio){tBeep(880,.18); if(navigator.vibrate)navigator.vibrate([150,80,150]);}
+  dimRestBtn(floatRest.bi,floatRest.idx,false);
+  hideFloatingRest();
+  floatRest=null;
+}
+window.completeFloatingRest=function(){ finishFloatRest(); };
 function prescribedCount(rx){const m=(rx||'').match(/^(\d+)\s*x/i);return m?Math.max(1,+m[1]):1}
 function prescribedReps(rx){const m=(rx||'').match(/x\s*(\d+)/i);return m?m[1]:''}
 function ensureSets(e){
@@ -1628,11 +1669,12 @@ $('pauseResume').onclick=()=>{closeSheets(); startWkTimer()};
 $('pauseRestart').onclick=()=>{
   closeSheets();
   wkElapsedSec=0;
+  clearAllRestTimers();
   Object.values(dayData.sets).forEach(arr=>arr.forEach(s=>s.done=false));
   scheduleSave();
   if(inLogView){ renderDayLog(); startWkTimer(); }
 };
-$('pauseEnd').onclick=()=>{closeSheets(); pauseWkTimer(); showTab(backTarget)};
+$('pauseEnd').onclick=()=>{closeSheets(); pauseWkTimer(); clearAllRestTimers(); showTab(backTarget)};
 $('optAudio').onchange=e=>{WKOPT.audio=e.target.checked; sSet('wkopt',WKOPT)};
 $('optExpand').onchange=e=>{WKOPT.expand=e.target.checked; sSet('wkopt',WKOPT)};
 
