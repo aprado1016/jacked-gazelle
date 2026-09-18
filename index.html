@@ -28,6 +28,7 @@
   --disp:'Barlow Condensed',-apple-system,sans-serif;
   --body:-apple-system,BlinkMacSystemFont,'SF Pro Text',Segoe UI,Roboto,sans-serif;
   --tabbar-h:64px;
+  --vvb:0px;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html{background:var(--bg);height:100%}
@@ -124,7 +125,7 @@ input:focus,textarea:focus{border-color:var(--blue)}
 .pvkebab{flex-shrink:0;color:var(--faint);font-size:18px;padding:4px 6px;letter-spacing:1px}
 .pvgrouplab{padding:10px 14px 0;font-size:11px;letter-spacing:.1em;color:var(--gold);text-transform:uppercase}
 .wkendspacer{height:calc(var(--tabbar-h) + env(safe-area-inset-bottom) + 84px)}
-.wkstartbar{position:fixed;left:10px;right:10px;bottom:calc(var(--tabbar-h) + env(safe-area-inset-bottom) + 16px);z-index:60;display:none}
+.wkstartbar{position:fixed;left:10px;right:10px;bottom:calc(var(--vvb) + var(--tabbar-h) + env(safe-area-inset-bottom) + 16px);z-index:60;display:none}
 .wkstartbar.show{display:block}
 .startbtn2{width:100%;padding:17px;border-radius:16px;background:linear-gradient(180deg,#2B2620,#17130F);color:#F2ECE0;font-weight:700;font-size:16px;letter-spacing:.06em;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:var(--shadow)}
 
@@ -183,7 +184,7 @@ input:focus,textarea:focus{border-color:var(--blue)}
 .restlabel{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--tfaint)}
 .resttime{font-size:22px;font-weight:800;color:var(--tink);font-variant-numeric:tabular-nums;margin-top:1px}
 .restcomplete{width:100%;background:#F2ECE0;color:#17130F;border-radius:14px;padding:13px;font-weight:700;font-size:13px;letter-spacing:.05em;text-transform:uppercase;display:flex;align-items:center;justify-content:center;gap:6px}
-.restfloat{position:fixed;left:14px;right:14px;bottom:calc(env(safe-area-inset-bottom) + 18px);z-index:70;background:#211D17;border:1px solid var(--tline);border-radius:24px;padding:16px 18px;box-shadow:0 16px 40px rgba(0,0,0,.5);display:none}
+.restfloat{position:fixed;left:14px;right:14px;bottom:calc(var(--vvb) + env(safe-area-inset-bottom) + 18px);z-index:70;background:#211D17;border:1px solid var(--tline);border-radius:24px;padding:16px 18px;box-shadow:0 16px 40px rgba(0,0,0,.5);display:none}
 .restfloat.show{display:block}
 .restfloat .restrow{margin:0}
 .restfloat .restring{width:60px;height:60px}
@@ -229,7 +230,7 @@ input:focus,textarea:focus{border-color:var(--blue)}
 .screen.active{display:block}
 body.workout-active .tabbar{display:none}
 body.workout-active{padding-bottom:0;background:var(--tbg)}
-.tabbar{position:fixed;left:10px;right:10px;bottom:calc(env(safe-area-inset-bottom) + 8px);z-index:70;height:var(--tabbar-h);
+.tabbar{position:fixed;left:10px;right:10px;bottom:calc(var(--vvb) + env(safe-area-inset-bottom) + 8px);z-index:70;height:var(--tabbar-h);
   background:rgba(255,255,255,.55);border:1px solid var(--glass-brd);border-radius:22px;box-shadow:var(--shadow);
   -webkit-backdrop-filter:blur(22px) saturate(160%);backdrop-filter:blur(22px) saturate(160%);
   display:flex;align-items:stretch;justify-content:space-around;padding:4px}
@@ -1945,6 +1946,23 @@ window.addEventListener('resize',()=>{
   const on=document.querySelector('#tabbar button[data-tab].on');
   if(on) moveTabIndicator(on.dataset.tab);
 });
+/* iOS Safari doesn't always settle its collapsible toolbar's real visible
+   height before first paint, which leaves position:fixed bottom bars
+   floating too high (with a stray gap below them) until the next scroll or
+   resize forces a recompute. Track the gap ourselves via visualViewport so
+   fixed bottom bars sit correctly from the very first frame. */
+function syncViewportInset(){
+  if(!window.visualViewport)return;
+  const vv=window.visualViewport;
+  const gap=Math.max(0,Math.round(window.innerHeight-(vv.height+vv.offsetTop)));
+  document.documentElement.style.setProperty('--vvb',gap+'px');
+}
+if(window.visualViewport){
+  window.visualViewport.addEventListener('resize',syncViewportInset);
+  window.visualViewport.addEventListener('scroll',syncViewportInset);
+}
+window.addEventListener('pageshow',syncViewportInset);
+syncViewportInset();
 document.querySelectorAll('#tabbar button[data-tab]').forEach(b=>b.onclick=()=>showTab(b.dataset.tab));
 $('timerTab').onclick=()=>openSheet('quickTimerSheet');
 document.querySelectorAll('#quickTimerSheet [data-qt]').forEach(b=>b.onclick=()=>{
