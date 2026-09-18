@@ -32,7 +32,18 @@
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html{background:var(--bg);height:100%}
 html,body{color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.45}
-body{min-height:100vh;min-height:100dvh;padding-bottom:calc(var(--tabbar-h) + env(safe-area-inset-bottom) + 14px);overscroll-behavior-y:contain;background:radial-gradient(120% 60% at 15% -10%,rgba(255,255,255,.65),transparent 55%),radial-gradient(140% 70% at 100% 0%,rgba(180,121,30,.10),transparent 45%),var(--bg);background-attachment:fixed}
+body{min-height:100vh;min-height:100dvh;padding-bottom:calc(var(--tabbar-h) + env(safe-area-inset-bottom) + 14px);overscroll-behavior-y:contain;position:relative;
+  /* Fallback layer only — always sized to the real document, never fixed-attachment (iOS can
+     fail to paint a fixed-attachment background on the very first frame, leaving a bar of flat
+     unpainted color, close to but visibly not the gradient, until a later repaint fills it in).
+     #appbg below is the real, always-correctly-sized background; this just backs it up. */
+  background:radial-gradient(120% 60% at 15% -10%,rgba(255,255,255,.65),transparent 55%),radial-gradient(140% 70% at 100% 0%,rgba(180,121,30,.10),transparent 45%),var(--bg)}
+/* A real element (not a ::before/background-attachment:fixed) pinned to the viewport with
+   inset:0 so the browser's own containing-block math sizes it correctly under safe areas from
+   the first frame, independent of html/body's own height and any position:fixed timing quirk
+   iOS can have on cold load for other fixed chrome (e.g. the tab bar). Sits behind everything. */
+#appbg{position:fixed;inset:0;z-index:-1;
+  background:radial-gradient(120% 60% at 15% -10%,rgba(255,255,255,.65),transparent 55%),radial-gradient(140% 70% at 100% 0%,rgba(180,121,30,.10),transparent 45%),var(--bg)}
 button{font-family:inherit;border:none;background:none;color:inherit;cursor:pointer}
 input,textarea{font-family:inherit;color:var(--ink);background:var(--panel2);border:1px solid var(--line);border-radius:8px;outline:none}
 input:focus,textarea:focus{border-color:var(--blue)}
@@ -434,7 +445,7 @@ body.workout-active{padding-bottom:0;background:var(--tbg)}
 </style>
 </head>
 <body>
-
+<div id="appbg"></div>
 <div class="screens">
   <section class="screen active" id="screen-home">
     <div class="hero" id="heroBanner"></div>
@@ -1945,19 +1956,6 @@ window.addEventListener('resize',()=>{
   const on=document.querySelector('#tabbar button[data-tab].on');
   if(on) moveTabIndicator(on.dataset.tab);
 });
-/* iOS doesn't always settle its collapsible toolbar's real visible height
-   before first paint, which can leave position:fixed bottom bars sitting
-   too high until the next scroll forces a layout recompute. A single,
-   tiny, immediately-reversed scroll right after load forces that recompute
-   ourselves instead of waiting on the user to scroll — with no ongoing
-   listener, so it can't interfere with real scrolling afterward. */
-function settleViewport(){
-  const y=window.scrollY;
-  window.scrollTo(0,y+1);
-  requestAnimationFrame(()=>window.scrollTo(0,y));
-}
-window.addEventListener('load',settleViewport);
-window.addEventListener('pageshow',settleViewport);
 document.querySelectorAll('#tabbar button[data-tab]').forEach(b=>b.onclick=()=>showTab(b.dataset.tab));
 $('timerTab').onclick=()=>openSheet('quickTimerSheet');
 document.querySelectorAll('#quickTimerSheet [data-qt]').forEach(b=>b.onclick=()=>{
