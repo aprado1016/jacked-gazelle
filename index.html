@@ -33,17 +33,14 @@
 html{background:var(--bg);height:100%}
 html,body{color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.45}
 body{min-height:100vh;min-height:100dvh;padding-bottom:calc(var(--tabbar-h) + env(safe-area-inset-bottom) + 14px);overscroll-behavior-y:contain;position:relative;
-  /* Fallback layer only — always sized to the real document, never fixed-attachment (iOS can
-     fail to paint a fixed-attachment background on the very first frame, leaving a bar of flat
-     unpainted color, close to but visibly not the gradient, until a later repaint fills it in).
-     #appbg below is the real, always-correctly-sized background; this just backs it up. */
-  background:radial-gradient(120% 60% at 15% -10%,rgba(255,255,255,.65),transparent 55%),radial-gradient(140% 70% at 100% 0%,rgba(180,121,30,.10),transparent 45%),var(--bg)}
+  /* Flat, single color — no gradient layer to ever look like a mismatched band anywhere on
+     screen. Fallback only; #appbg below is the real, always-correctly-sized background. */
+  background:var(--bg)}
 /* A real element (not a ::before/background-attachment:fixed) pinned to the viewport with
    inset:0 so the browser's own containing-block math sizes it correctly under safe areas from
    the first frame, independent of html/body's own height and any position:fixed timing quirk
    iOS can have on cold load for other fixed chrome (e.g. the tab bar). Sits behind everything. */
-#appbg{position:fixed;inset:0;z-index:-1;
-  background:radial-gradient(120% 60% at 15% -10%,rgba(255,255,255,.65),transparent 55%),radial-gradient(140% 70% at 100% 0%,rgba(180,121,30,.10),transparent 45%),var(--bg)}
+#appbg{position:fixed;inset:0;z-index:-1;background:var(--bg)}
 button{font-family:inherit;border:none;background:none;color:inherit;cursor:pointer}
 input,textarea{font-family:inherit;color:var(--ink);background:var(--panel2);border:1px solid var(--line);border-radius:8px;outline:none}
 input:focus,textarea:focus{border-color:var(--blue)}
@@ -240,8 +237,8 @@ input:focus,textarea:focus{border-color:var(--blue)}
 .screen.active{display:block}
 body.workout-active .tabbar{display:none}
 body.workout-active{padding-bottom:0;background:var(--tbg)}
-.tabbar{position:fixed;left:10px;right:10px;bottom:calc(env(safe-area-inset-bottom) + 8px);z-index:70;height:var(--tabbar-h);
-  background:rgba(255,255,255,.55);border:1px solid var(--glass-brd);border-radius:22px;box-shadow:var(--shadow);
+.tabbar{position:fixed;left:10px;right:10px;bottom:max(env(safe-area-inset-bottom),8px);z-index:70;height:var(--tabbar-h);
+  background:rgba(255,255,255,.55);border:1px solid var(--glass-brd);border-radius:22px;box-shadow:0 4px 14px rgba(43,38,32,.12);
   -webkit-backdrop-filter:blur(22px) saturate(160%);backdrop-filter:blur(22px) saturate(160%);
   display:flex;align-items:stretch;justify-content:space-around;padding:4px}
 .tabbar button{position:relative;z-index:1;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border-radius:16px;color:var(--faint);transition:color .25s}
