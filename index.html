@@ -1328,9 +1328,83 @@ function dayTargets(d){
   if(!top.length) return d.cond?'Cardio':'Full Body';
   return top.join(' / ');
 }
+/* Pull a real duration out of a conditioning block's own text (warmup/main/cooldown clock
+   patterns, an explicit "NN minutes", a title's "— NN min", rep×rest hill-repeat
+   structure, etc.) instead of guessing — a flat +20 was wildly off for anything from a 30-minute
+   easy run up to a 100-minute long run. Returns null when nothing in the text can be trusted,
+   so callers can fall back to a flat estimate exactly as before. */
+function condMinutes(cond){
+  if(!cond) return null;
+  const title=stripTags(cond.t||'');
+  const lines=(cond.l||[]).map(stripTags);
+  const body=lines.join(' | ');
+  let m;
+
+  m=body.match(/(\d+)\s*-\s*(\d+)\s*minutes\b/i);
+  if(m) return (+m[1]+ +m[2])/2;
+  m=body.match(/(\d+)\s*minutes\b/i);
+  if(m) return +m[1];
+
+  m=title.match(/[—-]\s*(\d+)\s*min\b/i);
+  if(m) return +m[1];
+
+  m=body.match(/(\d+)\s*-\s*(\d+)\s*min(?:ute)?s?\s+(?:easy\s+)?run\b/i);
+  if(m && !/min(?:ute)?s?\s+easy\s+run\/?\s*walk\s*cool ?down/i.test(body)) return (+m[1]+ +m[2])/2;
+  m=body.match(/(\d+)\s*min(?:ute)?s?\s+(?:easy\s+)?run\b/i);
+  if(m){
+    const seg=lines.find(l=>l.toLowerCase().includes(m[0].toLowerCase()));
+    if(!seg || !/cool ?down|warm ?up/i.test(seg)) return +m[1];
+  }
+
+  if(!/warm ?up|\bwu\b|cool ?down|\bcd\b|tempo|interval/i.test(body)){
+    m=body.match(/(\d+)\s*-\s*(\d+)\s*min\b/i);
+    if(m) return (+m[1]+ +m[2])/2;
+  }
+
+  const wu=body.match(/(\d+):\d{2}\s*[^|]*\b(?:warm ?up|wu)\b/i)||body.match(/(\d+)\s*min\s*[^|]*\b(?:warm ?up|wu)\b/i);
+  const cd=body.match(/(\d+):\d{2}\s*[^|]*\b(?:cool ?down|cd)\b/i)||body.match(/(\d+)\s*min\s*[^|]*\b(?:cool ?down|cd)\b/i);
+  let main=null;
+  m=body.match(/(\d+)\s*x\s*(\d+):(\d{2})/i);
+  if(m) main=(+m[1])*(+m[2]+(+m[3])/60);
+  if(main===null){
+    m=body.match(/(\d+):(\d{2})\s*of\b/i);
+    if(m) main=+m[1]+(+m[2])/60;
+  }
+  if(main===null){
+    m=body.match(/(\d+):(\d{2})\s*(?:\w+\s+)?(?:tempo\s*run\b|@)/i);
+    if(m) main=+m[1]+(+m[2])/60;
+  }
+  if(main!==null) return (wu?+wu[1]:0)+main+(cd?+cd[1]:0);
+
+  let reps=title.match(/(\d+)\s*x\s*(\d+):(\d{2})/i);
+  let count=null, workSec=null;
+  if(reps){ count=+reps[1]; workSec=(+reps[2])*60+(+reps[3]); }
+  else{
+    reps=title.match(/(\d+)\s*x\s*(\d+)\s*sec\b/i);
+    if(reps){ count=+reps[1]; workSec=+reps[2]; }
+  }
+  if(reps){
+    const restM=body.match(/rest\s*(\d+):(\d{2})/i);
+    const restSec=restM?(+restM[1])*60+(+restM[2]):60;
+    let totalMin=(count*workSec+Math.max(0,count-1)*restSec)/60;
+    const cd2=body.match(/(\d+)\s*-\s*(\d+)\s*min\s*[^|]*(?:cool ?down|\bjog\b)/i);
+    if(cd2) totalMin+=(+cd2[1]+ +cd2[2])/2;
+    else{
+      const cd3=body.match(/(\d+)\s*min\s*[^|]*(?:cool ?down|\bjog\b)/i);
+      if(cd3) totalMin+=+cd3[1];
+    }
+    return totalMin;
+  }
+
+  return null;
+}
 function dayMinutes(d){
   const exCount=(d.blocks||[]).reduce((n,b)=>n+b.ex.length,0);
-  let mins=15+exCount*4; if(d.cond) mins+=20;
+  let mins=exCount>0?15+exCount*4:0;
+  if(d.cond){
+    const cm=condMinutes(d.cond);
+    mins+=(cm!=null)?cm:(exCount>0?20:35);
+  }
   return Math.max(20,Math.round(mins/5)*5);
 }
 function dayDescription(d){
