@@ -1,5 +1,6 @@
-const C='jg2-v23';
-const SHELL=['./','./index.html','./manifest.webmanifest','./icon-192.png','./icon-512.png','./hero.png'];
+const C='jg2-v24';
+const SHELL=['./','./index.html','./manifest.webmanifest','./icon-192.png','./icon-512.png','./hero.png',
+  './lower.jpg','./push.jpg','./pull.jpg','./full.jpg','./cardio.jpg','./ruck.jpg'];
 
 self.addEventListener('install',e=>{
   e.waitUntil(caches.open(C).then(c=>c.addAll(SHELL)));

@@ -1119,17 +1119,44 @@ function ensureHeroImage(){
   img.onload=()=>{ $('heroBanner').style.backgroundImage="url('hero.png'), linear-gradient(150deg,#4A6350,#26332A)"; };
   img.src='hero.png';
 }
-let schedImgOk=null;
-function applySchedImg(el){
-  if(!el)return;
-  if(schedImgOk===true){ el.style.backgroundImage="url('hero.png'), linear-gradient(150deg,#4A6350,#26332A)"; return; }
-  if(schedImgOk===false) return;
-  const img=new Image();
-  img.onload=()=>{ schedImgOk=true; el.style.backgroundImage="url('hero.png'), linear-gradient(150deg,#4A6350,#26332A)"; };
-  img.onerror=()=>{ schedImgOk=false; };
-  img.src='hero.png';
+/* Which of the six mood photos best represents a day's actual training, based on the same
+   muscle-group analysis already used for the target-area label — lower/push/pull for a
+   strength day dominated by that group, full for core/power/mixed work, cardio for a plain
+   running/interval day, ruck for a ruck. */
+const WK_PHOTOS={lower:'lower.jpg',push:'push.jpg',pull:'pull.jpg',full:'full.jpg',cardio:'cardio.jpg',ruck:'ruck.jpg'};
+const PHOTO_BUCKET={Quads:'lower',Hamstrings:'lower',Glutes:'lower',Calves:'lower',
+  Chest:'push',Shoulders:'push',Triceps:'push',
+  Back:'pull',Biceps:'pull',Traps:'pull',
+  Core:'full',Power:'full','Full Body':'full'};
+function dayPhotoCategory(d){
+  if(!(d.blocks&&d.blocks.length)){
+    if(d.cond){
+      const t=(stripTags(d.cond.t||'')+' '+(d.cond.l||[]).join(' ')).toLowerCase();
+      if(/\bruck/.test(t)) return 'ruck';
+    }
+    return d.cond?'cardio':'full';
+  }
+  const counts={};
+  d.blocks.forEach(b=>b.ex.forEach(e=>{
+    const bucket=PHOTO_BUCKET[classifyMuscle(e.n)]||'full';
+    counts[bucket]=(counts[bucket]||0)+1;
+  }));
+  let best='full',bestN=-1;
+  for(const k in counts) if(counts[k]>bestN){best=k;bestN=counts[k];}
+  return best;
 }
-function applyWkHero(el){ applySchedImg(el); }
+const photoImgOk={};
+function applyDayImg(el,cat){
+  if(!el)return;
+  const file=WK_PHOTOS[cat]||WK_PHOTOS.full;
+  const set=()=>{ el.style.backgroundImage=`url('${file}'), linear-gradient(150deg,#4A6350,#26332A)`; };
+  if(photoImgOk[file]===true){ set(); return; }
+  if(photoImgOk[file]===false) return;
+  const img=new Image();
+  img.onload=()=>{ photoImgOk[file]=true; set(); };
+  img.onerror=()=>{ photoImgOk[file]=false; };
+  img.src=file;
+}
 function renderHome(){
   ensureHeroImage();
   const d=dy(), sc=$('schedCard');
@@ -1149,7 +1176,7 @@ function renderHome(){
     </div>`;
     $('schedOpen').onclick=()=>openWorkout('home');
     $('schedCheck').onclick=(e)=>{e.stopPropagation();setDone(!dayData.done)};
-    applySchedImg($('schedImg'));
+    applyDayImg($('schedImg'),dayPhotoCategory(d));
   }
   buildActSkeleton();
   updateActivity();
@@ -1452,7 +1479,7 @@ function renderDay(){
   }
   h+=`<div class="wkendspacer"></div>`;
   m.innerHTML=h;
-  applyWkHero($('wkHero'));
+  applyDayImg($('wkHero'),dayPhotoCategory(d));
   $('wkStartBar').classList.add('show');
   $('wkStart').onclick=startWorkout;
 }
