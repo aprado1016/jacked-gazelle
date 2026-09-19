@@ -30,7 +30,12 @@
   --tabbar-h:64px;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html{background:var(--bg);height:100%}
+/* html deliberately has NO background of its own: per spec, when html's background is
+   transparent, the browser instead paints the whole canvas (including any overscroll/rubber-band
+   region beyond the document, and any gap a safe-area quirk leaves uncovered) using body's own
+   background — so that canvas always matches whichever theme is currently active instead of
+   being permanently stuck on the light cream color. */
+html{height:100%}
 html,body{color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.45}
 body{min-height:100vh;min-height:100dvh;padding-bottom:calc(var(--tabbar-h) + env(safe-area-inset-bottom) + 14px);overscroll-behavior-y:contain;position:relative;
   /* Flat, single color — no gradient layer to ever look like a mismatched band anywhere on
@@ -40,7 +45,8 @@ body{min-height:100vh;min-height:100dvh;padding-bottom:calc(var(--tabbar-h) + en
    inset:0 so the browser's own containing-block math sizes it correctly under safe areas from
    the first frame, independent of html/body's own height and any position:fixed timing quirk
    iOS can have on cold load for other fixed chrome (e.g. the tab bar). Sits behind everything. */
-#appbg{position:fixed;inset:0;z-index:-1;background:var(--bg)}
+#appbg{position:fixed;top:-100px;left:0;right:0;bottom:-100px;z-index:-1;background:var(--bg)}
+body.workout-active #appbg{background:var(--tbg)}
 button{font-family:inherit;border:none;background:none;color:inherit;cursor:pointer}
 input,textarea{font-family:inherit;color:var(--ink);background:var(--panel2);border:1px solid var(--line);border-radius:8px;outline:none}
 input:focus,textarea:focus{border-color:var(--blue)}
@@ -62,7 +68,7 @@ input:focus,textarea:focus{border-color:var(--blue)}
 .selpill .car{color:var(--faint);font-size:11px}
 
 /* ---------- Home dashboard ---------- */
-.hero{position:fixed;top:0;left:0;right:0;height:min(34vh,220px);z-index:0;
+.hero{position:fixed;top:-100px;left:0;right:0;height:calc(min(34vh,220px) + 100px);z-index:0;
   background-image:linear-gradient(150deg,#4A6350,#26332A);background-size:cover;background-position:center}
 .herospacer{height:min(34vh,220px)}
 .homecontent{position:relative;z-index:1;background:var(--bg)}
@@ -113,7 +119,7 @@ input:focus,textarea:focus{border-color:var(--blue)}
 .wktopbar.overlay button span{display:none}
 
 /* ---------- Workout preview ---------- */
-.wkhero{position:fixed;top:0;left:0;right:0;height:280px;z-index:0;background-image:linear-gradient(150deg,#4A6350,#26332A);background-size:cover;background-position:center}
+.wkhero{position:fixed;top:-100px;left:0;right:0;height:calc(280px + 100px);z-index:0;background-image:linear-gradient(150deg,#4A6350,#26332A);background-size:cover;background-position:center}
 .wkherospacer{height:280px}
 .wkbody{position:relative;z-index:1;background:var(--bg)}
 .wkinfo{padding:18px 16px 6px}
@@ -214,7 +220,7 @@ input:focus,textarea:focus{border-color:var(--blue)}
 .toggle input:checked+.slider:before{transform:translateX(18px)}
 
 /* ---------- Get-ready countdown ---------- */
-.grwrap{position:fixed;inset:0;z-index:96;background:radial-gradient(120% 70% at 50% -10%,rgba(255,255,255,.06),transparent 55%),var(--tbg);display:none;flex-direction:column;align-items:center;justify-content:center;color:var(--tink)}
+.grwrap{position:fixed;top:-100px;left:0;right:0;bottom:-100px;z-index:96;background:radial-gradient(120% 70% at 50% -10%,rgba(255,255,255,.06),transparent 55%),var(--tbg);display:none;flex-direction:column;align-items:center;justify-content:center;color:var(--tink)}
 .grwrap.on{display:flex}
 .grlabel{font-size:13px;letter-spacing:.2em;text-transform:uppercase;color:var(--tdim)}
 .grnum{font-weight:800;font-size:96px;line-height:1;margin-top:10px;font-variant-numeric:tabular-nums}
@@ -1494,6 +1500,7 @@ let grInterval=null;
 function startWorkout(){
   inLogView=true;
   wkElapsedSec=0;
+  document.body.classList.add('workout-active');
   const wrap=$('grWrap'); wrap.classList.add('on');
   let n=3; $('grNum').textContent=n; if(WKOPT.audio)tBeep(660,.08);
   clearInterval(grInterval);
