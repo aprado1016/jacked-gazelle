@@ -468,6 +468,8 @@ body.workout-active{padding-bottom:0;background:var(--tbg)}
     <div class="wktopbar" id="wkTopbar">
       <button id="wkBack">&#8592;<span>&nbsp;Back</span></button>
     </div>
+    <div class="wkhero" id="wkHero"></div>
+    <div class="wkherospacer" id="wkHeroSpacer"></div>
     <main id="main"></main>
     <div class="wkstartbar" id="wkStartBar"><button class="startbtn2" id="wkStart">&#9654;&nbsp; Start</button></div>
     <div class="restfloat" id="restFloat">
@@ -1436,15 +1438,15 @@ function renderDay(){
   document.body.classList.remove('workout-active');
   $('wkTopbar').style.display='';
   $('wkTopbar').classList.toggle('overlay', !d.rest);
+  $('wkHero').style.display=d.rest?'none':'';
+  $('wkHeroSpacer').style.display=d.rest?'none':'';
   if(d.rest){
     $('wkStartBar').classList.remove('show');
     m.innerHTML=`<div class="ticket"><div class="meta">${phTag()}</div><h2>Rest Day</h2></div>
     <div class="restday"><h3>Recover</h3><p>Training is only effective to the extent it's recovered from.<br>Sleep, eat, walk. That's the work today.</p></div>`;
     return;
   }
-  let h=`<div class="wkhero" id="wkHero"></div>
-  <div class="wkherospacer"></div>
-  <div class="wkbody">
+  let h=`<div class="wkbody">
   <div class="wkinfo">
     <div class="wklabel">Workout</div>
     <h1 class="wktitle">${esc(d.f)}</h1>
@@ -1547,6 +1549,8 @@ function renderDay_restBranch(m,d){
 }
 function renderDayLog(){
   $('wkTopbar').style.display='none';
+  $('wkHero').style.display='none';
+  $('wkHeroSpacer').style.display='none';
   $('wkStartBar').classList.remove('show');
   const m=$('main'); const d=dy();
   if(d.rest){ document.body.classList.remove('workout-active'); renderDay_restBranch(m,d); return; }
