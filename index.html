@@ -113,7 +113,7 @@ input:focus,textarea:focus{border-color:var(--blue)}
 .wktopbar.overlay button span{display:none}
 
 /* ---------- Workout preview ---------- */
-.wkhero{position:relative;height:280px;background-image:linear-gradient(150deg,#4A6350,#26332A);background-size:cover;background-position:center}
+.wkhero{position:relative;height:calc(280px + env(safe-area-inset-top));margin-top:calc(env(safe-area-inset-top) * -1);background-image:linear-gradient(150deg,#4A6350,#26332A);background-size:cover;background-position:center}
 .wkinfo{padding:18px 16px 6px}
 .wklabel{font-size:11px;letter-spacing:.14em;color:var(--faint);text-transform:uppercase;font-weight:600}
 .wktitle{font-weight:700;font-size:28px;line-height:1.1;margin:4px 0 18px;color:var(--ink)}
