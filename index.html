@@ -1123,10 +1123,15 @@ function renderDayRail(){
    no code change needed. Until then these probes fail silently and the CSS
    gradient fallback shows. */
 let heroImgChecked=false;
+/* A soft, deliberate fade for status-bar legibility, tuned to the hero's own box (which now
+   starts 100px above the visible screen, per the safe-area overextension) rather than left to
+   whatever tone the photo itself happens to have up there — smooth multi-stop so it blends
+   into the image instead of reading as a hard-edged band. */
+const HERO_SCRIM='linear-gradient(to bottom, rgba(0,0,0,.32) 0px, rgba(0,0,0,.16) 110px, rgba(0,0,0,.04) 200px, rgba(0,0,0,0) 280px)';
 function ensureHeroImage(){
   if(heroImgChecked)return; heroImgChecked=true;
   const img=new Image();
-  img.onload=()=>{ $('heroBanner').style.backgroundImage="url('hero.png'), linear-gradient(150deg,#4A6350,#26332A)"; };
+  img.onload=()=>{ $('heroBanner').style.backgroundImage=`${HERO_SCRIM}, url('hero.png'), linear-gradient(150deg,#4A6350,#26332A)`; };
   img.src='hero.png';
 }
 /* Which of the six mood photos best represents a day's actual training, based on the same
@@ -1159,7 +1164,7 @@ const photoImgOk={};
 function applyDayImg(el,cat){
   if(!el)return;
   const file=WK_PHOTOS[cat]||WK_PHOTOS.full;
-  const set=()=>{ el.style.backgroundImage=`url('${file}'), linear-gradient(150deg,#4A6350,#26332A)`; };
+  const set=()=>{ el.style.backgroundImage=`${HERO_SCRIM}, url('${file}'), linear-gradient(150deg,#4A6350,#26332A)`; };
   if(photoImgOk[file]===true){ set(); return; }
   if(photoImgOk[file]===false) return;
   const img=new Image();
