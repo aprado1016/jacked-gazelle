@@ -2503,8 +2503,9 @@ $('impFile').onchange=async()=>{
     if(obj.app!=='jg2'||!obj.data)throw 0;
     let n=0;
     for(const [k,v] of Object.entries(obj.data)){await sSetRaw(k,v);n++}
-    $('bkOut').innerHTML=`Restored <b>${n}</b> records. Reloading…`;
-    setTimeout(()=>location.reload(),900);
+    await boot();
+    showTab('home');
+    $('bkOut').innerHTML=`Restored <b>${n}</b> records.`;
   }catch(e){$('bkOut').innerHTML='That file isn\u2019t a Jacked Gazelle backup.'}
   $('impFile').value='';
 };
@@ -2513,7 +2514,7 @@ if('serviceWorker' in navigator&&location.protocol==='https:'){
 }
 
 /* =============== INIT =============== */
-(async function(){
+async function boot(){
   await loadState(); await loadDone();
   applyTheme((await sGet('theme'))||'cream',false); buildThemeGrid();
   exNotes=(await sGet('exnotes'))||{};
@@ -2529,7 +2530,8 @@ if('serviceWorker' in navigator&&location.protocol==='https:'){
   renderHeader();renderDayRail();refreshMain();renderHome();
   syncTools();
   moveTabIndicator('home');
-})();
+}
+boot();
 window.addEventListener('pagehide',()=>{if(dirty)saveDay()});
 </script>
 </body>
