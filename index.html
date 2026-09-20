@@ -36,7 +36,7 @@
    region beyond the document, and any gap a safe-area quirk leaves uncovered) using body's own
    background — so that canvas always matches whichever theme is currently active instead of
    being permanently stuck on the light cream color. */
-html{height:100%}
+html{height:100vh}
 html,body{color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.45}
 body{min-height:100vh;min-height:100dvh;padding-bottom:calc(var(--tabbar-h) + env(safe-area-inset-bottom) + 14px);overscroll-behavior-y:contain;position:relative;
   /* Flat, single color — no gradient layer to ever look like a mismatched band anywhere on
