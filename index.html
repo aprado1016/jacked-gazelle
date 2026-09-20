@@ -2105,6 +2105,29 @@ window.addEventListener('pageshow',syncBottomInset);
 syncBottomInset();
 document.querySelectorAll('#tabbar button[data-tab]').forEach(b=>b.onclick=()=>showTab(b.dataset.tab));
 
+/* On a true cold launch, iOS can size the standalone PWA's content view a good 30-40px
+   shorter than the real screen for the first couple of frames (confirmed on-device: reported
+   window.innerHeight/visualViewport.height BOTH read the short value, so syncBottomInset's own
+   gap check can't see this one — it's not a viewport-metric mismatch, it's the content view
+   itself being briefly short). Confirmed on-device that a real scroll gesture makes it settle
+   to the correct height. body's min-height:100vh means a short screen (Home with little
+   scheduled today, a rest day, etc.) may have zero natural overflow to scroll within, so this
+   temporarily forces extra height, scrolls into it and back, then restores it — guaranteeing a
+   real scroll delta happens regardless of how much content the current screen has. */
+function nudgeScrollSettle(){
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    const body=document.body, prevMinH=body.style.minHeight;
+    body.style.minHeight='calc(100vh + 24px)';
+    const y=window.scrollY;
+    window.scrollTo(0,y+3);
+    requestAnimationFrame(()=>{
+      window.scrollTo(0,y);
+      body.style.minHeight=prevMinH;
+      syncBottomInset();
+    });
+  }));
+}
+
 /* Read-only diagnostic readout for the "tab bar isn't flush with the bottom on cold launch"
    bug — never fed back into layout, just displayed, so it's safe to also refresh on 'scroll'
    (unlike syncBottomInset, which must not react to scroll). Toggle it on in Tools > Layout
@@ -2591,6 +2614,7 @@ async function boot(){
   renderHeader();renderDayRail();refreshMain();renderHome();
   syncTools();
   moveTabIndicator('home');
+  nudgeScrollSettle();
 }
 boot();
 window.addEventListener('pagehide',()=>{if(dirty)saveDay()});
