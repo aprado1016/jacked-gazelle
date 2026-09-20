@@ -48,6 +48,10 @@ body{min-height:100vh;min-height:100dvh;padding-bottom:calc(var(--tabbar-h) + en
    iOS can have on cold load for other fixed chrome (e.g. the tab bar). Sits behind everything. */
 #appbg{position:fixed;top:-100px;left:0;right:0;bottom:-100px;z-index:-1;background:var(--bg)}
 body.workout-active #appbg{background:var(--tbg)}
+#safeProbeT{position:fixed;top:0;left:0;height:0;padding-top:env(safe-area-inset-top);visibility:hidden;pointer-events:none}
+#safeProbeB{position:fixed;bottom:0;left:0;height:0;padding-bottom:env(safe-area-inset-bottom);visibility:hidden;pointer-events:none}
+.dbgoverlay{position:fixed;top:6px;left:6px;z-index:9999;background:rgba(0,0,0,.8);color:#5f5;font:10px/1.45 ui-monospace,Menlo,Consolas,monospace;padding:8px 10px;border-radius:8px;white-space:pre;pointer-events:none;display:none}
+.dbgoverlay.on{display:block}
 button{font-family:inherit;border:none;background:none;color:inherit;cursor:pointer}
 input,textarea{font-family:inherit;color:var(--ink);background:var(--panel2);border:1px solid var(--line);border-radius:8px;outline:none}
 input:focus,textarea:focus{border-color:var(--blue)}
@@ -449,6 +453,9 @@ body.workout-active{padding-bottom:0;background:var(--tbg)}
 </head>
 <body>
 <div id="appbg"></div>
+<div id="safeProbeT"></div>
+<div id="safeProbeB"></div>
+<pre class="dbgoverlay" id="dbgOverlay"></pre>
 <div class="screens">
   <section class="screen active" id="screen-home">
     <div class="hero" id="heroBanner"></div>
@@ -575,6 +582,11 @@ body.workout-active{padding-bottom:0;background:var(--tbg)}
         <input type="file" id="impFile" accept="application/json,.json" style="display:none">
         <div class="out" id="bkOut" style="margin-top:4px">Export saves every set, note and result to a file &mdash; keep it in Files or iCloud. Import restores it here or on a new phone. Your logs live only on this device, so back up every few weeks.</div>
       </div>
+      <div class="tool">
+        <h4>Layout Diagnostics</h4>
+        <label class="togglerow"><span>Show Debug Overlay<br><span class="out" style="font-size:12px">Live viewport &amp; safe-area numbers in the top-left corner. Turn on, then fully close the app (swipe it away) and reopen from the Home Screen icon to see the numbers from a true cold launch &mdash; screenshot it if something looks off.</span></span>
+          <span class="toggle"><input type="checkbox" id="optDebug"><span class="slider"></span></span></label>
+      </div>
     </div>
   </section>
 </div>
@@ -665,6 +677,15 @@ body.workout-active{padding-bottom:0;background:var(--tbg)}
 </div>
 
 <script>
+/* Show the debug overlay (if the toggle was left on) before anything else runs, so a cold
+   launch's very first frame is captured rather than only frames after boot() finishes. */
+try{
+  if(localStorage.getItem('jg2:debug')==='1'){
+    const el=document.getElementById('dbgOverlay');
+    if(el) el.classList.add('on');
+  }
+}catch(e){}
+
 /* =============== PROGRAM DATA =============== */
 const E=(n,rx,nt)=>({n,rx,nt});
 const REST={rest:true};
@@ -2075,6 +2096,7 @@ function syncBottomInset(){
   const vv=window.visualViewport;
   const gap=Math.max(0,Math.round(window.innerHeight-(vv.height+vv.offsetTop)));
   document.documentElement.style.setProperty('--vvb',gap+'px');
+  dbgUpdate();
 }
 if(window.visualViewport) window.visualViewport.addEventListener('resize',syncBottomInset);
 window.addEventListener('resize',syncBottomInset);
@@ -2082,6 +2104,39 @@ window.addEventListener('orientationchange',syncBottomInset);
 window.addEventListener('pageshow',syncBottomInset);
 syncBottomInset();
 document.querySelectorAll('#tabbar button[data-tab]').forEach(b=>b.onclick=()=>showTab(b.dataset.tab));
+
+/* Read-only diagnostic readout for the "tab bar isn't flush with the bottom on cold launch"
+   bug — never fed back into layout, just displayed, so it's safe to also refresh on 'scroll'
+   (unlike syncBottomInset, which must not react to scroll). Toggle it on in Tools > Layout
+   Diagnostics, force-quit the app, and reopen from the Home Screen icon; screenshot the
+   overlay next to the bug so the real device numbers can be read off instead of guessed at. */
+function dbgUpdate(){
+  const el=document.getElementById('dbgOverlay');
+  if(!el||!el.classList.contains('on'))return;
+  const vv=window.visualViewport;
+  const tb=document.getElementById('tabbar');
+  const tbRect=tb?tb.getBoundingClientRect():null;
+  const sat=getComputedStyle(document.getElementById('safeProbeT')).paddingTop;
+  const sab=getComputedStyle(document.getElementById('safeProbeB')).paddingBottom;
+  const standalone=(window.navigator.standalone===true)||window.matchMedia('(display-mode: standalone)').matches;
+  const lines=[
+    't='+new Date().toISOString().slice(11,19),
+    'standalone='+standalone,
+    'innerH='+window.innerHeight+' innerW='+window.innerWidth,
+    'vv.h='+(vv?Math.round(vv.height):'n/a')+' vv.off='+(vv?Math.round(vv.offsetTop):'n/a'),
+    'safe-top='+sat+' safe-bot='+sab,
+    '--vvb='+getComputedStyle(document.documentElement).getPropertyValue('--vvb').trim(),
+    'tabbar.bottom='+(tbRect?Math.round(tbRect.bottom):'n/a')+' gap-to-innerH='+(tbRect?Math.round(window.innerHeight-tbRect.bottom):'n/a'),
+    'scrollY='+Math.round(window.scrollY),
+  ];
+  el.textContent=lines.join('\n');
+}
+window.addEventListener('scroll',dbgUpdate,{passive:true});
+if(localStorage.getItem('jg2:debug')==='1'){
+  dbgUpdate();
+  let dbgTicks=0;
+  const dbgTimer=setInterval(()=>{dbgUpdate();if(++dbgTicks>25)clearInterval(dbgTimer)},200);
+}
 
 /* =============== TOOLS =============== */
 $('tClose').onclick=closeTimer;
@@ -2508,6 +2563,12 @@ $('impFile').onchange=async()=>{
     $('bkOut').innerHTML=`Restored <b>${n}</b> records.`;
   }catch(e){$('bkOut').innerHTML='That file isn\u2019t a Jacked Gazelle backup.'}
   $('impFile').value='';
+};
+$('optDebug').checked=localStorage.getItem('jg2:debug')==='1';
+$('optDebug').onchange=e=>{
+  try{localStorage.setItem('jg2:debug',e.target.checked?'1':'0')}catch(err){}
+  $('dbgOverlay').classList.toggle('on',e.target.checked);
+  if(e.target.checked) dbgUpdate();
 };
 if('serviceWorker' in navigator&&location.protocol==='https:'){
   navigator.serviceWorker.register('sw.js').catch(()=>{});
