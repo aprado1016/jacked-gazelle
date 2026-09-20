@@ -2111,34 +2111,29 @@ document.querySelectorAll('#tabbar button[data-tab]').forEach(b=>b.onclick=()=>s
    gap check can't see this one — it's not a viewport-metric mismatch, it's the content view
    itself being briefly short). Confirmed on-device that a real scroll gesture makes it settle
    to the correct height. body's min-height:100vh means a short screen (Home with little
-   scheduled today, a rest day, etc.) may have zero natural overflow to scroll within, so each
-   attempt temporarily forces extra height, scrolls into it and back, then restores it —
-   guaranteeing a real scroll delta regardless of how much content the current screen has.
+   scheduled today, a rest day, etc.) may have zero natural overflow to scroll within, so this
+   temporarily forces 1px of extra height, scrolls into it and back, then restores it —
+   guaranteeing a real (if tiny) scroll delta regardless of how much content the current screen
+   has.
 
-   A single attempt right after boot() was unreliable in practice: boot()'s storage reads and
-   iOS's own icon-zoom launch transition each take a variable amount of time, so one fixed-timing
-   attempt sometimes fires before the content view has even been shrunk yet, missing the window
-   entirely. Retrying at several staggered delays over the first second covers that timing
-   variance instead of gambling on one guess. */
+   Retrying this every 60-800ms fixed the miss rate but made every launch visibly shake — six
+   scroll+resize round trips in under a second is not subtle. A single, minimal (1px) attempt at
+   a middling delay trades some reliability back for not being a worse problem than the bug it's
+   fixing. */
 function nudgeScrollSettle(){
-  const delays=[0,60,150,300,500,800];
-  let i=0;
-  function attempt(){
-    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+  setTimeout(()=>{
+    requestAnimationFrame(()=>{
       const body=document.body, prevMinH=body.style.minHeight;
-      body.style.minHeight='calc(100vh + 24px)';
+      body.style.minHeight='calc(100vh + 1px)';
       const y=window.scrollY;
-      window.scrollTo(0,y+3);
+      window.scrollTo(0,y+1);
       requestAnimationFrame(()=>{
         window.scrollTo(0,y);
         body.style.minHeight=prevMinH;
         syncBottomInset();
-        i++;
-        if(i<delays.length) setTimeout(attempt,delays[i]-delays[i-1]);
       });
-    }));
-  }
-  attempt();
+    });
+  },150);
 }
 
 /* Read-only diagnostic readout for the "tab bar isn't flush with the bottom on cold launch"
