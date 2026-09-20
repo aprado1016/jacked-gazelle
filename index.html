@@ -53,9 +53,8 @@ body.workout-active #appbg{background:var(--tbg)}
 .dbgoverlay{position:fixed;top:calc(env(safe-area-inset-top) + 10px);left:6px;z-index:9999;background:rgba(0,0,0,.85);color:#5f5;font:10px/1.45 ui-monospace,Menlo,Consolas,monospace;padding:8px 10px;border-radius:8px;white-space:pre;pointer-events:none;display:none}
 .dbgoverlay.on{display:block}
 #launchSplash{position:fixed;inset:-100px 0 0 0;height:calc(100% + 100px);z-index:100000;background:#F2ECE0;display:flex;align-items:center;justify-content:center;transition:opacity .4s ease}
-#launchSplash img{width:88px;height:88px;border-radius:20px;box-shadow:0 10px 34px rgba(43,38,32,.2);animation:splashPulse 1.3s ease-in-out infinite}
+#launchSplash img{width:88px;height:88px;border-radius:20px;box-shadow:0 10px 34px rgba(43,38,32,.2)}
 #launchSplash.hide{opacity:0;pointer-events:none}
-@keyframes splashPulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.05);opacity:.88}}
 button{font-family:inherit;border:none;background:none;color:inherit;cursor:pointer}
 input,textarea{font-family:inherit;color:var(--ink);background:var(--panel2);border:1px solid var(--line);border-radius:8px;outline:none}
 input:focus,textarea:focus{border-color:var(--blue)}
@@ -691,9 +690,11 @@ try{
   }
 }catch(e){}
 
-/* Launch splash: covers the screen while boot() loads data and the cold-launch scroll nudge
-   (below, near syncBottomInset) runs, so neither has to happen invisibly-or-not-at-all. Held for
-   a minimum stretch so a fast boot doesn't just flash it, lifted (with a fade) once boot()
+/* Launch splash: covers the screen while boot() loads data, purely so the app opens on a
+   deliberate branded moment instead of a blank/mid-layout flash. (It previously also hid a
+   scroll nudge meant to work around a cold-launch tab bar positioning bug, but that nudge caused
+   its own visible shaking and was removed — see git history if revisiting that bug.) Held for a
+   minimum stretch so a fast boot doesn't just flash it, lifted (with a fade) once boot()
    finishes, and force-hidden after a few seconds regardless in case something above throws and
    never gets that far — a launch screen that never leaves is worse than the bug it's covering for. */
 const LAUNCH_T0=performance.now();
@@ -2127,35 +2128,6 @@ window.addEventListener('pageshow',syncBottomInset);
 syncBottomInset();
 document.querySelectorAll('#tabbar button[data-tab]').forEach(b=>b.onclick=()=>showTab(b.dataset.tab));
 
-/* On a true cold launch, iOS can size the standalone PWA's content view a good 30-40px
-   shorter than the real screen for the first couple of frames (confirmed on-device: reported
-   window.innerHeight/visualViewport.height BOTH read the short value, so syncBottomInset's own
-   gap check can't see this one — it's not a viewport-metric mismatch, it's the content view
-   itself being briefly short). Confirmed on-device that a real scroll gesture makes it settle
-   to the correct height. body's min-height:100vh means a short screen (Home with little
-   scheduled today, a rest day, etc.) may have zero natural overflow to scroll within, so this
-   temporarily forces extra height, scrolls into it and back, then restores it — guaranteeing a
-   real scroll delta happens regardless of how much content the current screen has.
-
-   This used to need to be invisible, which forced a tradeoff between reliability (retrying) and
-   visible jank (retrying shakes the screen). #launchSplash now covers the whole screen while
-   this runs, so the nudge doesn't need to be subtle anymore — it just needs to happen before the
-   splash lifts. */
-function nudgeScrollSettle(done){
-  requestAnimationFrame(()=>requestAnimationFrame(()=>{
-    const body=document.body, prevMinH=body.style.minHeight;
-    body.style.minHeight='calc(100vh + 24px)';
-    const y=window.scrollY;
-    window.scrollTo(0,y+3);
-    requestAnimationFrame(()=>{
-      window.scrollTo(0,y);
-      body.style.minHeight=prevMinH;
-      syncBottomInset();
-      if(done)done();
-    });
-  }));
-}
-
 /* Read-only diagnostic readout for the "tab bar isn't flush with the bottom on cold launch"
    bug — never fed back into layout, just displayed, so it's safe to also refresh on 'scroll'
    (unlike syncBottomInset, which must not react to scroll). Toggle it on in Tools > Layout
@@ -2643,15 +2615,9 @@ async function boot(){
   syncTools();
   moveTabIndicator('home');
 }
-/* nudgeScrollSettle() is only for the true cold-launch case the splash screen covers for — a
-   later boot() call (backup import re-runs it to refresh state without a page reload) happens
-   with the splash long gone, so re-running the scroll+resize nudge there would just be the same
-   shake we removed, now visible again. Only the very first boot() gets it. */
 boot().then(()=>{
-  nudgeScrollSettle(()=>{
-    const wait=Math.max(0,LAUNCH_MIN_MS-(performance.now()-LAUNCH_T0));
-    setTimeout(hideSplash,wait);
-  });
+  const wait=Math.max(0,LAUNCH_MIN_MS-(performance.now()-LAUNCH_T0));
+  setTimeout(hideSplash,wait);
 });
 window.addEventListener('pagehide',()=>{if(dirty)saveDay()});
 </script>
