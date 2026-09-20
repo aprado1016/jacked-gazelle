@@ -52,9 +52,10 @@ body.workout-active #appbg{background:var(--tbg)}
 #safeProbeB{position:fixed;bottom:0;left:0;height:0;padding-bottom:env(safe-area-inset-bottom);visibility:hidden;pointer-events:none}
 .dbgoverlay{position:fixed;top:calc(env(safe-area-inset-top) + 10px);left:6px;z-index:9999;background:rgba(0,0,0,.85);color:#5f5;font:10px/1.45 ui-monospace,Menlo,Consolas,monospace;padding:8px 10px;border-radius:8px;white-space:pre;pointer-events:none;display:none}
 .dbgoverlay.on{display:block}
-#launchSplash{position:fixed;inset:-100px 0 0 0;height:calc(100% + 100px);z-index:100000;background:#F2ECE0;display:flex;align-items:center;justify-content:center;transition:opacity .4s ease}
-#launchSplash img{width:88px;height:88px;border-radius:20px;box-shadow:0 10px 34px rgba(43,38,32,.2)}
+#launchSplash{position:fixed;inset:0;z-index:100000;background:#F2ECE0;display:flex;align-items:center;justify-content:center;transition:opacity .5s ease}
+#launchSplash img{width:88px;height:88px;border-radius:20px;box-shadow:0 10px 34px rgba(43,38,32,.2);opacity:0;transform:scale(.9);animation:splashIn .7s cubic-bezier(.22,1,.36,1) .05s forwards}
 #launchSplash.hide{opacity:0;pointer-events:none}
+@keyframes splashIn{to{opacity:1;transform:scale(1)}}
 button{font-family:inherit;border:none;background:none;color:inherit;cursor:pointer}
 input,textarea{font-family:inherit;color:var(--ink);background:var(--panel2);border:1px solid var(--line);border-radius:8px;outline:none}
 input:focus,textarea:focus{border-color:var(--blue)}
@@ -691,14 +692,13 @@ try{
 }catch(e){}
 
 /* Launch splash: covers the screen while boot() loads data, purely so the app opens on a
-   deliberate branded moment instead of a blank/mid-layout flash. (It previously also hid a
-   scroll nudge meant to work around a cold-launch tab bar positioning bug, but that nudge caused
-   its own visible shaking and was removed — see git history if revisiting that bug.) Held for a
-   minimum stretch so a fast boot doesn't just flash it, lifted (with a fade) once boot()
+   deliberate branded moment instead of a blank/mid-layout flash. Held for a minimum stretch
+   (comfortably longer than the icon's own entrance animation, so a fast boot never cuts that
+   animation off mid-way) so a fast boot doesn't just flash it, lifted (with a fade) once boot()
    finishes, and force-hidden after a few seconds regardless in case something above throws and
    never gets that far — a launch screen that never leaves is worse than the bug it's covering for. */
 const LAUNCH_T0=performance.now();
-const LAUNCH_MIN_MS=550;
+const LAUNCH_MIN_MS=950;
 let splashHidden=false;
 function hideSplash(){
   if(splashHidden)return; splashHidden=true;
