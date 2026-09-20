@@ -50,7 +50,7 @@ body{min-height:100vh;min-height:100dvh;padding-bottom:calc(var(--tabbar-h) + en
 body.workout-active #appbg{background:var(--tbg)}
 #safeProbeT{position:fixed;top:0;left:0;height:0;padding-top:env(safe-area-inset-top);visibility:hidden;pointer-events:none}
 #safeProbeB{position:fixed;bottom:0;left:0;height:0;padding-bottom:env(safe-area-inset-bottom);visibility:hidden;pointer-events:none}
-.dbgoverlay{position:fixed;top:6px;left:6px;z-index:9999;background:rgba(0,0,0,.8);color:#5f5;font:10px/1.45 ui-monospace,Menlo,Consolas,monospace;padding:8px 10px;border-radius:8px;white-space:pre;pointer-events:none;display:none}
+.dbgoverlay{position:fixed;top:calc(env(safe-area-inset-top) + 10px);left:6px;z-index:9999;background:rgba(0,0,0,.85);color:#5f5;font:10px/1.45 ui-monospace,Menlo,Consolas,monospace;padding:8px 10px;border-radius:8px;white-space:pre;pointer-events:none;display:none}
 .dbgoverlay.on{display:block}
 button{font-family:inherit;border:none;background:none;color:inherit;cursor:pointer}
 input,textarea{font-family:inherit;color:var(--ink);background:var(--panel2);border:1px solid var(--line);border-radius:8px;outline:none}
