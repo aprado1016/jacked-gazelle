@@ -452,6 +452,52 @@ body.workout-active{padding-bottom:0;background:var(--tbg)}
 .videoframe{position:relative;width:100%;aspect-ratio:16/9;background:#000}
 .videoframe iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
 
+/* Day-complete celebration screen. A fixed color palette (not the active theme's vars) — this
+   is a one-off reward moment meant to always read as warm/celebratory, the same regardless of
+   which of the app's themes is selected. */
+.daycomplete{position:fixed;inset:0;z-index:97;display:none;flex-direction:column;align-items:center;
+  background:linear-gradient(180deg,#9C8D80 0%,#C6A084 30%,#E1AC85 55%,#E39872 75%,#DB8259 100%);
+  opacity:0;transform:translateY(14px);transition:opacity .35s ease,transform .35s ease}
+.daycomplete.show{display:flex;opacity:1;transform:translateY(0)}
+.dcclose{position:fixed;top:calc(env(safe-area-inset-top) + 14px);right:16px;width:40px;height:40px;border-radius:50%;
+  background:rgba(30,20,12,.18);border:1.5px solid rgba(255,255,255,.45);color:#fff;font-size:20px;line-height:1;
+  display:flex;align-items:center;justify-content:center;opacity:0;animation:dcFadeIn .3s ease .05s forwards}
+.dcbody{flex:1;display:flex;flex-direction:column;align-items:center;width:100%;padding:0 24px;
+  padding-top:calc(env(safe-area-inset-top) + 78px)}
+.dctitle{font-family:var(--disp);font-weight:600;font-size:15px;letter-spacing:.22em;text-transform:uppercase;
+  color:#fff;opacity:0;animation:dcFadeIn .35s ease .05s forwards}
+.dcemblem{position:relative;width:172px;height:172px;margin-top:40px;display:flex;align-items:center;justify-content:center;
+  opacity:0;transform:scale(.55);animation:dcPop .5s cubic-bezier(.34,1.56,.64,1) .1s forwards}
+.dcring{position:absolute;inset:-14px;width:200px;height:200px;transform:rotate(-90deg)}
+.dcring-bg{fill:none;stroke:rgba(255,255,255,.25);stroke-width:2.5}
+.dcring-draw{fill:none;stroke:rgba(255,255,255,.65);stroke-width:2.5;stroke-linecap:round;
+  stroke-dasharray:100;stroke-dashoffset:100;animation:dcDraw .5s ease-out .3s forwards}
+.dccircle{position:relative;width:170px;height:170px;border-radius:50%;
+  background:radial-gradient(circle at 34% 28%,#FFFFFF,#F4EAE0 55%,#EBDECB 100%);
+  border:2px solid rgba(255,255,255,.6);box-shadow:0 18px 40px rgba(60,35,18,.35),0 0 0 8px rgba(255,255,255,.12);
+  display:flex;align-items:center;justify-content:center;animation:dcGlow .5s ease .85s}
+.dccircle::before{content:'';position:absolute;inset:-9px;border-radius:50%;border:1.5px solid rgba(255,255,255,.32)}
+.dccheck{width:64px;height:64px}
+.dccheck path{fill:none;stroke:#B08A63;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round;
+  stroke-dasharray:100;stroke-dashoffset:100;animation:dcDraw .3s ease-out .6s forwards}
+.dcbadgewrap{display:flex;flex-direction:column;align-items:center;gap:8px;margin-top:34px;
+  opacity:0;transform:translateY(10px);animation:dcRise .3s ease .8s forwards}
+.dcbadge{width:60px;height:60px;border-radius:50%;border:1.5px solid rgba(255,255,255,.55);
+  display:flex;align-items:center;justify-content:center}
+.dcbadge svg{width:26px;height:26px;fill:none;stroke:#fff;stroke-width:1.6}
+.dclabel{font-family:var(--disp);font-weight:600;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:#fff}
+.dcthanks{width:calc(100% - 40px);margin:0 20px calc(env(safe-area-inset-bottom) + 20px);padding:16px;border-radius:16px;
+  background:#3C2E22;color:#fff;font-family:var(--disp);font-weight:600;font-size:15px;letter-spacing:.12em;
+  text-transform:uppercase;opacity:0;transform:translateY(24px);animation:dcRise .35s cubic-bezier(.22,1,.36,1) .95s forwards}
+@keyframes dcFadeIn{to{opacity:1}}
+@keyframes dcPop{to{opacity:1;transform:scale(1)}}
+@keyframes dcDraw{to{stroke-dashoffset:0}}
+@keyframes dcRise{to{opacity:1;transform:translateY(0)}}
+@keyframes dcGlow{0%{box-shadow:0 18px 40px rgba(60,35,18,.35),0 0 0 8px rgba(255,255,255,.12)}
+  40%{box-shadow:0 18px 40px rgba(60,35,18,.35),0 0 0 16px rgba(255,255,255,.22)}
+  100%{box-shadow:0 18px 40px rgba(60,35,18,.35),0 0 0 8px rgba(255,255,255,.12)}}
+#screen-workout.dc-behind{transition:transform .4s ease,opacity .4s ease;transform:scale(.96);opacity:.6}
+
 @media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
@@ -605,6 +651,29 @@ body.workout-active{padding-bottom:0;background:var(--tbg)}
 </nav>
 
 <div class="savemsg" id="savemsg">Saved</div>
+
+<div class="daycomplete" id="dayComplete">
+  <button class="dcclose" id="dcClose" aria-label="Close">&times;</button>
+  <div class="dcbody">
+    <h2 class="dctitle">Day Completed</h2>
+    <div class="dcemblem">
+      <svg class="dcring" viewBox="0 0 200 200" aria-hidden="true">
+        <circle class="dcring-bg" cx="100" cy="100" r="92"/>
+        <circle class="dcring-draw" cx="100" cy="100" r="92" pathLength="100"/>
+      </svg>
+      <div class="dccircle">
+        <svg class="dccheck" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M5 12.5 10 17.5 19.5 7" pathLength="100"/>
+        </svg>
+      </div>
+    </div>
+    <div class="dcbadgewrap">
+      <div class="dcbadge"><svg viewBox="0 0 24 24"><rect x="1" y="9" width="3" height="6" rx="1"/><rect x="20" y="9" width="3" height="6" rx="1"/><rect x="4.5" y="7" width="3" height="10" rx="1"/><rect x="16.5" y="7" width="3" height="10" rx="1"/><line x1="7.5" y1="12" x2="16.5" y2="12"/></svg></div>
+      <div class="dclabel">Workout</div>
+    </div>
+  </div>
+  <button class="dcthanks" id="dcThanks">Thanks</button>
+</div>
 
 <div class="timerwrap" id="timerWrap">
   <div class="tbar"><span id="tTitle"></span><div class="tbarb"><button id="tCfg">Adjust</button><button id="tClose">Close</button></div></div>
@@ -1600,6 +1669,26 @@ function renderDoneUI(){
   b.innerHTML=on?'&#10003; Day Complete':'Mark Day Complete';
 }
 
+/* =============== DAY-COMPLETE CELEBRATION =============== */
+let dcOpening=false;
+function openDayComplete(){
+  if(dcOpening)return; dcOpening=true;
+  const btn=$('logDoneBtn'); if(btn)btn.disabled=true;
+  const wk=$('screen-workout'); if(wk)wk.classList.add('dc-behind');
+  const dc=$('dayComplete');
+  dc.classList.remove('show'); void dc.offsetHeight; // reset so repeat opens replay every animation
+  dc.classList.add('show');
+  setTimeout(()=>{dcOpening=false; if(btn)btn.disabled=false},1200);
+}
+function closeDayComplete(){
+  const dc=$('dayComplete'), wk=$('screen-workout');
+  dc.classList.remove('show');
+  if(wk)wk.classList.remove('dc-behind');
+  setTimeout(()=>{ showTab(backTarget); },350);
+}
+$('dcClose').onclick=closeDayComplete;
+$('dcThanks').onclick=closeDayComplete;
+
 function renderDay_restBranch(m,d){
   m.innerHTML=`<div class="ticket"><div class="meta">${phTag()}</div><h2>Rest Day</h2></div>
   <div class="restday"><h3>Recover</h3><p>Training is only effective to the extent it's recovered from.<br>Sleep, eat, walk. That's the work today.</p></div>`;
@@ -1690,7 +1779,11 @@ function renderDayLog(){
   if(d.cond) wireCalc(d.cond);
   if($('startTimer')) $('startTimer').onclick=()=>openTimer(d.cond);
   $('daynote').oninput=()=>{dayData.note=$('daynote').value;scheduleSave()};
-  $('logDoneBtn').onclick=()=>setDone(!dayData.done);
+  $('logDoneBtn').onclick=()=>{
+    const turningOn=!dayData.done;
+    setDone(turningOn);
+    if(turningOn)openDayComplete();
+  };
   $('logPause').onclick=()=>{pauseWkTimer();openSheet('pauseSheet')};
   $('logSettings').onclick=()=>openSheet('wkSettingsSheet');
   if(WKOPT.expand){
