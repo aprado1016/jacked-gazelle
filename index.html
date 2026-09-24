@@ -191,10 +191,7 @@ input:focus,textarea:focus{border-color:var(--blue)}
 .logsetnum{width:28px;height:28px;border-radius:50%;border:1.5px solid var(--tline);color:var(--tdim);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
 .logsetnum.done{background:var(--tink);border-color:var(--tink);color:var(--tbg)}
 .loginput{width:100%;padding:11px 8px;text-align:center;font-size:15px;font-weight:700;border-radius:11px;background:var(--tpanel2);border:1px solid var(--tline);color:var(--tink)}
-.logweightwrap{position:relative}
-.logweightwrap .loginput{padding-right:24px}
-.logstep{position:absolute;right:2px;top:2px;bottom:2px;display:flex;flex-direction:column;justify-content:center}
-.logstep button{width:20px;height:14px;color:var(--tfaint);font-size:8px;display:flex;align-items:center;justify-content:center}
+.loginput.empty{color:var(--tfaint);font-weight:600}
 .logprev{font-size:12px;color:var(--tfaint);text-align:center}
 .logrest{display:flex;align-items:center;gap:10px;margin-top:18px}
 .logrestplay{width:34px;height:34px;border-radius:10px;background:var(--tpanel2);border:1px solid var(--tline);color:var(--tink);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:opacity .25s}
@@ -406,6 +403,14 @@ body.workout-active{padding-bottom:0;background:var(--tbg)}
 .optbtn .nm{font-family:var(--disp);font-size:18px;font-weight:600;letter-spacing:.05em;text-transform:uppercase}
 .optbtn .sub{font-size:12px;color:var(--faint)}
 .optbtn.on .nm{color:var(--blue)}
+.wpickcols{display:flex;gap:14px;margin-bottom:16px}
+.wpickcol{flex:1;text-align:center}
+.wpicklabel{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin-bottom:8px}
+.wpickview{position:relative;height:220px;overflow:hidden;border-radius:14px;background:var(--panel2);border:1px solid var(--line)}
+.wpickhi{position:absolute;left:0;right:0;top:50%;height:44px;transform:translateY(-50%);background:var(--sel-a);border-top:1px solid var(--gold-line);border-bottom:1px solid var(--gold-line);pointer-events:none}
+.wpickscroll{position:relative;height:100%;overflow-y:auto;scroll-snap-type:y mandatory;padding:88px 0;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.wpickscroll::-webkit-scrollbar{display:none}
+.wpickitem{height:44px;display:flex;align-items:center;justify-content:center;scroll-snap-align:center;font-family:var(--disp);font-size:19px;font-weight:600;color:var(--ink)}
 .wdots{display:flex;gap:4px}
 .wdots i{width:7px;height:7px;border-radius:50%;background:var(--line)}
 .wdots i.d{background:var(--green)}
@@ -741,6 +746,27 @@ body.workout-active{padding-bottom:0;background:var(--tbg)}
     <label class="togglerow"><span>Expand Exercises by Default<br><span class="out" style="font-size:12px">Show sets and reps automatically when a workout opens</span></span>
       <span class="toggle"><input type="checkbox" id="optExpand"><span class="slider"></span></span></label>
   </div>
+</div>
+
+<div class="sheet" id="setPickerSheet">
+  <h3 id="spTitle">Set</h3>
+  <div class="wpickcols">
+    <div class="wpickcol">
+      <div class="wpicklabel">Weight</div>
+      <div class="wpickview">
+        <div class="wpickhi"></div>
+        <div class="wpickscroll" id="spWeightScroll"></div>
+      </div>
+    </div>
+    <div class="wpickcol">
+      <div class="wpicklabel" id="spRepsLabel">Reps</div>
+      <div class="wpickview">
+        <div class="wpickhi"></div>
+        <div class="wpickscroll" id="spRepsScroll"></div>
+      </div>
+    </div>
+  </div>
+  <button class="bigbtn pri" id="spSaveBtn">Set</button>
 </div>
 
 <div class="videomodal" id="videoModal">
@@ -1184,12 +1210,27 @@ async function saveDay(){
     if(good.length){ lastLifts[ex]={s:good,at:tag}; ch=true; }
   }
   if(ch) await sSet('lastlifts',lastLifts);
-  // history for charts/PRs: best numeric set per exercise per day
+  // history for charts/PRs: best set per exercise per day. "Best" means highest est. 1RM for a
+  // weighted lift, most reps for a bodyweight lift, and longest hold for a timed one — weight
+  // isn't scored against reps for a hold, since the reps/weight tradeoff formula doesn't apply
+  // to isometrics.
   const H=(await sGet('hist'))||{}; let hch=false;
   for(const [ex,sets] of Object.entries(dayData.sets)){
-    let best=null,bv=0;
-    sets.forEach(s=>{const w=parseFloat(s.w),r=parseFloat(s.r);
-      if(w>0&&r>0){const e=w*(1+r/30); if(e>bv){bv=e;best={w:s.w,r:s.r,e1:e}}}});
+    let best=null,bv=-1;
+    sets.forEach(s=>{
+      const bw=isBW(s.w), w=bw?0:parseFloat(s.w);
+      const sec=timeStrToSec(s.r);
+      const looksLikeTime=/^\d+:\d{2}$/.test(String(s.r||''));
+      if(looksLikeTime){
+        if(sec>0&&sec>bv){bv=sec;best={w:s.w,r:s.r}}
+      }else{
+        const r=parseFloat(s.r);
+        if((bw||w>0)&&r>0){
+          const score=bw?r:w*(1+r/30);
+          if(score>bv){bv=score;best={w:s.w,r:s.r,e1:bw?undefined:score}}
+        }
+      }
+    });
     if(best){(H[ex]=H[ex]||{})[kDay()]={...best,at:tag,o:S.p*10000+S.w*100+S.d};hch=true}
   }
   if(hch) await sSet('hist',H);
@@ -1902,10 +1943,32 @@ function finishFloatRest(){
 window.completeFloatingRest=function(){ finishFloatRest(); };
 function prescribedCount(rx){const m=(rx||'').match(/^(\d+)\s*x/i);return m?Math.max(1,+m[1]):1}
 function prescribedReps(rx){const m=(rx||'').match(/x\s*(\d+)/i);return m?m[1]:''}
+/* A "time" exercise (a plank, a farmer's-carry hold, a dead hang…) is logged as a duration
+   instead of a rep count — anything whose prescription mentions seconds/minutes or gives a
+   bare clock time. */
+function isTimeRx(rx){return /sec|min|:\d{2}\b/i.test(rx||'')}
+function secToMMSS(sec){sec=Math.max(0,Math.round(sec));const m=Math.floor(sec/60),s=sec%60;return `${m}:${String(s).padStart(2,'0')}`}
+function timeStrToSec(v){
+  const m=String(v==null?'':v).match(/^(\d+):(\d{2})$/);
+  if(m)return(+m[1])*60+(+m[2]);
+  const n=parseFloat(v);
+  return isNaN(n)?null:n; // bare legacy numbers were stored as raw seconds
+}
+function prescribedTimeStr(rx){
+  rx=rx||'';
+  let m=rx.match(/x\s*(\d+)\s*sec/i); if(m)return secToMMSS(+m[1]);
+  m=rx.match(/x\s*(\d+)\s*min/i); if(m)return secToMMSS(+m[1]*60);
+  m=rx.match(/x\s*(\d+):(\d{2})/i); if(m)return `${+m[1]}:${m[2]}`;
+  m=rx.match(/(\d+)\s*sec/i); if(m)return secToMMSS(+m[1]);
+  m=rx.match(/(\d+)\s*min/i); if(m)return secToMMSS(+m[1]*60);
+  return '0:30';
+}
+function isBW(w){return String(w==null?'':w).trim().toUpperCase()==='BW'}
 function ensureSets(e){
   const key=e.n;
   if(!dayData.sets[key]){
-    const n=prescribedCount(e.rx), r=prescribedReps(e.rx);
+    const n=prescribedCount(e.rx);
+    const r=isTimeRx(e.rx)?prescribedTimeStr(e.rx):prescribedReps(e.rx);
     dayData.sets[key]=Array.from({length:n},()=>({w:'',r,done:false}));
   }
   return dayData.sets[key];
@@ -1913,6 +1976,7 @@ function ensureSets(e){
 function renderLogger(bi,ei){
   const e=dy().blocks[bi].ex[ei]; const key=e.n;
   ensureSets(e);
+  const timeBased=isTimeRx(e.rx);
   const lg=$(`lg-${bi}-${ei}`);
   const last=lastLifts[key];
   const prevSets=(last&&last.s)||[];
@@ -1924,15 +1988,15 @@ function renderLogger(bi,ei){
     <button onclick="openExMeta(${bi},${ei},'notes')"><svg viewBox="0 0 24 24"><path d="M4 20l1.5-4.5L16 5l3 3-10.5 10.5z"/></svg>Notes</button>
     <button onclick="deleteLastSet('${cssk(key)}',${bi},${ei})"><svg viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg>Delete Set</button>
   </div>`;
-  h+=`<div class="logtablehead"><span></span><span>Reps</span><span>Weight</span><span>Previous</span></div>`;
+  h+=`<div class="logtablehead"><span></span><span>${timeBased?'Time':'Reps'}</span><span>Weight</span><span>Previous</span></div>`;
   dayData.sets[key].forEach((s,si)=>{
     const prev=prevSets[si]?`${prevSets[si].w||'--'}&times;${prevSets[si].r||'--'}`:'--';
+    const rDisp=s.r?esc(String(s.r)):'—';
+    const wDisp=isBW(s.w)?'BW':(s.w?esc(String(s.w)):'—');
     h+=`<div class="logsetrow">
       <button class="logsetnum${s.done?' done':''}" onclick="toggleSetDone('${cssk(key)}',${si},${bi},${ei})">${s.done?'&#10003;':si+1}</button>
-      <input class="loginput" inputmode="numeric" placeholder="reps" value="${s.r}" oninput="upSet('${cssk(key)}',${si},'r',this.value)">
-      <div class="logweightwrap"><input class="loginput" inputmode="decimal" placeholder="lb" value="${s.w}" oninput="upSet('${cssk(key)}',${si},'w',this.value)">
-        <div class="logstep"><button onclick="stepWeight('${cssk(key)}',${si},2.5,${bi},${ei})">&#9650;</button><button onclick="stepWeight('${cssk(key)}',${si},-2.5,${bi},${ei})">&#9660;</button></div>
-      </div>
+      <button class="loginput${s.r?'':' empty'}" onclick="openSetPicker('${cssk(key)}',${bi},${ei},${si})">${rDisp}</button>
+      <button class="loginput${(s.w||isBW(s.w))?'':' empty'}" onclick="openSetPicker('${cssk(key)}',${bi},${ei},${si})">${wDisp}</button>
       <div class="logprev">${prev}</div>
     </div>`;
   });
@@ -1944,14 +2008,57 @@ function renderLogger(bi,ei){
   }
 }
 function cssk(k){return k.replace(/'/g,"\\'")}
-window.upSet=function(k,si,f,v){dayData.sets[k][si][f]=v;scheduleSave()};
 window.addSet=function(k,bi,ei){const last=dayData.sets[k].at(-1);dayData.sets[k].push({w:last?.w||'',r:last?.r||'',done:false});renderLogger(bi,ei);scheduleSave();refreshSetsPill(bi,ei)};
 window.deleteLastSet=function(k,bi,ei){const arr=dayData.sets[k]; if(arr.length>1)arr.pop(); renderLogger(bi,ei); scheduleSave(); updateWkProgress(); refreshSetsPill(bi,ei)};
 window.toggleSetDone=function(k,si,bi,ei){dayData.sets[k][si].done=!dayData.sets[k][si].done; scheduleSave(); renderLogger(bi,ei); updateWkProgress()};
-window.stepWeight=function(k,si,delta,bi,ei){
-  const cur=parseFloat(dayData.sets[k][si].w)||0;
-  dayData.sets[k][si].w=String(Math.max(0,cur+delta));
-  scheduleSave(); renderLogger(bi,ei);
+
+/* =============== SET PICKER (scroll wheels) =============== */
+const SP_ITEM_H=44;
+const SP_WEIGHT_ITEMS=(()=>{const a=['BW'];for(let w=0;w<=600;w+=2.5)a.push(String(w));return a})();
+const SP_REPS_ITEMS=Array.from({length:50},(_,i)=>String(i+1));
+const SP_TIME_ITEMS=(()=>{const a=[];for(let s=5;s<=600;s+=5)a.push(secToMMSS(s));return a})();
+function spNearestIndex(items,val,toNum){
+  if(val==null||val==='')return 0;
+  let best=0,bestD=Infinity;
+  const target=toNum(val);
+  if(target==null)return 0;
+  items.forEach((it,i)=>{const d=Math.abs(toNum(it)-target); if(d<bestD){bestD=d;best=i}});
+  return best;
+}
+function spBuildColumn(el,items,selIndex){
+  el.innerHTML=items.map(v=>`<div class="wpickitem">${esc(String(v))}</div>`).join('');
+  el.scrollTop=Math.max(0,selIndex)*SP_ITEM_H;
+}
+let spCtx=null;
+window.openSetPicker=function(key,bi,ei,si){
+  const e=dy().blocks[bi].ex[ei], s=dayData.sets[key][si];
+  const timeBased=isTimeRx(e.rx);
+  spCtx={key,bi,ei,si,timeBased};
+  $('spTitle').textContent=`${e.n} · Set ${si+1}`;
+  $('spRepsLabel').textContent=timeBased?'Time':'Reps';
+  const wIdx=isBW(s.w)?0:spNearestIndex(SP_WEIGHT_ITEMS,s.w||0,v=>isBW(v)?0:parseFloat(v));
+  spBuildColumn($('spWeightScroll'),SP_WEIGHT_ITEMS,wIdx);
+  const rItems=timeBased?SP_TIME_ITEMS:SP_REPS_ITEMS;
+  const rIdx=timeBased
+    ? spNearestIndex(rItems,s.r,v=>timeStrToSec(v))
+    : spNearestIndex(rItems,s.r||1,v=>parseFloat(v));
+  spBuildColumn($('spRepsScroll'),rItems,rIdx);
+  openSheet('setPickerSheet');
+};
+$('spSaveBtn').onclick=function(){
+  if(!spCtx)return;
+  const{key,bi,ei,si,timeBased}=spCtx;
+  const wIdx=Math.round($('spWeightScroll').scrollTop/SP_ITEM_H);
+  const wVal=SP_WEIGHT_ITEMS[Math.max(0,Math.min(SP_WEIGHT_ITEMS.length-1,wIdx))];
+  const rItems=timeBased?SP_TIME_ITEMS:SP_REPS_ITEMS;
+  const rIdx=Math.round($('spRepsScroll').scrollTop/SP_ITEM_H);
+  const rVal=rItems[Math.max(0,Math.min(rItems.length-1,rIdx))];
+  dayData.sets[key][si].w=wVal;
+  dayData.sets[key][si].r=rVal;
+  scheduleSave();
+  renderLogger(bi,ei);
+  closeSheets();
+  spCtx=null;
 };
 function refreshSetsPill(bi,ei){
   const row=$(`ex-${bi}-${ei}`); if(!row)return;
