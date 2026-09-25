@@ -1678,20 +1678,32 @@ function startWorkout(){
 }
 /* =============== ACTIVE WORKOUT LOG (dark) =============== */
 let WKOPT={audio:true,expand:false};
-let wkElapsedSec=0, wkTimerId=null, wkRunning=false;
+let wkElapsedSec=0, wkTimerId=null, wkRunning=false, wkStartTs=null;
 const PLAY_SVG='<svg viewBox="0 0 24 24" width="13" height="13"><path d="M7 4.5v15a1 1 0 0 0 1.53.85l12-7.5a1 1 0 0 0 0-1.7l-12-7.5A1 1 0 0 0 7 4.5Z" fill="currentColor" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>';
 const PAUSE_SVG='<svg viewBox="0 0 24 24" width="13" height="13"><rect x="6" y="4" width="4.5" height="16" rx="2" fill="currentColor"/><rect x="13.5" y="4" width="4.5" height="16" rx="2" fill="currentColor"/></svg>';
 const INFO_SVG='<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="11" x2="12" y2="16"/><circle cx="12" cy="7.6" r=".9" fill="currentColor" stroke="none"/></svg>';
 function fmtMMSS(s){s=Math.max(0,Math.round(s));return `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`}
+/* setInterval ticks don't fire (or fire late) while the app is backgrounded — e.g. switching to
+   Spotify to change a song — so a counter that just does wkElapsedSec++ per tick silently loses
+   whatever time passed while backgrounded. Anchoring to a real wall-clock timestamp instead
+   fixes that for free: wherever the elapsed value is read, it's computed from Date.now() minus
+   that anchor, so the instant a throttled/suspended tick finally fires again (or the visible/
+   pageshow listeners below force one), it immediately reflects the true elapsed time — no drift
+   to make up, because nothing was ever being incremented per-tick in the first place. */
+function wkComputeElapsed(){return wkRunning?wkElapsedSec+(Date.now()-wkStartTs)/1000:wkElapsedSec}
+function wkRenderElapsed(){const el=$('logElapsed'); if(el)el.textContent=fmtMMSS(wkComputeElapsed())}
 function startWkTimer(){
   if(wkTimerId)return;
-  wkRunning=true;
+  wkRunning=true; wkStartTs=Date.now();
   const btn=$('logPause'); if(btn)btn.innerHTML=PAUSE_SVG;
-  wkTimerId=setInterval(()=>{wkElapsedSec++;const el=$('logElapsed');if(el)el.textContent=fmtMMSS(wkElapsedSec)},1000);
+  wkTimerId=setInterval(wkRenderElapsed,1000);
+  wkRenderElapsed();
 }
 function pauseWkTimer(){
+  if(wkRunning){wkElapsedSec=wkComputeElapsed(); wkStartTs=null;}
   clearInterval(wkTimerId); wkTimerId=null; wkRunning=false;
   const btn=$('logPause'); if(btn)btn.innerHTML=PLAY_SVG;
+  wkRenderElapsed();
 }
 function wkSetProgress(){
   const d=dy(); let total=0,done=0;
@@ -1750,7 +1762,7 @@ function renderDayLog(){
   </div>
   <div class="logmeta">
     <div class="logtitle">${esc(d.f)}</div>
-    <div class="logtimerow"><span id="logElapsed">${fmtMMSS(wkElapsedSec)}</span><div class="logprogbar"><i id="logProgFill"></i></div></div>
+    <div class="logtimerow"><span id="logElapsed">${fmtMMSS(wkComputeElapsed())}</span><div class="logprogbar"><i id="logProgFill"></i></div></div>
   </div>
   </div>
   <div class="logscreen">`;
@@ -1887,11 +1899,19 @@ function dimRestBtn(bi,idx,on){
   const wrap=$(`restwrap-${bi}-${idx}`);
   if(wrap) wrap.classList.toggle('dimmed',on);
 }
+/* Same fix as the workout elapsed timer: a real deadline timestamp instead of counting down
+   remaining-- per tick, so a tick delayed by backgrounding still lands on the true remaining
+   time instead of whatever a missed countdown left behind. */
+function floatRestRemaining(){
+  if(!floatRest)return 0;
+  return floatRest.running?Math.max(0,(floatRest.deadline-Date.now())/1000):floatRest.remaining;
+}
 function updateFloatRestUI(){
   if(!floatRest)return;
+  const remaining=floatRestRemaining();
   const ring=$('restFloatRing'), t=$('restFloatTime');
-  if(ring) ring.style.strokeDashoffset=REST_C2*(1-floatRest.remaining/floatRest.total);
-  if(t) t.textContent=fmtMMSS(floatRest.remaining);
+  if(ring) ring.style.strokeDashoffset=REST_C2*(1-remaining/floatRest.total);
+  if(t) t.textContent=fmtMMSS(remaining);
 }
 function showFloatingRest(){
   const el=$('restFloat'); if(!el)return;
@@ -1905,20 +1925,22 @@ function hideFloatingRest(){
 function startFloatRestTick(){
   if(!floatRest)return;
   floatRest.running=true;
+  floatRest.deadline=Date.now()+floatRest.remaining*1000;
   const el=$('restFloat'); if(el)el.classList.remove('paused');
   const btn=$('restFloatBtn'); if(btn)btn.innerHTML=PAUSE_SVG;
   clearInterval(floatRest.timer);
   floatRest.timer=setInterval(()=>{
-    floatRest.remaining--;
-    if(floatRest.remaining<=0){ finishFloatRest(); return; }
+    if(floatRestRemaining()<=0){ finishFloatRest(); return; }
     updateFloatRestUI();
   },1000);
 }
 function pauseFloatRestTick(){
   if(!floatRest)return;
+  if(floatRest.running) floatRest.remaining=floatRestRemaining();
   clearInterval(floatRest.timer); floatRest.timer=null; floatRest.running=false;
   const el=$('restFloat'); if(el)el.classList.add('paused');
   const btn=$('restFloatBtn'); if(btn)btn.innerHTML=PLAY_SVG;
+  updateFloatRestUI();
 }
 window.toggleFloatingRestPause=function(){
   if(!floatRest)return;
@@ -1941,6 +1963,19 @@ function finishFloatRest(){
   floatRest=null;
 }
 window.completeFloatingRest=function(){ finishFloatRest(); };
+/* Force both wall-clock-anchored timers to redraw the instant the app comes back to the
+   foreground, instead of waiting up to a second for their next natural tick — otherwise the
+   displayed time would sit visibly stale for a moment even though the underlying value is
+   already correct. Also catches a rest timer that finished entirely while backgrounded, since a
+   suspended setInterval can't have fired finishFloatRest() for us in the meantime. */
+function resyncWorkoutTimers(){
+  if(wkRunning)wkRenderElapsed();
+  if(floatRest&&floatRest.running){
+    if(floatRestRemaining()<=0)finishFloatRest(); else updateFloatRestUI();
+  }
+}
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')resyncWorkoutTimers()});
+window.addEventListener('pageshow',resyncWorkoutTimers);
 function prescribedCount(rx){const m=(rx||'').match(/^(\d+)\s*x/i);return m?Math.max(1,+m[1]):1}
 function prescribedReps(rx){const m=(rx||'').match(/x\s*(\d+)/i);return m?m[1]:''}
 /* A "time" exercise (a plank, a farmer's-carry hold, a dead hang…) is logged as a duration
